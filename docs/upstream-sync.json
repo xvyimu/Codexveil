@@ -1,0 +1,5 @@
+{
+  "lastSyncedUpstreamSha": "fd6a118",
+  "syncedAt": "2026-07-20T00:00:00Z",
+  "note": "Baseline = upstream main at fork divergence. No assets/PS fixes absorbed since; run scripts/windows/sync-upstream-assets.ps1 to review new upstream changes."
+}
