@@ -55,4 +55,5 @@ powershell -File scripts\windows\publish-runtime.ps1 -RepoRoot D:\orca\codex-ski
 - [`PAIN-POINTS.md`](docs/PAIN-POINTS.md) — 痛点合集与状态
 - [`usage.md`](docs/usage.md) — 使用说明
 - [`dual-open-policy.md`](docs/dual-open-policy.md) — 过渡期双开规则
-- [`adr-0001-merge-product-line.md`](docs/adr-0001-merge-product-line.md) — 产品线合并决策
+- [`adr/`](docs/adr/) — 架构决策记录（0001 产品线合并 · 0002 上游同步 · 0003 单一版本源）
+- [`GLOSSARY.md`](docs/GLOSSARY.md) — 领域术语表

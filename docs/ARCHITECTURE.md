@@ -164,6 +164,7 @@ watch injector 启动
 - `README.md` — 项目入口
 - `CHANGELOG.md` — 版本时间线（合并 12 份 release-*.md）
 - `PAIN-POINTS.md` — 痛点合集
-- `adr-0001-merge-product-line.md` — 产品线合并决策
+- `adr/` — 架构决策记录（0001 合并 · 0002 上游同步 · 0003 单一版本源）
+- `GLOSSARY.md` — 领域术语表
 - `usage.md` — 使用说明
 - `dual-open-policy.md` — 过渡期双开规则
