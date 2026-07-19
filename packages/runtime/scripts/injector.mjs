@@ -12,7 +12,7 @@ const root = path.resolve(here, "..");
 // (`node packages/runtime/scripts/injector.mjs`) resolve to "dev"; publish
 // rewrites the placeholder to the release version in both this file and in
 // versions/<id>/scripts/injector.mjs.
-const SKIN_VERSION_TOKEN = "1.3.16";
+const SKIN_VERSION_TOKEN = "1.3.18";
 const SKIN_VERSION = SKIN_VERSION_TOKEN === "__" + "SKIN_VERSION__" ? "dev" : SKIN_VERSION_TOKEN;
 const MAX_ART_BYTES = 16 * 1024 * 1024;
 const DEFAULT_PAYLOAD_BUDGET_BYTES = 4 * 1024 * 1024;
@@ -344,9 +344,15 @@ async function loadTheme(themeDir) {
   const art = raw.art && typeof raw.art === "object" && !Array.isArray(raw.art) ? raw.art : {};
   const palette = raw.palette && typeof raw.palette === "object" && !Array.isArray(raw.palette)
     ? raw.palette : {};
+  const name = normalizedText(raw.name, "name", "Codex Dream Skin", 120);
   const theme = {
     id: normalizedText(raw.id, "id", "custom", 80),
-    name: normalizedText(raw.name, "name", "Codex Dream Skin", 120),
+    name,
+    // Brand strings feed the heige-style left-top overlay. brandSubtitle falls
+    // back to the theme name so every theme shows at least its name; tagline is
+    // optional (blank -> the headline line is simply not rendered).
+    brandSubtitle: normalizedText(raw.brandSubtitle, "brandSubtitle", name, 80),
+    tagline: normalizedText(raw.tagline, "tagline", "", 160),
     image,
     appearance: normalizedChoice(raw.appearance, "appearance", THEME_CHOICES.appearance, "auto"),
     art: {
@@ -597,14 +603,16 @@ async function loadPayload(themeDir = path.join(root, "assets"), candidateTheme 
     fs.readFile(path.join(root, "assets", "renderer-inject.js"), "utf8"),
     loadThemeCatalog(themeDir, loadedTheme),
   ]);
-  // Catalog is the sole theme channel. Active art is only embedded once, as
-  // catalog[0] (key "active"). Legacy __DREAM_ART__/__DREAM_THEME__ slots stay
-  // as null so older renderers still parse, but new renderers ignore them when
-  // catalog is non-empty.
+  // Active art rides __DREAM_ART_JSON__ as a data URL so the renderer paints the
+  // right-half hero (heige-style). __DREAM_THEME_JSON__ carries the active theme
+  // config (art focus + palette + brand copy) that drives the ::before/::after
+  // brand overlay. Catalog stays the F6 channel (best-effort; may be dropped by
+  // older renderers that only read 3 args).
+  const activeArtDataUrl = imageDataUrl(loadedTheme);
   const payload = template
     .replace("__DREAM_CSS_JSON__", JSON.stringify(css))
-    .replace("__DREAM_ART_JSON__", "null")
-    .replace("__DREAM_THEME_JSON__", "null")
+    .replace("__DREAM_ART_JSON__", JSON.stringify(activeArtDataUrl))
+    .replace("__DREAM_THEME_JSON__", JSON.stringify(loadedTheme.theme))
     .replace("__DREAM_THEME_CATALOG_JSON__", JSON.stringify(themeCatalog.entries));
   const fingerprint = createHash("sha256")
     .update(loadedTheme.fingerprint)
@@ -787,11 +795,13 @@ async function removeFromSession(session) {
       'dream-art-wide', 'dream-art-standard', 'dream-focus-left',
       'dream-focus-center', 'dream-focus-right', 'dream-safe-left',
       'dream-safe-center', 'dream-safe-right', 'dream-safe-none',
-      'dream-task-ambient', 'dream-task-banner', 'dream-task-off'
+      'dream-task-ambient', 'dream-task-banner', 'dream-task-off',
+      'dream-has-art', 'dream-has-brand', 'dream-has-headline'
     );
     for (const property of [
       '--dream-art', '--dream-art-position', '--dream-focus-x', '--dream-focus-y',
-      '--dream-accent', '--dream-accent-ink', '--dream-image-luma'
+      '--dream-accent', '--dream-accent-ink', '--dream-image-luma',
+      '--dream-brand', '--dream-headline'
     ]) document.documentElement?.style.removeProperty(property);
     document.querySelectorAll('.dream-home').forEach((node) => node.classList.remove('dream-home'));
     document.querySelectorAll('.dream-task').forEach((node) => node.classList.remove('dream-task'));

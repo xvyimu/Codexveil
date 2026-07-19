@@ -6,6 +6,17 @@
 
 ---
 
+## 1.3.18 — heige 融合视觉 · 1.3.18-118f81
+**基线**：扩展 1.3.15；把观感改回 heige studio + 原项目那样（右半 hero 图 + 左上品牌字），底部输入区收敛为 heige 单框。（1.3.16 = 单一版本源落地，1.3.17 = 融合视觉首版，均为过渡。）
+
+- **修复断掉的图通道**：injector 之前把 `__DREAM_ART_JSON__` 硬写 `"null"`，renderer 又没读 catalog，导致 `--dream-art` 恒空、根本没背景图。改为把 active 主题 art 以 data URL 经 `__DREAM_ART_JSON__` 回填，`__DREAM_THEME_JSON__` 传完整 theme config。
+- **右半 hero 布局**（heige 风格）：`body::before` 固定层 `right center / cover`，左三分之一渐隐 mask，人物清晰、内容区在左。
+- **左上品牌字**：renderer 把 active 主题 `brandSubtitle`/`tagline` 经 `--dream-brand`/`--dream-headline`（JSON.stringify 保证 CSS 字符串安全）暴露；`body::after` 品牌名（绑 `--dream-accent`）、`#root::after` tagline。空 tagline 不渲染。`dream-has-art/brand/headline` class 控制显隐。
+- **每套主题自己的 accent**：品牌字/描边/高亮绑 `--dream-accent`（miku 蓝绿、火影橙…），不硬套单一配色。
+- **底部输入区改回 heige 单框**：删除 Fei-Away 的 `dream-home-utility` 双层拼框（项目选择栏 `18px 18px 0 0` + composer `0 0 18px 18px`）；composer 恢复单岛 `border-radius: 22px`、0.96 不透明、8px blur、accent 描边；utility 栏透明化（选择器仍可点，不再画成第二个框）。
+- injector loadTheme 加 `brandSubtitle`（兜底=主题名）/`tagline`；cleanup 清理新增 class/var。
+- 验证：doctor OK · verify pass（version 1.3.18）· smoke SMOKE_PASS · kick applied=1/sessions=1 · live 探针确认 hero 图铺上、品牌字生效、accent=主题色、composer 单框 22px/0.96。
+
 ## 1.3.15 — 收敛注入路径 · 1.3.15-4b1f91
 **基线**：扩展 1.3.14。
 

@@ -365,13 +365,15 @@ html.codex-dream-skin.dream-safe-center .dream-home > div:first-child > div:firs
   color: currentColor !important;
 }
 
+/* heige-style single composer island: one rounded box, opaque enough to stay
+   readable over the right-half hero, 8px blur (heige's own perf note). */
 html.codex-dream-skin .composer-surface-chrome {
   color: var(--dream-text) !important;
-  border: 1px solid var(--dream-line) !important;
-  border-radius: 18px !important;
-  background: color-mix(in oklab, var(--dream-surface-raised) 95%, transparent) !important;
-  box-shadow: 0 12px 34px color-mix(in oklab, var(--dream-accent) 8%, transparent) !important;
-  backdrop-filter: blur(14px) saturate(1.06) !important;
+  border: 1px solid color-mix(in oklab, var(--dream-accent) 24%, transparent) !important;
+  border-radius: 22px !important;
+  background: color-mix(in oklab, var(--dream-surface-raised) 92%, var(--dream-accent) 4%) !important;
+  box-shadow: 0 8px 24px color-mix(in oklab, var(--dream-accent) 12%, transparent) !important;
+  backdrop-filter: blur(8px) saturate(1.08) !important;
 }
 
 html.codex-dream-skin .ProseMirror {
@@ -494,37 +496,22 @@ html.codex-dream-skin.dream-art-wide main.main-surface.dream-home-shell
   backdrop-filter: blur(8px) saturate(1.04) !important;
 }
 
-/* The composer owns exactly one solid readability surface. Native bottom
-   gradients are cleared below so the control never appears double stacked. */
-html.codex-dream-skin.dream-art-wide .composer-surface-chrome {
-  color: var(--dream-text) !important;
-  background: var(--dream-immersive-composer) !important;
-  border: 0 !important;
-  box-shadow: 0 10px 30px color-mix(in oklab, var(--dream-canvas) 20%, transparent),
-    inset 0 0 0 1px var(--dream-immersive-line) !important;
-  backdrop-filter: none !important;
-}
-
+/* heige single-island composer in wide mode too: no separate utility bar, no
+   two-piece rounded stack. The base .composer-surface-chrome rule above already
+   styles it; here we only clear the native ::before gradient so it doesn't
+   double-stack. The project picker utility bar is NOT merged into a second box. */
 html.codex-dream-skin.dream-art-wide .composer-surface-chrome::before {
   content: none !important;
 }
 
-/* Current Codex builds render the home project picker in a hashed utility bar.
-   Merge it with the composer so the bottom control reads as one surface. */
+/* Keep the home project-picker utility bar transparent so it does not read as a
+   second stacked box above the composer (heige has no such bar). */
 html.codex-dream-skin .dream-home-utility {
-  border: 1px solid var(--dream-line) !important;
-  border-bottom: 0 !important;
-  border-radius: 18px 18px 0 0 !important;
-  background: var(--dream-immersive-composer) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
   box-shadow: none !important;
-}
-
-html.codex-dream-skin .dream-home:has(.dream-home-utility) .composer-surface-chrome {
-  border-radius: 0 0 18px 18px !important;
-  box-shadow: 0 10px 30px color-mix(in oklab, var(--dream-canvas) 20%, transparent),
-    inset 1px 0 var(--dream-immersive-line),
-    inset -1px 0 var(--dream-immersive-line),
-    inset 0 -1px var(--dream-immersive-line) !important;
+  backdrop-filter: none !important;
 }
 
 /* Plugins, scheduled tasks and search routes ship opaque sticky wrappers.
@@ -630,6 +617,71 @@ html.codex-dream-skin.dream-art-wide main.main-surface
     align-items: center !important;
     text-align: center !important;
   }
+}
+
+/* ===========================================================================
+   heige-style right-half hero + top-left brand overlay (fused visual)
+   - hero image pinned to the right half via a fixed body layer (right center /
+     cover), so the character stays sharp and content lives on the left.
+   - brand + headline sit top-left, colored by the active theme accent.
+   - accent/border/highlight all bind to --dream-accent (per-theme).
+   - blur capped at 8px (heige's own note: large blur repaints every frame).
+   Uses --dream-art (set by renderer from active theme). Hidden when absent.
+   =========================================================================== */
+html.codex-dream-skin body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: var(--dream-art);
+  background-repeat: no-repeat;
+  background-position: var(--dream-art-position, right center);
+  background-size: cover;
+  /* Fade the left third so text/content stays readable over the surface. */
+  -webkit-mask-image: linear-gradient(90deg, transparent 0 30%,
+    oklch(0 0 0 / .55) 46%, oklch(0 0 0 / .95) 70%, oklch(0 0 0) 100%);
+  mask-image: linear-gradient(90deg, transparent 0 30%,
+    oklch(0 0 0 / .55) 46%, oklch(0 0 0 / .95) 70%, oklch(0 0 0) 100%);
+}
+
+/* No image resolved yet — keep the layer hidden (class set by renderer). */
+html.codex-dream-skin:not(.dream-has-art) body::before {
+  display: none;
+}
+
+/* Brand name (top-left). Rendered only when the theme supplies it. */
+html.codex-dream-skin.dream-has-brand body::after {
+  content: var(--dream-brand);
+  position: fixed;
+  z-index: 21;
+  top: 74px;
+  left: max(360px, 22vw);
+  color: var(--dream-accent);
+  font: 800 clamp(15px, 1.9vw, 28px)/1.2 ui-rounded, system-ui, sans-serif;
+  text-shadow: 0 2px 10px color-mix(in oklab, var(--dream-canvas) 82%, transparent);
+  pointer-events: none;
+}
+
+/* Headline / tagline sits just under the brand (on #root::after). */
+html.codex-dream-skin.dream-has-headline #root::after {
+  content: var(--dream-headline);
+  position: fixed;
+  z-index: 21;
+  top: 116px;
+  left: max(360px, 22vw);
+  max-width: 40vw;
+  color: var(--dream-text);
+  font: 700 clamp(17px, 2.4vw, 36px)/1.16 ui-rounded, system-ui, sans-serif;
+  text-shadow: 0 2px 12px color-mix(in oklab, var(--dream-canvas) 80%, transparent);
+  pointer-events: none;
+}
+
+/* Content sits above the hero layer. */
+html.codex-dream-skin #root,
+html.codex-dream-skin main.main-surface {
+  position: relative;
+  z-index: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {

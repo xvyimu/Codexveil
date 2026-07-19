@@ -9,7 +9,7 @@
 
 ## 状态
 
-见 [`docs/CHANGELOG.md`](docs/CHANGELOG.md) 里的里程碑与最新 runtime。当前主线 `1.3.15-4b1f91`。
+见 [`docs/CHANGELOG.md`](docs/CHANGELOG.md) 里的里程碑与最新 runtime。当前主线 `1.3.18-118f81`。
 
 ## 架构
 
