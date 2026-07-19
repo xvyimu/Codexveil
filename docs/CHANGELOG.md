@@ -1,0 +1,130 @@
+# Codex Dream Skin — Changelog
+
+> 由 12 份 `release-1.3.*.md` + `m2-status.md` + `m3-status.md` +
+> `optimization-best-path.md` + `ux-improvements.md` + `all-launchers-skinned.md`
+> 合并；每版一个小节，从新到旧。
+
+---
+
+## 1.3.15 — 收敛注入路径 · 1.3.15-4b1f91
+**基线**：扩展 1.3.14。
+
+- 删除 `packages/legacy-inject/`（原 heige `--once` CDP 旁路 · 4 mjs · 785 LOC）。
+- `cli.mjs` 移除 `--once` / `--force-dual-open` / `--prefer-stored` 分支；`apply` 只保留 hot-active-theme + 控制面 /kick 一条路径。
+- 移除 `status` 里的 `heigeWindows` 字段与 `pause` 里的 heige DOM 兜底清理（reader-side 已无 heige CSS）。
+- 页面注入唯一路径：watch injector；`dreamskin-guard.mjs` 保留为 doctor 诊断，不再做 dual-open 拦截。
+- 上游 renderer-inject.js 兼容：`artDataUrl=null`（catalog 通道）时不炸。
+- `SKIN_VERSION` / renderer `dreamVersion` / `installed:true version:` 三处统一为 `1.3.15`。
+- 验证：`doctor` OK · `apply` mode=hot-active-theme · smoke SMOKE_PASS · post-update 8/8 PASS。
+
+## 1.3.14 — repo 架构重构 · 1.3.14-198361
+**基线**：扩展 1.3.13；无功能变更，只做 repo 层清理与拆包。
+
+- 删除 17 份一次性 fix 脚本（`scripts/windows/_*.py` `_*.out` `_verify-136.ps1` `_trace-switch.ps1`）与遗留 `.bak`。
+- 删除空目录 `apps/tray/` 与无引用的 `vendor/heige/`（2 文件）。
+- 25 份 docs 合并为 6 份：`ARCHITECTURE.md` · `CHANGELOG.md` · `PAIN-POINTS.md` · `usage.md` · `dual-open-policy.md` · `adr-0001-merge-product-line.md`。
+- `packages/inject/` 改名 `packages/legacy-inject/`（明示"heige 遗留 · 仅 --once 调试"）；cli.mjs import 路径同步。
+- `packages/core/` 按子目录归拢：
+  - `cdp/` — cdp-client · cdp-helpers · cdp-port · cdp-session · cdp-targets
+  - `discover/` — codex-app · path-utils · process-win
+  - `state/` — dreamskin-guard · kick-inject · state-freshness
+- 补 `packages/core-win/README.md` 与 `packages/runtime/README.md`，说明包边界与命名规约。
+- `SKIN_VERSION` 与 renderer `dreamVersion` 对齐到 `1.3.14`。
+- 验证：doctor OK · list 11 · kick 200/2ms · publish 后 check-and-fix exit=0。
+
+## 1.3.13 — deeper freeze / jank mitigation · 1.3.13-f4bf1a
+**基线**：扩展 1.3.12。
+
+- 更严格的会话页玻璃退让：在 chat 检测到高频 mutation 时短暂停 backdrop-filter。
+- watch injector 增加 payload 变更节流，避免相同指纹重复 evaluate。
+- 冻结应急路径：托盘「暂停皮肤 30s + kick」双击可救。
+- 验证：ChatGPT 进程 `Responding=True`，smoke **PASS**。
+
+## 1.3.12 — freeze / jank fix · 1.3.12-0f7c2f
+- 症状：会话切换/连击后 Codex 会短暂 UI 冻结。
+- 根因：CSS mutation observer 触发无限重试 apply，叠加 backdrop-filter 卡帧。
+- 修：observer 节流 400ms · CSS 移除高开销 backdrop（header）· 缩小选择器覆盖面。
+- 应急：暂停皮肤 30s → 状态恢复后 kick。
+
+## 1.3.11 — controlPort / fix timeout / report freshness / version align · 1.3.11-c83c04
+- `state.controlPort` 正确写入并保留（normalize 不再覆盖）。
+- `check-and-fix` CDP 短重试 + 硬超时（≤15s）。
+- publish 后自动跑 quiet post-update 更新报告。
+- SKIN_VERSION / renderer version 对齐 install version。
+- 遗留：会话页 probe（需手动进对话）· 原生 focus helper · post-update publish race。
+
+## 1.3.10 — focus hard-fix from deep UX scan · 1.3.10-*
+- 根因：PS 5.1 `Add-Type` C# 不支持 discard `out _`，`Focus-CodexSkinWindow` 编译失败，EnumWindows 整条链废。
+- 修：命名 out 变量 · 进程评分优先 `Chrome_WidgetWin_1` + Codex/ChatGPT 标题。
+- 部署：`lib\launcher-ui.ps1` 同步 install。
+
+## 1.3.9 — UX iteration (focus / bare / tip / DOM probe) · 1.3.9-c08338
+- **A · Focus**：EnumWindows 主路径 + AppActivate fallback。
+- **B · Bare Codex**：托盘首项「★ 用皮肤重启 Codex」，气泡多行 + 明确路径。
+- **C · Cold-start tip**：phase 状态机（start / slow-path / shell-wait / launch-cdp / inject-start / healthy-focus / control-hit / ready / focus-miss / bare-codex / failed / first-run / user-feedback），≥8s 追加"仍在等待"。
+- **D · DOM probe**：新增 `scripts/windows/probe-session-dom.mjs`（首页 + 会话）。
+
+## 1.3.7 — session selectors + F6 thumb coverage · 1.3.7-509f0a
+- N09 自适应会话选择器（composer / user / assistant / approval 各支持多种候选）。
+- Shell 判定放宽：composer **或** sidebar **或** main 存在即可。
+- F6 缩略图覆盖：`thumb.mjs` 全套主题预生成，payload 减重。
+
+## 1.3.6 — T1–T3 UX (focus / bare poll / Chinese feedback / tray) · 1.3.6-58b376
+- 焦点用户手势链路 + bare Codex 轮询发现 + 中文反馈气泡 + 托盘条目重排。
+- 已知：VBS 保持 ASCII；中文 UI 走 PS feedback helper。
+
+## 1.3.5 — UX visibility & recovery (S1–S3) · 1.3.5-6920f6
+- 建立控制面 `/health` `/kick` `/focus` `/open-healthy` 快路径。
+- 气泡节流 45–60s（避免连点刷屏）。
+
+## 1.3.4 — hard-bottleneck fixes · 1.3.4-db4479
+- payload 减重：catalog 只嵌缩略图，active 才全图。
+- thumb 生成链：Pillow → ImageMagick → System.Drawing（有则用，无跳过）。
+- 遗留：后台 helper focus 仍受 Windows 前台规则限制；WebP 全 thumbs 需 magick。
+
+## 1.3.3 — pain-point fixes · 1.3.3-554d87
+- `cli list` 去重（bundled + user store 合并计数）。
+- `kick-theme-now` 面板直接调 node（去掉中间 PS）。
+- `versions/` GC：保留 current + 上一版。
+
+## 1.3.2 — Codex Store update compatibility · 1.3.2-9a68fa
+- 目标：Store 侧 Codex/ChatGPT 更新后无需重装皮肤。
+- adaptive wait-shell 复制到 `stateRoot`。
+- `post-update-regression.ps1` / `kick-theme-now.ps1` 落地到 programRoot。
+- 已知限制：Store 磁贴 / AUMID / 第三方 Codex-X launcher 仍可能裸启。
+
+## 1.3.1 — 模块化发布 · 1.3.1-5293ef
+- PowerShell 共享库 `launcher-ui.ps1` 落地 + apps/launcher 全部薄化。
+- Node 核心拆分：core / themes / inject / runtime 四包，每包 `index.mjs` 出口。
+- 安装布局：`programRoot\lib\` 存放共享库；publish 同步 lib + 入口脚本。
+- 验证：ParseFile 全部 PARSE_OK · doctor OK · apply hot-active-theme OK。
+
+---
+
+## 里程碑历史（合并 m2/m3 状态）
+
+| 里程碑 | runtime | 说明 |
+|---|---|---|
+| M0 停双开 | — | dreamskin-guard 检测 DreamSkin，拒绝 heige studio 二次启动 |
+| M1 建仓 + 迁内核 | — | heige + DreamSkin 合并进单仓 |
+| M2 多主题接入守护 | 1.3.0 | active-theme 热切换验证通过 |
+| M3 托盘 / F6 / 归档 / 回归 | 1.3.0 | SMOKE_PASS + POST_UPDATE_PASS |
+| 模块化 + 安静启动 | 1.3.1 | launcher-ui + 包 index 出口 |
+| runtime 1.3.2 – 1.3.13 | 见上 | 详见各版 |
+
+---
+
+## UX 改进类（原 ux-improvements / optimization-best-path 摘要）
+
+- 快捷方式全部皮肤化（wscript 静默启动），Codex / ChatGPT / 换肤 / 修复 / 管理 5 条入口。
+- 换肤面板 200ms debounce + optimistic UI 高亮。
+- 控制面 `/kick` 45ms 主路径；spawn 是 fallback。
+- 托盘条目：暂停皮肤 · 换肤… · 保存主题 · 修复 · 帮助（保存主题在锁定态不可用）。
+
+---
+
+## 参考
+
+- 痛点合集：`PAIN-POINTS.md`
+- 架构：`ARCHITECTURE.md`
+- 使用：`usage.md`

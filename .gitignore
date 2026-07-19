@@ -1,0 +1,20 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Local build / runtime scratch
+_*.out
+_*.err
+*.log
+*.bak
+*.bak-*
+
+# Never commit install-side state (lives in %LOCALAPPDATA%)
+current.json.bak-*

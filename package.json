@@ -1,0 +1,19 @@
+{
+  "name": "codex-skin",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Unified Codex Desktop skin product line: DreamSkin launch/guard + multi-theme engine",
+  "bin": {
+    "codex-skin": "packages/core/cli.mjs"
+  },
+  "scripts": {
+    "doctor": "node packages/core/cli.mjs doctor",
+    "list": "node packages/core/cli.mjs list",
+    "status": "node packages/core/cli.mjs status",
+    "help": "node packages/core/cli.mjs help"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "miku-488137",
+  "name": "Miku 晶透浅色 2.0",
+  "hero": "hero.webp",
+  "logo": "logo.webp",
+  "polaroid": "polaroid.webp",
+  "colors": {
+    "accent": "#087f95",
+    "secondary": "#7a315f",
+    "surface": "#f5f7fa",
+    "text": "#172a4d"
+  }
+}
