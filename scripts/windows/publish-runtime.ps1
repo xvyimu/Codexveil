@@ -270,20 +270,100 @@ if (-not $SkipImportThemes) {
   }
 }
 
-# Refresh post-update report so advanced tools don't show a stale runtime.
+# Refresh post-update report (G5-C): hard timeout so Quiet -Repair cannot hang publish forever.
+# On timeout/failure → soft reattach (same intent as Install-Product.ps1).
+function Invoke-CodexSkinSoftReattach {
+  param(
+    [Parameter(Mandatory = $true)][string]$RuntimeRoot,
+    [Parameter(Mandatory = $true)][string]$RuntimeId,
+    [Parameter(Mandatory = $true)][string]$StateRoot
+  )
+  $nodeCmd = $null
+  try { $nodeCmd = (Get-Command node -ErrorAction Stop).Source } catch {}
+  $injPath = Join-Path $RuntimeRoot "scripts\injector.mjs"
+  if (-not $nodeCmd -or -not (Test-Path -LiteralPath $injPath)) {
+    Write-Warning "soft reattach skipped: node or injector missing"
+    return $false
+  }
+  $browserId = $null
+  $statePath = Join-Path $StateRoot "state.json"
+  if (Test-Path -LiteralPath $statePath) {
+    try {
+      $st = Get-Content -LiteralPath $statePath -Raw -Encoding UTF8 | ConvertFrom-Json
+      if ($st.browserId) { $browserId = [string]$st.browserId }
+    } catch {}
+  }
+  $oldInjectors = @(
+    Get-CimInstance Win32_Process -Filter "Name='node.exe'" -ErrorAction SilentlyContinue |
+      Where-Object { $_.CommandLine -and ($_.CommandLine -match 'CodexDreamSkin\\versions\\.*injector\.mjs') }
+  )
+  $hadInjector = $oldInjectors.Count -gt 0
+  foreach ($proc in $oldInjectors) {
+    try {
+      Write-Host "Stopping old injector PID $($proc.ProcessId)"
+      Stop-Process -Id $proc.ProcessId -Force -ErrorAction SilentlyContinue
+    } catch {}
+  }
+  if (-not ($hadInjector -or $browserId)) {
+    Write-Host "soft reattach: no live injector/browserId — click taskbar Codex after publish"
+    return $false
+  }
+  $argList = @($injPath, "--watch", "--port", "9335")
+  if ($browserId) { $argList += @("--browser-id", $browserId) }
+  Write-Host "soft reattach: starting watch injector on $RuntimeId..."
+  $started = Start-Process -FilePath $nodeCmd -ArgumentList $argList -WindowStyle Hidden -PassThru
+  Start-Sleep -Milliseconds 800
+  if ($started -and -not $started.HasExited -and (Test-Path -LiteralPath $statePath)) {
+    try {
+      $st2 = Get-Content -LiteralPath $statePath -Raw -Encoding UTF8 | ConvertFrom-Json
+      $st2 | Add-Member -NotePropertyName injectorPid -NotePropertyValue $started.Id -Force
+      $st2 | Add-Member -NotePropertyName injectorPath -NotePropertyValue $injPath -Force
+      $st2 | Add-Member -NotePropertyName runtimeId -NotePropertyValue $RuntimeId -Force
+      $st2 | Add-Member -NotePropertyName updatedAt -NotePropertyValue ((Get-Date).ToUniversalTime().ToString("o")) -Force
+      $json = ($st2 | ConvertTo-Json -Depth 8) + "`n"
+      [System.IO.File]::WriteAllText($statePath, $json, [System.Text.UTF8Encoding]::new($false))
+      Write-Host "soft reattach: injector PID=$($started.Id)"
+      return $true
+    } catch {
+      Write-Warning ("soft reattach state patch: " + $_.Exception.Message)
+    }
+  }
+  return $false
+}
+
 try {
   $post = Join-Path $programRoot 'post-update-regression.ps1'
   if (Test-Path -LiteralPath $post) {
-    Write-Host "Refreshing post-update report (Quiet)..."
-    # -Repair so post-update reattaches watch injector onto the just-published
-    # runtime (otherwise smoke verifies with a stale injector from previous version).
+    $postTimeoutSec = 60
+    Write-Host "Refreshing post-update report (Quiet, timeout ${postTimeoutSec}s)..."
+    # -Repair reattaches onto the just-published runtime; bounded wait avoids hang (G5).
     $pPost = Start-Process -FilePath 'powershell.exe' -ArgumentList @(
       '-NoProfile','-ExecutionPolicy','Bypass','-File',$post,'-Quiet','-Repair'
-    ) -Wait -PassThru -WindowStyle Hidden
-    Write-Host ("post-update exit=" + $pPost.ExitCode)
+    ) -PassThru -WindowStyle Hidden
+    $finished = $pPost.WaitForExit($postTimeoutSec * 1000)
+    if (-not $finished) {
+      Write-Warning "post-update timed out after ${postTimeoutSec}s — killing child and soft-reattaching"
+      try {
+        # Kill process tree when possible (Windows).
+        Stop-Process -Id $pPost.Id -Force -ErrorAction SilentlyContinue
+        Get-CimInstance Win32_Process -Filter "ParentProcessId=$($pPost.Id)" -ErrorAction SilentlyContinue |
+          ForEach-Object { try { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue } catch {} }
+      } catch {}
+      [void](Invoke-CodexSkinSoftReattach -RuntimeRoot $dest -RuntimeId $runtimeId -StateRoot $stateRoot)
+    } elseif ($pPost.ExitCode -ne 0) {
+      Write-Warning ("post-update exit=" + $pPost.ExitCode + " — soft reattach fallback")
+      [void](Invoke-CodexSkinSoftReattach -RuntimeRoot $dest -RuntimeId $runtimeId -StateRoot $stateRoot)
+    } else {
+      Write-Host ("post-update exit=" + $pPost.ExitCode)
+    }
   }
 } catch {
   Write-Warning ("post-update refresh: " + $_.Exception.Message)
+  try {
+    [void](Invoke-CodexSkinSoftReattach -RuntimeRoot $dest -RuntimeId $runtimeId -StateRoot $stateRoot)
+  } catch {
+    Write-Warning ("soft reattach after post-update error: " + $_.Exception.Message)
+  }
 }
 
 # Mark report with published runtime stamp even if post-update is partial.

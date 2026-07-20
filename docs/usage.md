@@ -29,16 +29,19 @@
 
 重复的「Codex Skin」入口、旧「Codex Skin 高级」文件夹、散落的「管理 / 更新回归」会在 `install-ux-shortcuts.ps1` 里清掉。
 
-### 不要用微软商店磁贴开 Codex（PAIN #21）
+### 不要用微软商店磁贴开 Codex（PAIN #21 · 不是 bug）
 
-商店磁贴 / 包 AUMID（`OpenAI.Codex_...!App`）走 **package activation**，**无法**被本产品改写成带 CDP 的入口——这是 Windows 硬限，不是 bug。
+商店磁贴 / 包 AUMID（`OpenAI.Codex_...!App`）走 **package activation**，**无法**被本产品改写成带 CDP 的入口——这是 **Windows OS 硬限**。  
+本产品**不会**、也**不能**劫持商店包身份。若你点了商店磁贴出现「无皮肤」，请改用任务栏钉，不要重装皮肤。
 
 | 场景 | 结果 | 正确做法 |
 |------|------|----------|
-| 任务栏钉着 **Codex**（我们的 lnk → FastLaunch） | 有皮肤 | 继续用 |
+| 任务栏钉着 **Codex**（我们的 lnk → FastLaunch） | 有皮肤 | **只认这个** |
 | 开始菜单 / 桌面 **Codex** | 有皮肤 | 继续用 |
 | **微软商店** 磁贴 /「最近添加的应用」里的 Codex | **裸启、无皮肤** | 忽略该磁贴；用任务栏钉 |
 | 开机自启 | 有皮肤（Startup 已指向 FastLaunch） | 保持 |
+
+若已经裸启：再点一次任务栏 **Codex**（会安静 reattach / 必要时带 CDP 重启），或 **Codex 工具 → 皮肤修复**。
 
 打开 Codex 时会自动（**默认不弹窗**）：
 1. 启用 CDP 调试端口 9335  

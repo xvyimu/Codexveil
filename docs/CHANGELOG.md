@@ -33,6 +33,14 @@
 - **runtimeId**：内容哈希 6 位（injector+renderer+VERSION），同包可复现。
 - 验收：Install exit 0 · doctor fresh · package CLI apply · STRUCTURAL_PASS。
 
+### 残差加固（G1-B / G3-A / G4-A / G5-C · 规划落地）
+
+- **G1-B CI**：`.github/workflows/themes-gate.yml` 在 push/PR 跑 `npm run test:themes`（轻量；**不是**云端 doctor）。
+- **G3-A**：文档钉死 **Windows only**；macOS 永久非目标。
+- **G4-A**：#21 预期管理加强（usage / dual-open：不劫持商店 AUMID；成功标准=会用任务栏钉）。
+- **G5-C**：`publish-runtime.ps1` 对 `post-update -Quiet -Repair` **60s 硬超时**；超时/非零退出 → 与 Install 同语义的 **soft reattach** fallback。
+- 规划全文：`docs/plans/residual-g1-g3-g4-g5-2026-07-20.md`。
+
 ## 1.3.24 — wait-shell cold-start + tray native focus + UTF-8 console
 
 - **wait-shell.mjs**: reuse CDP WebSocket across polls; adaptive 120–500ms backoff; default deadline 45s (was 90s hard); structural pass without requiring sidebar. Ready-session bench ~76ms.

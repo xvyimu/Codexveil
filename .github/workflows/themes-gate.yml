@@ -1,0 +1,25 @@
+# G1-B: light CI gate — theme schema only (no Codex/CDP/Windows install state).
+# Full doctor/smoke remain local. See docs/plans/residual-g1-g3-g4-g5-2026-07-20.md
+name: themes-gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  themes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Theme schema dual-format gate
+        run: npm run test:themes

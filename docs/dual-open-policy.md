@@ -49,8 +49,9 @@
 微软商店包激活走 `OpenAI.Codex_…!App` AUMID，**不能**被第三方改写 Target。
 
 - FastLaunch 使用独立 AUMID `CodexDreamSkin.FastLaunch`，避免任务栏把我们的钉归组回商店包  
-- 无法阻止用户点商店磁贴本身  
+- 无法阻止用户点商店磁贴本身；**产品不提供、也不尝试 AUMID 劫持**  
 - 文档与 `usage.md` 明确：**日常只用任务栏钉 / 开始菜单 Codex**  
+- 成功标准是「用户知道用哪颗钉」，**不是**「商店磁贴也有皮肤」（不可达）
 
 缓解（已做）：
 

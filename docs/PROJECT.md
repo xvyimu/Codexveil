@@ -48,11 +48,11 @@
 | 做 | 不做 |
 |----|------|
 | 一条 injector 常驻守护（watch） | 修改 Codex `.asar` / 安装包 |
-| CDP 注入 CSS/JS（默认端口 9335） | 跨平台 macOS 主路径（上游有，本 fork 聚焦 Windows） |
-| 多主题 catalog + F6 / 托盘 / CLI 切换 | 商店磁贴/AUMID 裸启拦截（OS 限制） |
+| CDP 注入 CSS/JS（默认端口 9335） | **macOS / 跨平台主路径**（永久非目标；上游有，本 fork **Windows only**） |
+| 多主题 catalog + F6 / 托盘 / CLI 切换 | 商店磁贴/AUMID 裸启拦截（OS 限制 · #21） |
 | 控制面 `/kick` 毫秒级热应用 | 多 injector 并行 |
 | publish 自包含 `versions/<id>/` | 自动 merge 上游（结构已分叉） |
-| doctor / smoke / verify 可验证 | 把 UI 皮肤逻辑塞进 `packages/core` |
+| doctor / smoke / verify · CI `test:themes` | 把 UI 皮肤逻辑塞进 `packages/core` |
 
 ### 1.3 用户与入口
 
@@ -419,7 +419,7 @@ powershell -File scripts\windows\sync-upstream-assets.ps1
 | 改动类型 | 最低验证 |
 |----------|----------|
 | 文档 only | 链接有效、术语与 GLOSSARY 一致 |
-| 主题资源 | `list` 含 id · `apply` 不炸 · `npm run test:themes` |
+| 主题资源 | `list` 含 id · `apply` 不炸 · `npm run test:themes` · **CI themes-gate** |
 | core / themes 逻辑 | `doctor` + 相关 cli 子命令 · `npm run test:themes` |
 | runtime / CSS / renderer | `publish` + smoke +（有条件）verify / live probe |
 | launcher / core-win | open 路径手动或 check-and-fix exit 0 |
@@ -497,8 +497,8 @@ paused/locked: false（正常使用时）
 | ~~P2~~ | ~~控制台 GBK 乱码~~ | — | **已完成** · UTF-8 入口 |
 | ~~P2~~ | ~~修复/回归工具快捷方式 UX（#18）~~ | — | **已完成** · install-ux 唯一源 + Codex 工具文件夹 |
 | ~~P2~~ | ~~清理 heige studio 残留（#20）~~ | — | **已完成** · 扫删 lnk + 文档；本机无独立目录 |
-| 已知限 | Store AUMID / 商店磁贴裸启（#21） | OS | **已文档化** · usage + dual-open-policy；日常钉任务栏 |
-| 规划 | 残差 G1 CI / G3 mac / G4 #21 / G5 Quiet | docs/plans | **方案已定** · 见 residual 规划；实现待确认（推荐 G1-B + G5-C） |
+| 已知限 | Store AUMID / 商店磁贴裸启（#21） | OS | **已文档化** · usage + dual-open；日常钉任务栏；**不**劫持包 AUMID |
+| ~~规划~~ | ~~残差 G1/G3/G4/G5~~ | docs/plans | **已实现推荐组合** · G1-B CI · G3-A Windows-only · G4-A 文档 · G5-C publish 超时 |
 | ~~文档~~ | ~~CHANGELOG unreleased 并入正式版号~~ | — | **已完成** · 记入 1.3.25 |
 
 ### 12.3 明确不在范围
@@ -506,7 +506,9 @@ paused/locked: false（正常使用时）
 - 修改 OpenAI 签名包  
 - 在 core 内实现 UI 皮肤  
 - 自动无审 promote 上游 CSS  
-- macOS 一等公民支持（除非单独立项）
+- macOS 一等公民支持（**永久非目标**，见 residual 规划 G3-A）
+- 劫持 / 改写微软商店 Codex 包 AUMID（#21 OS 硬限）
+- 云端 CI 跑完整 doctor/smoke（无 Store Codex/CDP；仅 `test:themes`）
 
 ---
 

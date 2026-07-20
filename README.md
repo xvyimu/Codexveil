@@ -1,11 +1,13 @@
 # codex-skin
 
-统一 Codex Desktop 换肤产品线。
+统一 Codex Desktop 换肤产品线（**Windows only**）。
 
 - **日常入口（安装态）**：开始菜单 / 任务栏 **Codex**（走 `%LOCALAPPDATA%\Programs\CodexDreamSkin`）
 - **开发仓（本仓库）**：`D:\orca\codex-skin`
 - **默认 CDP**：`9335`
 - **原则**：只允许一条 injector；DreamSkin 级守护 + heige 级多主题
+- **平台**：Windows 10/11 + OpenAI Codex（Store）。**不做 macOS** 一等公民支持（见 PROJECT §1.2）
+- **入口纪律**：请用任务栏 **Codex** 钉，**不要**用微软商店磁贴开 Codex（OS 硬限，裸启无皮肤 · PAIN #21）
 
 ## 状态
 
@@ -19,7 +21,10 @@
 | `packages/runtime` `SKIN_VERSION_TOKEN` | 由 `publish-runtime.ps1 -Version` 写入（ADR 0003 唯一写回 git） |
 | 安装态 `current.json` / `runtimeId` | 本机当前引擎，如 `1.3.25-d14cf4` |
 
-全面检查：[`docs/AUDIT-2026-07-20.md`](docs/AUDIT-2026-07-20.md)。
+全面检查：[`docs/AUDIT-2026-07-20.md`](docs/AUDIT-2026-07-20.md)。  
+残差规划（G1 CI / G3 mac / G4 #21 / G5 Quiet）：[`docs/plans/residual-g1-g3-g4-g5-2026-07-20.md`](docs/plans/residual-g1-g3-g4-g5-2026-07-20.md)。
+
+**CI**：GitHub Actions `themes-gate` 在 push/PR 跑 `npm run test:themes`（**不等于**本机 `doctor`/smoke；完整诊断仍在 Windows 安装态）。
 
 ## 产品包（终端用户）
 
