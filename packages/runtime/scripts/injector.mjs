@@ -1,3 +1,14 @@
+// === TOC (approximate line anchors; search // === Region: ) ===
+// 1. Constants / version token                         ~L40+
+// 2. parseArgs (--theme-dir, --state-root, modes)      Region: ParseArgs
+// 3. CDP session / identity / targets                  Region: CdpSession
+// 4. Theme load / catalog / payload budget             Region: ThemeLoad
+// 5. Apply / verify / one-shot                         Region: Apply
+// 6. Watch main loop + signals                         Region: Watch
+// 7. Control-plane startup                             Region: ControlPlane
+// 8. CLI entry (self-test / check-payload / watch)     Region: Main
+// Single-file daemon by design (ADR 0001); do not split without publish copy list.
+
 import fs from "node:fs/promises";
 import { createHash } from "node:crypto";
 import path from "node:path";
@@ -12,6 +23,8 @@ const root = path.resolve(here, "..");
 // (`node packages/runtime/scripts/injector.mjs`) resolve to "dev"; publish
 // rewrites the placeholder to the release version in both this file and in
 // versions/<id>/scripts/injector.mjs.
+// Note: after publish-runtime.ps1 -Version X, the repo source is also stamped
+// (e.g. "1.3.25"); SKIN_VERSION === "dev" only on unpublished working copies.
 const SKIN_VERSION_TOKEN = "1.3.25";
 const SKIN_VERSION = SKIN_VERSION_TOKEN === "__" + "SKIN_VERSION__" ? "dev" : SKIN_VERSION_TOKEN;
 const MAX_ART_BYTES = 16 * 1024 * 1024;
@@ -28,6 +41,7 @@ const BROWSER_ID_PATTERN = /^[A-Za-z0-9._-]{1,200}$/;
 
 class CdpIdentityMismatchError extends Error {}
 
+// === Region: ParseArgs ===
 function parseArgs(argv) {
   const options = {
     port: 9335,
@@ -106,6 +120,7 @@ function isValidCdpPageTarget(item, port) {
   }
 }
 
+// === Region: CdpSession ===
 class CdpSession {
   constructor(target, port) {
     this.target = target;
@@ -321,6 +336,7 @@ function normalizedText(value, name, fallback, maxLength = 120) {
   return value;
 }
 
+// === Region: ThemeLoad ===
 async function loadTheme(themeDir) {
   const realThemeDir = await fs.realpath(themeDir);
   const themePath = path.join(realThemeDir, "theme.json");
@@ -732,6 +748,7 @@ async function connectCodexTargets(port, timeoutMs, expectedBrowserId) {
   throw new Error(`No verified Codex renderer on 127.0.0.1:${port}: ${lastError?.message ?? "timed out"}`);
 }
 
+// === Region: Apply ===
 async function applyToSession(session, payload) {
   return session.evaluate(payload);
 }
@@ -1032,6 +1049,7 @@ async function runOneShot(options) {
   if (failed) process.exitCode = 2;
 }
 
+// === Region: Watch ===
 async function runWatch(options) {
   const identityAnchor = await connectBrowserIdentityAnchor(options.port, options.browserId);
   const sessions = new Map();
@@ -1126,6 +1144,7 @@ async function runWatch(options) {
     lastStrongThemeAuditAt = Date.now();
     paused = await fileExists(options.pauseFile);
 
+    // === Region: ControlPlane ===
     // Control plane: zero extra long-lived process; serves open/kick/focus.
     try {
       const { startControlPlane, focusViaPowerShell } = await import("./control-plane.mjs");
@@ -1393,6 +1412,7 @@ async function runWatch(options) {
   }
 }
 
+// === Region: Main ===
 if (path.resolve(process.argv[1] || "") === path.resolve(scriptPath)) {
   const options = parseArgs(process.argv.slice(2));
   if (options.mode === "self-test") {

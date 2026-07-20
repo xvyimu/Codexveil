@@ -3,7 +3,8 @@ import { copyFile, mkdir, readFile, readdir, rename, rm, stat, writeFile } from 
 import { basename, extname, join } from "node:path";
 
 const IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp"]);
-// 单张源图上限：base64 后要内联进一条 CDP Runtime.evaluate，过大易触发 5 秒命令超时
+// 导入/建主题源图上限 8MB（UX + 避免 CDP 命令超时）。
+// 与 injector MAX_ART_BYTES=16MB（已装 art 硬顶）不同：此处卡「入库前」体积。
 const MAX_SOURCE_IMAGE_BYTES = 8 * 1024 * 1024;
 
 function slugify(value) {
@@ -67,8 +68,13 @@ export async function createSingleImageTheme({ imagePath, name, storeRoot, color
 
 /**
  * List themes across roots with optional de-duplication.
- * When the same id appears in multiple roots (e.g. bundled + user store),
- * later roots win (user store should be listed after bundled).
+ *
+ * Dedupe 策略（dedupe=true，默认）：
+ * - 同 id 在多个 roots 出现时，**后遍历的 root 覆盖前者**（Map.set）。
+ * - 调用方应把 user store root 放在 bundled 之后，使 user 覆盖 bundled。
+ * - source 标签：preferRoot 命中 → user；路径匹配 CodexDreamSkin/themes → user；
+ *   否则尾段 themes → bundled；其余 other（路径正则仅为 fallback）。
+ * 形状守卫：缺 string id/name 的 manifest 直接跳过，避免 sort 对 undefined 崩。
  *
  * @param {{ roots: string[], preferRoot?: string, dedupe?: boolean }} opts
  */

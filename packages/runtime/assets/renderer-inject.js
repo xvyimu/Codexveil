@@ -3,7 +3,10 @@
   const STYLE_ID = "codex-dream-skin-style";
   // Single version source: publish-runtime.ps1 rewrites __SKIN_VERSION__ in
   // both this file (repo copy) and versions/<id>/assets/renderer-inject.js.
-  // If the token is still literal, we're running from an unpublished repo.
+  // If the token is still literal "__SKIN_VERSION__", we're on an unpublished
+  // working copy and SKIN_VERSION resolves to "dev".
+  // Note: after publish-runtime.ps1 -Version X, the repo source is also stamped
+  // (e.g. "1.3.25"); dev detection only fires before that stamp.
   const SKIN_VERSION_TOKEN = "1.3.25";
   const SKIN_VERSION = SKIN_VERSION_TOKEN === "__" + "SKIN_VERSION__" ? "dev" : SKIN_VERSION_TOKEN;
   const CHROME_ID = "codex-dream-skin-chrome";

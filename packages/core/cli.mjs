@@ -248,6 +248,11 @@ export async function runCli(argv, overrides = {}) {
       cdpPort: runtime.activePort ?? requestedPort,
       requestedPort,
       ...runtime,
+      // Top-level control summary (extracted; dreamSkin retains full fields).
+      control: {
+        port: dreamSkin.controlPort ?? null,
+        tokenPresent: Boolean(dreamSkin.controlTokenPresent),
+      },
       dreamSkin,
       themeCount: themes.length,
       userThemeCount,
