@@ -35,6 +35,7 @@
 | [`CONTRIBUTING.md`](./CONTRIBUTING.md) | PR 必答 7 问 · 8 类规范 · 禁止事项速查表 |
 | [`plans/task-cards-2026-07-21.md`](./plans/task-cards-2026-07-21.md) | 维护任务卡（P1–P3） |
 | [`prompts/agent-maintain-task-cards-zh.md`](./prompts/agent-maintain-task-cards-zh.md) | 维护 Agent 可粘贴提示词 |
+| [`research/2026-07-21-peer-landscape-and-architecture.md`](./research/2026-07-21-peer-landscape-and-architecture.md) | 同类项目对照 · 技术债 · 架构优化调研（长文） |
 | [`adr/`](./adr/) | 架构决策（0001 合并 · 0002 上游 · 0003 版本源） |
 | 根目录 `CLAUDE.md` | Agent 短索引 |
 
