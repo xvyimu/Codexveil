@@ -31,9 +31,12 @@ npm run test:store
 npm run test:adapter
 npm run test:deps
 npm run test:freshness
-npm test                  # themes + store + adapter + deps + freshness
+npm run test:cdp-url
+npm test                  # themes + store + adapter + deps + freshness + cdp-url
 npm run test:control      # 本机 loopback；不进 CI
+npm run probe:session     # live CDP DOM probe；不进 npm test
 # node packages/core/cli.mjs <cmd>
+# pwsh -NoProfile -File scripts/windows/write-baseline.ps1
 ```
 
 启动/发布脚本用 **pwsh**（`apps/launcher/*.ps1`、`publish-runtime.ps1`）。  

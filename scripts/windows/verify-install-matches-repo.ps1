@@ -97,6 +97,7 @@ try {
   # Files that must byte-match after a correct publish (control-plane is not version-stamped).
   $exactPairs = @(
     @{ Rel = "scripts\control-plane.mjs"; Required = $true },
+    @{ Rel = "scripts\cdp-url-guard.mjs"; Required = $true },
     @{ Rel = "scripts\wait-shell.mjs"; Required = $false },
     @{ Rel = "scripts\thumb.mjs"; Required = $false },
     @{ Rel = "scripts\image-metadata.mjs"; Required = $false },

@@ -14,6 +14,7 @@ import { createHash } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { readImageMetadata } from "./image-metadata.mjs";
+import { validatedDebuggerUrl } from "./cdp-url-guard.mjs";
 
 const scriptPath = fileURLToPath(import.meta.url);
 const here = path.dirname(scriptPath);
@@ -36,7 +37,6 @@ const MAX_THEME_CATALOG_BYTES = 1.6 * 1024 * 1024;
 const MAX_CATALOG_MEMBER_BYTES = 96 * 1024;
 // Strong audit less often: catalog stamp checks already cover normal switches.
 const STRONG_THEME_AUDIT_MS = 60000;
-const LOOPBACK_HOSTS = new Set(["127.0.0.1", "localhost", "[::1]", "::1"]);
 const BROWSER_ID_PATTERN = /^[A-Za-z0-9._-]{1,200}$/;
 
 class CdpIdentityMismatchError extends Error {}
@@ -87,16 +87,6 @@ function parseArgs(argv) {
     throw new Error(`--browser-id is required in ${options.mode} mode`);
   }
   return options;
-}
-
-function validatedDebuggerUrl(target, port) {
-  const url = new URL(target.webSocketDebuggerUrl);
-  const pathIsValid = /^\/devtools\/(?:page|browser)\/[A-Za-z0-9._-]{1,200}$/.test(url.pathname);
-  if (url.protocol !== "ws:" || !LOOPBACK_HOSTS.has(url.hostname) || Number(url.port) !== port ||
-      url.username || url.password || url.search || url.hash || !pathIsValid) {
-    throw new Error("Rejected a CDP WebSocket URL outside the allowed loopback endpoint shape");
-  }
-  return url.href;
 }
 
 function browserIdFromVersion(version, port) {

@@ -86,7 +86,8 @@ pwsh -NoProfile -File scripts\windows\verify-install-matches-repo.ps1 -RepoRoot 
 - exit `2`：本机未安装 / 无 `current.json`  
 - `-Json`：机器可读报告  
 
-发版证据一页纸（维护者勾选）：[RELEASE-EVIDENCE.md](./RELEASE-EVIDENCE.md)。
+发版证据一页纸（维护者勾选）：[RELEASE-EVIDENCE.md](./RELEASE-EVIDENCE.md)。  
+发版前建议再跑：`pwsh -NoProfile -File scripts/windows/write-baseline.ps1`（刷新 `docs/BASELINE.generated.md`，便于对照 HEAD / expectedRuntimeId）。
 
 ---
 
@@ -106,7 +107,7 @@ pwsh -NoProfile -File scripts\windows\verify-install-matches-repo.ps1 -RepoRoot 
 
 **反例**：在 `package.json` 直接改 `version` 字段当作 stamp 权威。
 
-**验收**：`publish-runtime.ps1 -Version <x.y.z>` 后 doctor `expectedRuntimeId` 对齐；Install 路径 soft reattach 后 `fresh=true`。完整勾选见 [RELEASE-EVIDENCE.md](./RELEASE-EVIDENCE.md)。
+**验收**：`publish-runtime.ps1 -Version <x.y.z>` 后 doctor `expectedRuntimeId` 对齐；Install 路径 soft reattach 后 `fresh=true`。完整勾选见 [RELEASE-EVIDENCE.md](./RELEASE-EVIDENCE.md)。建议同步 `write-baseline.ps1` 刷新生成基线。
 
 ---
 

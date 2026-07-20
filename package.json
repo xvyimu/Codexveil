@@ -13,13 +13,15 @@
     "list": "node packages/core/cli.mjs list",
     "status": "node packages/core/cli.mjs status",
     "help": "node packages/core/cli.mjs help",
+    "probe:session": "node scripts/windows/probe-session-dom.mjs",
     "test:themes": "node packages/themes/theme-schema.test.mjs",
     "test:store": "node packages/themes/theme-store.test.mjs",
     "test:adapter": "node packages/themes/dream-adapter.test.mjs",
     "test:deps": "node scripts/check-package-deps.mjs",
     "test:control": "node packages/runtime/scripts/control-plane.test.mjs",
     "test:freshness": "node packages/core/state/state-freshness.test.mjs",
-    "test": "npm run test:themes && npm run test:store && npm run test:adapter && npm run test:deps && npm run test:freshness"
+    "test:cdp-url": "node packages/runtime/scripts/cdp-url-guard.test.mjs",
+    "test": "npm run test:themes && npm run test:store && npm run test:adapter && npm run test:deps && npm run test:freshness && npm run test:cdp-url"
   },
   "engines": {
     "node": ">=20"
