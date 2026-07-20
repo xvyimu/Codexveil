@@ -57,6 +57,8 @@
 | publish 自包含 `versions/<id>/` | 自动 merge 上游（结构已分叉） |
 | doctor / smoke / verify · CI `test:themes` | 把 UI 皮肤逻辑塞进 `packages/core` |
 
+**本仓 = CDP Skin（Windows only）**，不是 CLI TUI 主题串，也不是官方 Appearance。三层对照与链接见根目录 [`README.md`](../README.md)「三层 Codex 换肤」。
+
 ### 1.3 用户与入口
 
 | 入口 | 路径 | 谁用 |
@@ -440,6 +442,19 @@ themeCount / userThemeCount: ≥ 内置导入数
 diagnosis: not-running | active-injector | …
 paused/locked: false（正常使用时）
 ```
+
+### 9.4 发版后可选 probe 验收表（不进 CI）
+
+前置：用任务栏 **Codex** 打开、CDP `9335`、皮肤已注入。**不要**把下表写进 GitHub Actions。
+
+| 场景 | 命令 | 期望 |
+|------|------|------|
+| home | `node scripts\windows\probe-session-dom.mjs`（或安装树 `node "%LOCALAPPDATA%\Programs\CodexDreamSkin\probe-session-dom.mjs"`） | JSON 含 `"ok": true`、`"dreamStyle": true`、`"pass": true`；exit 0（无 page → exit 2，先开 Codex） |
+| conversation | 打开任一对话后再跑同上 | `"conversationPass": true` 且 exit 0；失败 exit 3 |
+| 可选辅助 | `node scripts\windows\probe-dom.mjs` | home shell 标记如 `dreamStyle` / `mainSurface` |
+| 静态（可选） | `Test-Path scripts\windows\probe-session-dom.mjs` | `True` |
+
+脚本契约见 `scripts/windows/probe-session-dom.mjs`（`pass` / `conversationPass` / exit）。
 
 ---
 

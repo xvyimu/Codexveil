@@ -1,5 +1,5 @@
-# G1-B: light CI gate — theme schema only (no Codex/CDP/Windows install state).
-# Full doctor/smoke remain local. See docs/plans/residual-g1-g3-g4-g5-2026-07-20.md
+# G1-B: light CI gate — npm test = themes + deps + freshness (no Codex/CDP/Windows install state).
+# Full doctor/smoke/probe remain local. See docs/plans/residual-g1-g3-g4-g5-2026-07-20.md
 name: themes-gate
 
 on:
@@ -21,8 +21,5 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Theme schema dual-format gate
-        run: npm run test:themes
-
-      - name: Package dependency boundary gate
-        run: npm run test:deps
+      - name: Unit gates (themes + deps + freshness)
+        run: npm test

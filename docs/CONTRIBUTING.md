@@ -67,12 +67,13 @@
 - [ ] `packages/runtime/assets/dream-skin.css` 改动需手测 backdrop 历史回归（PAIN-POINTS #21 OS 硬限语境下的视觉回归）
 - [ ] 任何 payload 预算常量改动（`MAX_ART_BYTES` / `DEFAULT_PAYLOAD_BUDGET_BYTES` / `MAX_THEME_CATALOG_BYTES` / `MAX_CATALOG_MEMBER_BYTES`）需在 PR 描述说明理由
 - [ ] 改动 `SKIN_VERSION_TOKEN` 字面量必须经 `publish-runtime.ps1 -Version`，禁止手改源文件 token
+- [ ] **发版纪律**：改 `packages/runtime/**` 后必须 `pwsh scripts/windows/publish-runtime.ps1 -Version <line>` 才能进入 `%LOCALAPPDATA%\Programs\CodexDreamSkin\versions\<runtimeId>\`（源树改动不会自动进安装树）
 
 **正例**：CSS 改动 PR 附 before/after 说明 + doctor 输出。
 
 **反例**：CSS 改动 PR 仅「美化」无验证；手改 `SKIN_VERSION_TOKEN = "1.3.26"`。
 
-**验收**：doctor `fresh=true`；`apply --theme <id>` 后 CDP 注入成功。
+**验收**：doctor `fresh=true`；`apply --theme <id>` 后 CDP 注入成功。安装树 `control-plane.mjs` 含 `timingSafeEqual` 且 mutating 路由 header-only（`x-codex-skin-token`）；`node packages/core/cli.mjs doctor` → `injectorPathFreshness.fresh=true`。
 
 ---
 
@@ -83,8 +84,9 @@
 - [ ] `scripts/windows/publish-runtime.ps1` 改动需用 `-Version` 参数本机 dry-run / 实跑
 - [ ] `scripts/windows/Build-ProductPackage.ps1` / `Install-Product.ps1` 改动需本机安装态验证
 - [ ] 任何版本源改动必须只走 `publish-runtime.ps1 -Version`（ADR 0003）
+- [ ] 改 `packages/runtime/**` 后必须跑 `publish-runtime.ps1 -Version <line>` 才能进安装树；验收安装树 control-plane 含 `timingSafeEqual` / header-only（`x-codex-skin-token`）+ doctor `fresh=true`
 - [ ] `soft-reattach.ps1` 改动需同时验证 publish + Install 两条调用链，且传 `--theme-dir` + `--state-root`
-- [ ] G5-C 超时逻辑（publish 尾部 `WaitForExit` + soft reattach fallback）改动需验证超时与非零退出两条路径
+- [ ] G5-C 超时逻辑（publish 尾部 `WaitForExit` + soft reattach fallback）改动需验证超时与非零退出两条路径；Quiet exit=2 后 soft reattach **成功**应见 `soft reattach OK`（非吓人 Warning）
 - [ ] seed art fallback 不得钉死已 GC 的旧 runtimeId；优先 repo `packages/runtime/assets` + 动态扫 `versions/*/assets`
 
 **正例**：publish 改动 PR 附 `node packages/core/cli.mjs doctor` 输出含新 runtimeId。

@@ -9,6 +9,16 @@
 - **平台**：Windows 10/11 + OpenAI Codex（Store）。**不做 macOS** 一等公民支持（见 PROJECT §1.2）
 - **入口纪律**：请用任务栏 **Codex** 钉，**不要**用微软商店磁贴开 Codex（OS 硬限，裸启无皮肤 · PAIN #21）
 
+### 三层 Codex 换肤（本仓定位）
+
+| 层 | 是什么 | 本仓？ |
+|----|--------|:------:|
+| CLI TUI 主题 | 终端 Codex CLI 配色/主题串 | 否 |
+| 官方 Appearance | Desktop 官方外观设置 | 否 |
+| **CDP Skin** | 经 CDP 注入 CSS/JS（Desktop 皮肤） | **是** · Windows only |
+
+本仓是 **CDP Skin / Windows only**，**不是** codex-theme-v1 导入串。三层划分参考：[awesome-codex-themes](https://github.com/mcpso/awesome-codex-themes)。
+
 ## 状态
 
 见 [`docs/CHANGELOG.md`](docs/CHANGELOG.md)。当前主线 **runtime `1.3.25`** · **11 套内置主题**。
@@ -24,7 +34,7 @@
 全面检查：[`docs/AUDIT-2026-07-20.md`](docs/AUDIT-2026-07-20.md)。  
 残差规划（G1 CI / G3 mac / G4 #21 / G5 Quiet）：[`docs/plans/residual-g1-g3-g4-g5-2026-07-20.md`](docs/plans/residual-g1-g3-g4-g5-2026-07-20.md)。
 
-**CI**：GitHub Actions `themes-gate` 在 push/PR 跑 `npm run test:themes` + `npm run test:deps`（**不等于**本机 `doctor`/smoke；完整诊断仍在 Windows 安装态）。
+**CI**：GitHub Actions `themes-gate` 在 push/PR 跑 `npm test`（= `test:themes` + `test:deps` + `test:freshness`；**不等于**本机 `doctor`/smoke/live probe；完整诊断仍在 Windows 安装态）。
 
 ## 产品包（终端用户）
 
@@ -71,7 +81,7 @@ node packages/core/cli.mjs import-themes                 # 导入内置主题到
 npm run test:themes                                      # 主题 schema 双格式 + 11 套 loadTheme
 npm run test:deps                                        # core↔runtime 静态依赖边界
 npm run test:control                                     # control-plane token（本机 9347+；不进 CI）
-npm test                                                 # themes + deps
+npm test                                                 # themes + deps + freshness
 ```
 
 发布 runtime（本机开发路径）：

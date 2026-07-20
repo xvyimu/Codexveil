@@ -25,7 +25,7 @@
 | 8 | CDP 探测偶发 false → 触发不必要 full open | 1.3.9 | 已修 · 短重试 + 硬超时 |
 | 9 | `versions/` 堆积（1.2 → 1.3.2 共 6 套 5.5MB） | 1.3.2 | 已修 · publish GC 保留 current + 上一版 |
 | 10 | SKIN_VERSION / renderer version 与 install version 脱节 | 1.3.2 | 已修 · SKIN_VERSION 与 install 同步 |
-| 11 | post-update 报告陈旧（还停在旧 runtime） | 1.3.9 | 已修 · pwsh→powershell.exe 子进程继承 PS7 PSModulePath 令 PS5.1 加载 Microsoft.PowerShell.Security 失败；publish 后脚本首行重置 PSModulePath + `Import-Module` |
+| 11 | post-update 报告陈旧（还停在旧 runtime） | 1.3.9 | 已修 · pwsh→powershell.exe 子进程继承 PS7 PSModulePath 令 PS5.1 加载 Microsoft.PowerShell.Security 失败；publish 后脚本首行重置 PSModulePath + `Import-Module`；**Quiet 任一 check 失败常见 exit=2**，publish 以 soft reattach 收口不算发版失败（G5-C 正式降级） |
 | 12 | 会话页玻璃未在真实会话验证；probe 只到 home | 1.3.2 / 1.3.9 | 已修 · 真会话 probe pass + conversationPass；气泡去描边 |
 | 13 | 发布后 reattach 杀旧 injector 失败 → 短暂双 injector | 1.3.2 | 已修 · `Stop-DreamSkinWatchInjectors` 全局清扫 + open/check 启动前硬门闩（身份不匹配不再 throw 挡清扫） |
 | 14 | `cli list` 主题重复：repo + user store 都算 | 1.3.2 | 已修 · `listThemes({ dedupe:true })` + user root 后写覆盖 |

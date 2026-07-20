@@ -7,7 +7,7 @@
 > **审查人角色**：外部审查与优化顾问 Agent（只读；不改业务代码）  
 > **对照基线**：[`AUDIT-2026-07-20.md`](./AUDIT-2026-07-20.md) @ `f373fcb` · residual [`G1-B/G3-A/G4-A/G5-C`](./plans/residual-g1-g3-g4-g5-2026-07-20.md) **已完成**  
 > **落地状态（同日后续）**：**SEC-01 · TEST-02 · ARCH-01/03 soft-reattach · SCR-01 · CODE-02 · doctor 字段 · injector `--state-root` · `test:deps` CI** 已实现（见仓库 diff / AUDIT §16）。下列 §0「最严重问题」保留为扫描当时证据；实现以代码为准。  
-> **当前基线校准**（2026-07-21 · DOC-01）：HEAD=`8efe18e` · runtimeId=`1.3.25-107b0e` · 见文末修订记录
+> **当前基线校准**（2026-07-21 · L0/L1）：HEAD=`2e900fd` · runtimeId=`1.3.25-50fee1` · 见文末修订记录
 
 ---
 
@@ -628,3 +628,4 @@ active-theme · runtimeId · SKIN_VERSION_TOKEN · kick · soft reattach · cata
 | 2026-07-20 | `ea229b7` | `1.3.25-d14cf4` | 扫描当时基线（正文证据保留） |
 | 2026-07-20 后 | → `c390d4e` | `1.3.25-107b0e` | SEC-01 / soft-reattach / test:deps 等落地（见 AUDIT §16） |
 | 2026-07-21 · DOC-01 | `c390d4e` | `1.3.25-107b0e` | 文档基线校准；CONTRIBUTING + task-cards 入库 |
+| 2026-07-21 · L0/L1 | `2e900fd` | `1.3.25-50fee1` | CI=`npm test`（含 freshness）；publish soft reattach 日志分级；probe 验收表 |

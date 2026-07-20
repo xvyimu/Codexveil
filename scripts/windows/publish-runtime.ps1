@@ -290,6 +290,7 @@ if (-not $SkipImportThemes) {
 }
 
 # Refresh post-update report (G5-C): hard timeout so Quiet -Repair cannot hang publish forever.
+# G5-C: post-update Quiet 任一 check 失败会 exit 2；soft reattach 为正式降级路径（非发版失败）。
 # On timeout/failure → soft reattach (shared with Install-Product.ps1).
 . (Join-Path $PSScriptRoot "soft-reattach.ps1")
 
@@ -304,17 +305,25 @@ try {
     ) -PassThru -WindowStyle Hidden
     $finished = $pPost.WaitForExit($postTimeoutSec * 1000)
     if (-not $finished) {
-      Write-Warning "post-update timed out after ${postTimeoutSec}s — killing child and soft-reattaching"
       try {
         # Kill process tree when possible (Windows).
         Stop-Process -Id $pPost.Id -Force -ErrorAction SilentlyContinue
         Get-CimInstance Win32_Process -Filter "ParentProcessId=$($pPost.Id)" -ErrorAction SilentlyContinue |
           ForEach-Object { try { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue } catch {} }
       } catch {}
-      [void](Invoke-CodexSkinSoftReattach -RuntimeRoot $dest -RuntimeId $runtimeId -StateRoot $stateRoot)
+      $okReattach = [bool](Invoke-CodexSkinSoftReattach -RuntimeRoot $dest -RuntimeId $runtimeId -StateRoot $stateRoot)
+      if ($okReattach) {
+        Write-Host "post-update skipped/failed (timeout) → soft reattach OK"
+      } else {
+        Write-Warning "post-update timed out — soft reattach failed/skipped; click taskbar Codex"
+      }
     } elseif ($pPost.ExitCode -ne 0) {
-      Write-Warning ("post-update exit=" + $pPost.ExitCode + " — soft reattach fallback")
-      [void](Invoke-CodexSkinSoftReattach -RuntimeRoot $dest -RuntimeId $runtimeId -StateRoot $stateRoot)
+      $okReattach = [bool](Invoke-CodexSkinSoftReattach -RuntimeRoot $dest -RuntimeId $runtimeId -StateRoot $stateRoot)
+      if ($okReattach) {
+        Write-Host ("post-update skipped/failed (exit=" + $pPost.ExitCode + ") → soft reattach OK")
+      } else {
+        Write-Warning ("post-update exit=" + $pPost.ExitCode + " — soft reattach failed/skipped; click taskbar Codex")
+      }
     } else {
       Write-Host ("post-update exit=" + $pPost.ExitCode)
     }
@@ -322,7 +331,12 @@ try {
 } catch {
   Write-Warning ("post-update refresh: " + $_.Exception.Message)
   try {
-    [void](Invoke-CodexSkinSoftReattach -RuntimeRoot $dest -RuntimeId $runtimeId -StateRoot $stateRoot)
+    $okReattach = [bool](Invoke-CodexSkinSoftReattach -RuntimeRoot $dest -RuntimeId $runtimeId -StateRoot $stateRoot)
+    if ($okReattach) {
+      Write-Host "post-update skipped/failed (error) → soft reattach OK"
+    } else {
+      Write-Warning "soft reattach after post-update error failed/skipped; click taskbar Codex"
+    }
   } catch {
     Write-Warning ("soft reattach after post-update error: " + $_.Exception.Message)
   }
