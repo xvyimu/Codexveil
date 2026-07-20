@@ -12,7 +12,9 @@
     "list": "node packages/core/cli.mjs list",
     "status": "node packages/core/cli.mjs status",
     "help": "node packages/core/cli.mjs help",
-    "test:themes": "node packages/themes/theme-schema.test.mjs"
+    "test:themes": "node packages/themes/theme-schema.test.mjs",
+    "test:deps": "node scripts/check-package-deps.mjs",
+    "test": "npm run test:themes && npm run test:deps"
   },
   "engines": {
     "node": ">=20"

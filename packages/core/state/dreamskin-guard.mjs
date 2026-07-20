@@ -46,6 +46,8 @@ export async function detectDreamSkinRuntime({
   const activeTheme = join(root, "active-theme", "theme.json");
   const themesLock = join(root, "themes", "themes.locked");
 
+  const controlPortFile = join(root, "control.port");
+  const controlTokenFile = join(root, "control.token");
   const result = {
     stateRoot: root,
     statePath,
@@ -57,14 +59,20 @@ export async function detectDreamSkinRuntime({
     port: null,
     browserId: null,
     activeThemePresent: false,
+    controlPortFile,
+    controlTokenFile,
+    controlPort: null,
+    controlTokenPresent: false,
     summary: "not-installed",
   };
 
-  const [hasState, hasPause, hasActive, hasLock] = await Promise.all([
+  const [hasState, hasPause, hasActive, hasLock, hasPortFile, hasTokenFile] = await Promise.all([
     pathExists(statePath),
     pathExists(pauseFile),
     pathExists(activeTheme),
     pathExists(themesLock),
+    pathExists(controlPortFile),
+    pathExists(controlTokenFile),
   ]);
   if (!hasState && !hasActive) return result;
 
@@ -72,6 +80,16 @@ export async function detectDreamSkinRuntime({
   result.paused = hasPause;
   result.locked = hasLock;
   result.activeThemePresent = hasActive;
+  result.controlTokenPresent = hasTokenFile;
+
+  if (hasPortFile) {
+    try {
+      const n = Number((await readFile(controlPortFile, "utf8")).trim());
+      if (Number.isInteger(n) && n >= 1024) result.controlPort = n;
+    } catch {
+      // ignore
+    }
+  }
 
   if (hasState) {
     try {
@@ -80,6 +98,13 @@ export async function detectDreamSkinRuntime({
       result.port = Number.isInteger(state?.port) ? state.port : null;
       result.browserId = typeof state?.browserId === "string" ? state.browserId : null;
       result.injectorAlive = isProcessAlive(result.injectorPid);
+      if (
+        result.controlPort == null &&
+        Number.isInteger(state?.controlPort) &&
+        state.controlPort >= 1024
+      ) {
+        result.controlPort = state.controlPort;
+      }
     } catch {
       // 坏 state 仍视为「本机装过 DreamSkin」
     }

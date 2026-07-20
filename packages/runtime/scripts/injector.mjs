@@ -37,6 +37,9 @@ function parseArgs(argv) {
     reload: false,
     browserId: null,
     themeDir: path.join(root, "assets"),
+    /** Explicit state root for control.port / control.token / state.json patches.
+     * Prefer over dirname(themeDir) so soft reattach / dev never write under versions/<id>. */
+    stateRoot: null,
     pauseFile: null,
   };
   for (let i = 0; i < argv.length; i += 1) {
@@ -49,6 +52,7 @@ function parseArgs(argv) {
     else if (arg === "--timeout-ms") options.timeoutMs = Number(argv[++i]);
     else if (arg === "--browser-id") options.browserId = argv[++i];
     else if (arg === "--theme-dir") options.themeDir = path.resolve(argv[++i]);
+    else if (arg === "--state-root") options.stateRoot = path.resolve(argv[++i]);
     else if (arg === "--pause-file") options.pauseFile = path.resolve(argv[++i]);
     else if (arg === "--screenshot") options.screenshot = path.resolve(argv[++i]);
     else if (arg === "--reload") options.reload = true;
@@ -1125,9 +1129,12 @@ async function runWatch(options) {
     // Control plane: zero extra long-lived process; serves open/kick/focus.
     try {
       const { startControlPlane, focusViaPowerShell } = await import("./control-plane.mjs");
-      const stateRootGuess = path.dirname(path.resolve(options.themeDir));
+      // Prefer explicit --state-root; else dirname(themeDir) when themeDir is
+      // .../active-theme; never invent LOCALAPPDATA here (runtime self-contained).
+      const stateRootForPlane =
+        options.stateRoot || path.dirname(path.resolve(options.themeDir));
       controlPlane = await startControlPlane({
-        stateRoot: stateRootGuess,
+        stateRoot: stateRootForPlane,
         getHealth: async () => ({
           healthy: !stopping && !identityAnchor.closed && !paused,
           browserId: options.browserId,
@@ -1136,6 +1143,7 @@ async function runWatch(options) {
           payloadStamp: loadedPayload?.fingerprint ?? null,
           paused,
           themeDir: options.themeDir,
+          stateRoot: stateRootForPlane,
         }),
         onFocus: () => focusViaPowerShell({ timeoutMs: 500 }),
         onKick: async () => {

@@ -111,6 +111,31 @@ function assert(cond, msg) {
   }
 }
 
+// --- loadTheme every bundled themes/* directory (TEST-02) ---
+{
+  const { readdir } = await import("node:fs/promises");
+  const bundledRoot = join(repoRoot, "themes");
+  const entries = await readdir(bundledRoot, { withFileTypes: true });
+  const dirs = entries.filter((e) => e.isDirectory()).map((e) => e.name).sort();
+  assert(dirs.length >= 11, `bundled theme count >= 11 (got ${dirs.length})`);
+  let loadedCount = 0;
+  for (const id of dirs) {
+    const dir = join(bundledRoot, id);
+    try {
+      await access(join(dir, "theme.json"));
+    } catch {
+      assert(false, `loadTheme ${id}: theme.json missing`);
+      continue;
+    }
+    const loaded = await loadTheme(dir);
+    assert(loaded.manifest.id === id, `loadTheme ${id}: manifest.id matches dir`);
+    assert(!!loaded.manifest.colors?.accent, `loadTheme ${id}: accent present`);
+    assert(!!loaded.heroPath, `loadTheme ${id}: heroPath resolved`);
+    loadedCount += 1;
+  }
+  assert(loadedCount === dirs.length, `loadTheme all bundled themes (${loadedCount}/${dirs.length})`);
+}
+
 if (failed > 0) {
   console.error(`\ntheme-schema.test: ${failed} failed`);
   process.exit(1);

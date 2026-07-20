@@ -306,6 +306,7 @@ try {
     '--port', "$Port",
     '--browser-id', $cdp.BrowserId,
     '--theme-dir', $paths.Active,
+    '--state-root', $stateRoot,
     '--pause-file', $paths.PauseFile
   ) -WindowStyle Hidden -PassThru -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath
   Start-Sleep -Seconds 3

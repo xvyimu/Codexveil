@@ -23,3 +23,6 @@ jobs:
 
       - name: Theme schema dual-format gate
         run: npm run test:themes
+
+      - name: Package dependency boundary gate
+        run: npm run test:deps

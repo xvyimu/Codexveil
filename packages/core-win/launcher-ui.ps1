@@ -220,6 +220,22 @@ function Get-CodexSkinControlPort {
   return 9336
 }
 
+function Get-CodexSkinControlToken {
+  <#
+  .SYNOPSIS
+    Read loopback control-plane token (stateRoot\control.token). Empty if missing.
+  #>
+  param([string]$StateRoot = (Get-CodexSkinStateRoot))
+  try {
+    $tokenFile = Join-Path $StateRoot 'control.token'
+    if (Test-Path -LiteralPath $tokenFile) {
+      $t = (Get-Content -LiteralPath $tokenFile -Raw -ErrorAction Stop).Trim()
+      if ($t) { return $t }
+    }
+  } catch {}
+  return ''
+}
+
 function Resolve-CodexSkinUserError {
   <#
   .SYNOPSIS
@@ -901,15 +917,18 @@ function Invoke-CodexSkinControl {
   <#
   .SYNOPSIS
     Call watch control plane (127.0.0.1:9336 by default). Returns $null on miss.
+    Mutating POSTs send x-codex-skin-token from control.token when present.
+    GET health stays unauthenticated (FastLaunch / probes).
   #>
   param(
     [ValidateSet('health','focus','kick','open-healthy')][string]$Action = 'health',
     [int]$Port = 0,
-    [int]$TimeoutMs = 120
+    [int]$TimeoutMs = 120,
+    [string]$StateRoot = (Get-CodexSkinStateRoot)
   )
   try {
     if ($Port -lt 1024) {
-      $Port = Get-CodexSkinControlPort
+      $Port = Get-CodexSkinControlPort -StateRoot $StateRoot
     }
     $url = if ($Action -eq 'health') {
       "http://127.0.0.1:$Port/health"
@@ -923,6 +942,10 @@ function Invoke-CodexSkinControl {
     $req.ContentType = 'application/json'
     $req.ContentLength = 0
     if ($Action -ne 'health') {
+      $token = Get-CodexSkinControlToken -StateRoot $StateRoot
+      if ($token) {
+        $req.Headers['x-codex-skin-token'] = $token
+      }
       $stream = $req.GetRequestStream()
       $stream.Close()
     }

@@ -173,7 +173,7 @@ try {
       Exit-DreamSkinOperationLock -Mutex $operationLock
       $operationLock = $null
       & $node.Path $Injector --watch --port $Port --browser-id $cdpIdentity.BrowserId `
-        --theme-dir $themePaths.Active --pause-file $themePaths.PauseFile
+        --theme-dir $themePaths.Active --state-root $StateRoot --pause-file $themePaths.PauseFile
       $foregroundExitCode = $LASTEXITCODE
       if ($foregroundExitCode -ne 0 -and $pauseWasSet) {
         Set-DreamSkinPaused -Paused $true -StateRoot $StateRoot | Out-Null
@@ -194,7 +194,8 @@ try {
   try {
     $injectorArgs = @((ConvertTo-DreamSkinProcessArgument -Value $Injector), '--watch', '--port', "$Port",
       '--browser-id', $cdpIdentity.BrowserId, '--theme-dir',
-      (ConvertTo-DreamSkinProcessArgument -Value $themePaths.Active), '--pause-file',
+      (ConvertTo-DreamSkinProcessArgument -Value $themePaths.Active), '--state-root',
+      (ConvertTo-DreamSkinProcessArgument -Value $StateRoot), '--pause-file',
       (ConvertTo-DreamSkinProcessArgument -Value $themePaths.PauseFile))
     $daemon = Start-Process -FilePath $node.Path -ArgumentList $injectorArgs -WindowStyle Hidden -PassThru `
       -RedirectStandardOutput $StdoutPath -RedirectStandardError $StderrPath

@@ -143,10 +143,15 @@ foreach ($rel in @("runtime\scripts\injector.mjs", "runtime\assets\renderer-inje
 # Install / Uninstall wrappers at package root
 $installSrc = Join-Path $RepoRoot "scripts\windows\Install-Product.ps1"
 $uninstallSrc = Join-Path $RepoRoot "scripts\windows\Uninstall-Product.ps1"
+$softReattachSrc = Join-Path $RepoRoot "scripts\windows\soft-reattach.ps1"
 if (-not (Test-Path -LiteralPath $installSrc)) { throw "Missing Install-Product.ps1" }
 Copy-Item $installSrc (Join-Path $stage "Install.ps1") -Force
 if (Test-Path -LiteralPath $uninstallSrc) {
   Copy-Item $uninstallSrc (Join-Path $stage "Uninstall.ps1") -Force
+}
+# Install.ps1 dots soft-reattach.ps1 from same directory (product root).
+if (Test-Path -LiteralPath $softReattachSrc) {
+  Copy-Item $softReattachSrc (Join-Path $stage "soft-reattach.ps1") -Force
 }
 
 $meta = [ordered]@{

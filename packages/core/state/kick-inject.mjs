@@ -82,20 +82,37 @@ async function resolveControlPort(state, stateRoot) {
   return 9336;
 }
 
-async function kickViaControlPlane(controlPort, timeoutMs = 2500) {
+async function resolveControlToken(stateRoot) {
+  try {
+    const p = join(stateRoot, "control.token");
+    if (!(await pathExists(p))) return null;
+    const token = (await readFile(p, "utf8")).trim();
+    return token || null;
+  } catch {
+    return null;
+  }
+}
+
+async function kickViaControlPlane(controlPort, timeoutMs = 2500, token = null) {
   const ports = [controlPort, 9336, 9337, 9338, 9339, 9340].filter(
     (p, i, arr) => Number.isInteger(p) && p >= 1024 && arr.indexOf(p) === i,
   );
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["x-codex-skin-token"] = token;
   for (const port of ports) {
     try {
       const response = await fetch(`http://127.0.0.1:${port}/kick`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: "{}",
         signal: AbortSignal.timeout(timeoutMs),
       });
       if (response.status === 404) continue;
       const body = await response.json().catch(() => ({}));
+      if (response.status === 401 || body?.reason === "token-required") {
+        // Wrong/missing token on this port — try next (or fall through to --once).
+        continue;
+      }
       if (response.ok && body?.ok) {
         return {
           ok: true,
@@ -168,7 +185,12 @@ export async function kickThemeInjectNow({
 
   if (preferControlPlane) {
     const controlPort = await resolveControlPort(state, stateRoot);
-    const viaCp = await kickViaControlPlane(controlPort, Math.min(timeoutMs, 4000));
+    const token = await resolveControlToken(stateRoot);
+    const viaCp = await kickViaControlPlane(
+      controlPort,
+      Math.min(timeoutMs, 4000),
+      token,
+    );
     if (viaCp) return viaCp;
   }
 

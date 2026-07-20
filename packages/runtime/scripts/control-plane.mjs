@@ -2,17 +2,20 @@
  * @file control-plane.mjs
  * @description Loopback HTTP control plane hosted inside the watch injector.
  * Endpoints: GET /health, POST /focus, POST /kick, POST /open-healthy
- * Bind: 127.0.0.1 only. Optional token from %LOCALAPPDATA%/CodexDreamSkin/control.token
+ * Bind: 127.0.0.1 only.
+ * Auth: POST mutating routes require control.token via header x-codex-skin-token
+ * or ?token= (GET /health stays open for FastLaunch health probes).
  */
 import http from "node:http";
 import { spawn } from "node:child_process";
-import { access, readFile, writeFile, mkdir } from "node:fs/promises";
+import { access, readFile, writeFile, mkdir, rename } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { randomBytes } from "node:crypto";
 
 const DEFAULT_PORT = 9336;
 const PORT_SCAN = 11; // 9336..9346
+export const CONTROL_TOKEN_HEADER = "x-codex-skin-token";
 
 async function pathExists(p) {
   try {
@@ -24,6 +27,8 @@ async function pathExists(p) {
 }
 
 function stateRootDefault() {
+  // Fallback only when injector did not pass stateRoot (dev / mis-invocation).
+  // Prefer startControlPlane({ stateRoot }) from watch with active-theme dirname.
   const local = process.env.LOCALAPPDATA || join(homedir(), "AppData", "Local");
   return join(local, "CodexDreamSkin");
 }
@@ -32,7 +37,8 @@ async function ensureToken(stateRoot) {
   const tokenPath = join(stateRoot, "control.token");
   if (await pathExists(tokenPath)) {
     try {
-      return (await readFile(tokenPath, "utf8")).trim();
+      const existing = (await readFile(tokenPath, "utf8")).trim();
+      if (existing) return existing;
     } catch {
       // regenerate
     }
@@ -41,6 +47,14 @@ async function ensureToken(stateRoot) {
   await mkdir(stateRoot, { recursive: true });
   await writeFile(tokenPath, token + "\n", "utf8");
   return token;
+}
+
+async function atomicWriteText(filePath, text) {
+  const dir = join(filePath, ".."); // parent of filePath
+  await mkdir(dir, { recursive: true });
+  const tmp = join(dir, `.state-write.${process.pid}.${Date.now()}.tmp`);
+  await writeFile(tmp, text, "utf8");
+  await rename(tmp, filePath);
 }
 
 async function writeControlPort(stateRoot, port) {
@@ -57,7 +71,7 @@ async function writeControlPort(stateRoot, port) {
     const state = JSON.parse(raw.replace(/^﻿/, ""));
     state.controlPort = port;
     state.controlUpdatedAt = new Date().toISOString();
-    await writeFile(statePath, JSON.stringify(state, null, 2) + "\n", "utf8");
+    await atomicWriteText(statePath, JSON.stringify(state, null, 2) + "\n");
   } catch {
     // ignore
   }
@@ -156,13 +170,8 @@ export async function startControlPlane(opts) {
     try {
       const url = new URL(req.url || "/", `http://127.0.0.1`);
       const pathName = url.pathname.replace(/\/+$/, "") || "/";
-      // optional token: ?token= or header x-codex-skin-token
       const qToken = url.searchParams.get("token");
-      const hToken = req.headers["x-codex-skin-token"];
-      if (token && qToken !== token && hToken !== token) {
-        // still allow local unauthenticated for UX simplicity on same machine;
-        // token is recorded for future tightening. Accept always from 127.0.0.1.
-      }
+      const hToken = req.headers[CONTROL_TOKEN_HEADER];
       const send = (code, body) => {
         const data = JSON.stringify(body);
         res.writeHead(code, {
@@ -173,9 +182,25 @@ export async function startControlPlane(opts) {
         res.end(data);
       };
 
-      if (req.method === "GET" && (pathName === "/health" || pathName === "/")) {
+      // GET /health stays open: FastLaunch + doctor probes. Mutating POSTs need token.
+      const isHealthGet =
+        req.method === "GET" && (pathName === "/health" || pathName === "/");
+      if (!isHealthGet && token && qToken !== token && hToken !== token) {
+        return send(401, {
+          ok: false,
+          reason: "token-required",
+          detail: "provide header x-codex-skin-token or ?token= (see control.token)",
+        });
+      }
+
+      if (isHealthGet) {
         const health = await opts.getHealth();
-        return send(200, { ok: true, ...health, tokenPresent: Boolean(token) });
+        return send(200, {
+          ok: true,
+          ...health,
+          tokenPresent: Boolean(token),
+          tokenRequiredForMutations: Boolean(token),
+        });
       }
 
       if (req.method === "POST" && pathName === "/focus") {

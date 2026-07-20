@@ -48,11 +48,30 @@ New-Item -ItemType Directory -Force -Path $stateRoot | Out-Null
 if (Test-Path -LiteralPath (Join-Path $runtime "scripts\wait-shell.mjs")) {
   Copy-Item (Join-Path $runtime "scripts\wait-shell.mjs") (Join-Path $stateRoot "wait-shell.mjs") -Force
 }
-# Ensure default seed art exists (theme store init requires it)
+# Ensure default seed art exists (theme store init requires it).
+# Prefer repo runtime assets (already copied above); else newest versions/*/assets copy.
 $seedArt = Join-Path $dest "assets\dream-reference.jpg"
 if (-not (Test-Path -LiteralPath $seedArt)) {
-  $fallback = Join-Path $env:LOCALAPPDATA "Programs\CodexDreamSkin\versions\1.2.1-c1ad5a79ddf5\assets\dream-reference.jpg"
-  if (Test-Path -LiteralPath $fallback) {
+  $repoSeed = Join-Path $runtime "assets\dream-reference.jpg"
+  $fallback = $null
+  if (Test-Path -LiteralPath $repoSeed) {
+    $fallback = $repoSeed
+  } else {
+    $versionsDir = Join-Path $programRoot "versions"
+    if (Test-Path -LiteralPath $versionsDir) {
+      $candidate = Get-ChildItem $versionsDir -Directory -ErrorAction SilentlyContinue |
+        ForEach-Object {
+          $p = Join-Path $_.FullName "assets\dream-reference.jpg"
+          if (Test-Path -LiteralPath $p) {
+            Get-Item -LiteralPath $p
+          }
+        } |
+        Sort-Object LastWriteTime -Descending |
+        Select-Object -First 1
+      if ($candidate) { $fallback = $candidate.FullName }
+    }
+  }
+  if ($fallback) {
     Copy-Item $fallback $seedArt -Force
   } else {
     Write-Warning "dream-reference.jpg missing; Initialize-DreamSkinThemeStore may fail on first run"
@@ -271,65 +290,8 @@ if (-not $SkipImportThemes) {
 }
 
 # Refresh post-update report (G5-C): hard timeout so Quiet -Repair cannot hang publish forever.
-# On timeout/failure → soft reattach (same intent as Install-Product.ps1).
-function Invoke-CodexSkinSoftReattach {
-  param(
-    [Parameter(Mandatory = $true)][string]$RuntimeRoot,
-    [Parameter(Mandatory = $true)][string]$RuntimeId,
-    [Parameter(Mandatory = $true)][string]$StateRoot
-  )
-  $nodeCmd = $null
-  try { $nodeCmd = (Get-Command node -ErrorAction Stop).Source } catch {}
-  $injPath = Join-Path $RuntimeRoot "scripts\injector.mjs"
-  if (-not $nodeCmd -or -not (Test-Path -LiteralPath $injPath)) {
-    Write-Warning "soft reattach skipped: node or injector missing"
-    return $false
-  }
-  $browserId = $null
-  $statePath = Join-Path $StateRoot "state.json"
-  if (Test-Path -LiteralPath $statePath) {
-    try {
-      $st = Get-Content -LiteralPath $statePath -Raw -Encoding UTF8 | ConvertFrom-Json
-      if ($st.browserId) { $browserId = [string]$st.browserId }
-    } catch {}
-  }
-  $oldInjectors = @(
-    Get-CimInstance Win32_Process -Filter "Name='node.exe'" -ErrorAction SilentlyContinue |
-      Where-Object { $_.CommandLine -and ($_.CommandLine -match 'CodexDreamSkin\\versions\\.*injector\.mjs') }
-  )
-  $hadInjector = $oldInjectors.Count -gt 0
-  foreach ($proc in $oldInjectors) {
-    try {
-      Write-Host "Stopping old injector PID $($proc.ProcessId)"
-      Stop-Process -Id $proc.ProcessId -Force -ErrorAction SilentlyContinue
-    } catch {}
-  }
-  if (-not ($hadInjector -or $browserId)) {
-    Write-Host "soft reattach: no live injector/browserId — click taskbar Codex after publish"
-    return $false
-  }
-  $argList = @($injPath, "--watch", "--port", "9335")
-  if ($browserId) { $argList += @("--browser-id", $browserId) }
-  Write-Host "soft reattach: starting watch injector on $RuntimeId..."
-  $started = Start-Process -FilePath $nodeCmd -ArgumentList $argList -WindowStyle Hidden -PassThru
-  Start-Sleep -Milliseconds 800
-  if ($started -and -not $started.HasExited -and (Test-Path -LiteralPath $statePath)) {
-    try {
-      $st2 = Get-Content -LiteralPath $statePath -Raw -Encoding UTF8 | ConvertFrom-Json
-      $st2 | Add-Member -NotePropertyName injectorPid -NotePropertyValue $started.Id -Force
-      $st2 | Add-Member -NotePropertyName injectorPath -NotePropertyValue $injPath -Force
-      $st2 | Add-Member -NotePropertyName runtimeId -NotePropertyValue $RuntimeId -Force
-      $st2 | Add-Member -NotePropertyName updatedAt -NotePropertyValue ((Get-Date).ToUniversalTime().ToString("o")) -Force
-      $json = ($st2 | ConvertTo-Json -Depth 8) + "`n"
-      [System.IO.File]::WriteAllText($statePath, $json, [System.Text.UTF8Encoding]::new($false))
-      Write-Host "soft reattach: injector PID=$($started.Id)"
-      return $true
-    } catch {
-      Write-Warning ("soft reattach state patch: " + $_.Exception.Message)
-    }
-  }
-  return $false
-}
+# On timeout/failure → soft reattach (shared with Install-Product.ps1).
+. (Join-Path $PSScriptRoot "soft-reattach.ps1")
 
 try {
   $post = Join-Path $programRoot 'post-update-regression.ps1'

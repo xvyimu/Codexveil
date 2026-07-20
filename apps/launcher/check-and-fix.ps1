@@ -194,7 +194,8 @@ try {
     '' | Set-Content -LiteralPath $stderrPath -Encoding utf8
     $daemon = Start-Process -FilePath $node.Path -ArgumentList @(
       $inj, '--watch', '--port', "$Port", '--browser-id', $cdp.BrowserId,
-      '--theme-dir', $paths.Active, '--pause-file', $paths.PauseFile
+      '--theme-dir', $paths.Active, '--state-root', $stateRoot,
+      '--pause-file', $paths.PauseFile
     ) -WindowStyle Hidden -PassThru -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath
     # Bounded wait instead of fixed 3s sleep
     $deadline = (Get-Date).AddSeconds(5)

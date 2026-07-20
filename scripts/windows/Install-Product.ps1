@@ -402,55 +402,19 @@ if (-not $SkipShortcuts) {
   }
 }
 
-# Soft reattach: if a watch injector is already running (or CDP is open),
-# flip it onto the just-installed runtime without the hang-prone check-and-fix path.
+# Soft reattach: flip live watch injector onto the just-installed runtime
+# (shared helper; always passes --theme-dir StateRoot\active-theme).
 try {
-  $nodeCmd = $null
-  try { $nodeCmd = (Get-Command node -ErrorAction Stop).Source } catch {}
-  $injPath = Join-Path $dest "scripts\injector.mjs"
-  if ($nodeCmd -and (Test-Path -LiteralPath $injPath)) {
-    $browserId = $null
-    $statePath = Join-Path $stateRoot "state.json"
-    if (Test-Path -LiteralPath $statePath) {
-      try {
-        $st = Get-Content -LiteralPath $statePath -Raw -Encoding UTF8 | ConvertFrom-Json
-        if ($st.browserId) { $browserId = [string]$st.browserId }
-      } catch {}
-    }
-    $oldInjectors = @(
-      Get-CimInstance Win32_Process -Filter "Name='node.exe'" -ErrorAction SilentlyContinue |
-        Where-Object { $_.CommandLine -and ($_.CommandLine -match 'CodexDreamSkin\\versions\\.*injector\.mjs') }
-    )
-    $hadInjector = $oldInjectors.Count -gt 0
-    foreach ($proc in $oldInjectors) {
-      try {
-        Write-Host "Stopping old injector PID $($proc.ProcessId)"
-        Stop-Process -Id $proc.ProcessId -Force -ErrorAction SilentlyContinue
-      } catch {}
-    }
-    if ($hadInjector -or $browserId) {
-      $argList = @($injPath, "--watch", "--port", "9335")
-      if ($browserId) { $argList += @("--browser-id", $browserId) }
-      Write-Host "Starting watch injector on $runtimeId..."
-      $started = Start-Process -FilePath $nodeCmd -ArgumentList $argList -WindowStyle Hidden -PassThru
-      Start-Sleep -Milliseconds 800
-      if ($started -and -not $started.HasExited -and (Test-Path -LiteralPath $statePath)) {
-        try {
-          $st2 = Get-Content -LiteralPath $statePath -Raw -Encoding UTF8 | ConvertFrom-Json
-          $st2 | Add-Member -NotePropertyName injectorPid -NotePropertyValue $started.Id -Force
-          $st2 | Add-Member -NotePropertyName injectorPath -NotePropertyValue $injPath -Force
-          $st2 | Add-Member -NotePropertyName runtimeId -NotePropertyValue $runtimeId -Force
-          $st2 | Add-Member -NotePropertyName updatedAt -NotePropertyValue ((Get-Date).ToUniversalTime().ToString("o")) -Force
-          $json = ($st2 | ConvertTo-Json -Depth 8) + "`n"
-          [System.IO.File]::WriteAllText($statePath, $json, [System.Text.UTF8Encoding]::new($false))
-          Write-Host "Reattached injector PID=$($started.Id)"
-        } catch {
-          Write-Warning ("state patch after reattach: " + $_.Exception.Message)
-        }
-      }
-    } else {
-      Write-Host "No live injector/CDP session — click taskbar Codex after install to start watch."
-    }
+  $softHelper = Join-Path $PSScriptRoot "soft-reattach.ps1"
+  if (-not (Test-Path -LiteralPath $softHelper)) {
+    # Product zip: helper lives next to Install.ps1 after Build copies scripts/windows.
+    $softHelper = Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) "soft-reattach.ps1"
+  }
+  if (Test-Path -LiteralPath $softHelper) {
+    . $softHelper
+    [void](Invoke-CodexSkinSoftReattach -RuntimeRoot $dest -RuntimeId $runtimeId -StateRoot $stateRoot)
+  } else {
+    Write-Warning "soft-reattach.ps1 missing; click taskbar Codex after install"
   }
 } catch {
   Write-Warning ("soft reattach: " + $_.Exception.Message)
