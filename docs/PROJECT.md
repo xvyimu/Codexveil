@@ -341,6 +341,8 @@ sync-upstream-assets.ps1
 
 **发版检查清单**
 
+完整勾选见 [RELEASE-EVIDENCE.md](./RELEASE-EVIDENCE.md)。
+
 - [ ] 分支干净或明确 WIP 说明  
 - [ ] `node packages/core/cli.mjs doctor` 关键字段正常  
 - [ ] `publish-runtime.ps1` 成功，`current.json` 指向新 runtimeId  

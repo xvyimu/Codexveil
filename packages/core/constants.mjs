@@ -13,12 +13,16 @@ import { join } from "node:path";
 export const PRODUCT_ID = "codex-skin";
 export const PRODUCT_NAME = "Codex Skin";
 /**
- * Reserved product-level state schema marker for Node-side docs/exports only.
+ * Node-side docs/export marker only (value 1).
  * Install-side `%LOCALAPPDATA%\CodexDreamSkin\state.json` is written by
  * launcher-ui as **schemaVersion: 3** (accepted range 1..3 on read).
  * Do not treat this constant as the on-disk write version.
  */
-export const STATE_SCHEMA_VERSION = 1;
+export const STATE_SCHEMA_NODE_MARKER = 1;
+/**
+ * @deprecated Prefer STATE_SCHEMA_NODE_MARKER; alias kept for compatibility.
+ */
+export const STATE_SCHEMA_VERSION = STATE_SCHEMA_NODE_MARKER;
 /** theme.json / catalog manifest schema (heige + DreamSkin dual-format). */
 export const THEME_SCHEMA_VERSION = 1;
 export const DEFAULT_THEME_ID = "miku-488137";

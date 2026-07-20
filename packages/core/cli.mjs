@@ -24,7 +24,7 @@ import {
 import {
   DEFAULT_CDP_PORT,
   DEFAULT_THEME_ID,
-  STATE_SCHEMA_VERSION,
+  STATE_SCHEMA_NODE_MARKER,
   THEME_SCHEMA_VERSION,
   resolveStudioPaths,
 } from "./constants.mjs";
@@ -259,9 +259,9 @@ export async function runCli(argv, overrides = {}) {
         port: dreamSkin.controlPort ?? null,
         tokenPresent: Boolean(dreamSkin.controlTokenPresent),
       },
-      // Schema markers: STATE_SCHEMA_VERSION is Node docs only; on-disk write is 3.
+      // Schema markers: STATE_SCHEMA_NODE_MARKER is Node docs only; on-disk write is 3.
       stateSchema: {
-        nodeMarker: STATE_SCHEMA_VERSION,
+        nodeMarker: STATE_SCHEMA_NODE_MARKER,
         onDiskWrite: 3,
         accept: [1, 2, 3],
       },

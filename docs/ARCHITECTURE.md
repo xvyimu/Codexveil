@@ -65,7 +65,7 @@ codex-skin/
 | **3**（现行） | `launcher-ui` 规范化写出（`schemaVersion = 3`） | injector / doctor / check-and-fix |
 | 1–2 | 历史 | `common-windows` 读路径仍接受 `1..3`，缺字段时放宽 |
 
-`packages/core/constants.mjs` 的 `STATE_SCHEMA_VERSION` **不是** state.json 写出版本号（见该文件注释）；主题 manifest 用 `THEME_SCHEMA_VERSION = 1`。
+`packages/core/constants.mjs` 的 `STATE_SCHEMA_NODE_MARKER`（弃用别名 `STATE_SCHEMA_VERSION`）**不是** state.json 写出版本号（见该文件注释）；主题 manifest 用 `THEME_SCHEMA_VERSION = 1`。
 
 ---
 

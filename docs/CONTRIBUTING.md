@@ -86,6 +86,8 @@ pwsh -NoProfile -File scripts\windows\verify-install-matches-repo.ps1 -RepoRoot 
 - exit `2`：本机未安装 / 无 `current.json`  
 - `-Json`：机器可读报告  
 
+发版证据一页纸（维护者勾选）：[RELEASE-EVIDENCE.md](./RELEASE-EVIDENCE.md)。
+
 ---
 
 ## 附录 C-4：publish/产品包 PR 验收
@@ -104,7 +106,7 @@ pwsh -NoProfile -File scripts\windows\verify-install-matches-repo.ps1 -RepoRoot 
 
 **反例**：在 `package.json` 直接改 `version` 字段当作 stamp 权威。
 
-**验收**：`publish-runtime.ps1 -Version <x.y.z>` 后 doctor `expectedRuntimeId` 对齐；Install 路径 soft reattach 后 `fresh=true`。
+**验收**：`publish-runtime.ps1 -Version <x.y.z>` 后 doctor `expectedRuntimeId` 对齐；Install 路径 soft reattach 后 `fresh=true`。完整勾选见 [RELEASE-EVIDENCE.md](./RELEASE-EVIDENCE.md)。
 
 ---
 
@@ -221,12 +223,13 @@ Refs: docs/CONTRIBUTING.md §C-1, task TEST-02
 
 | 常量 / 字段 | 类型 | 当前值 | 语义 | 位置 |
 |------------|------|--------|------|------|
-| `STATE_SCHEMA_VERSION` | 契约常量 | 1 | core 状态契约版本（**非 on-disk 写出**） | `packages/core/constants.mjs` |
+| `STATE_SCHEMA_NODE_MARKER` | 契约常量 | 1 | Node 侧 docs/export 标记（**非 on-disk 写出**） | `packages/core/constants.mjs` |
+| `STATE_SCHEMA_VERSION` | 弃用别名 | = `STATE_SCHEMA_NODE_MARKER` | 兼容旧 import；新代码用 `STATE_SCHEMA_NODE_MARKER` | `packages/core/constants.mjs` |
 | `THEME_SCHEMA_VERSION` | 契约常量 | 1 | theme.json / catalog manifest schema 版本 | `packages/core/constants.mjs` |
 | `state.json.schemaVersion` | on-disk 写出 | 3 | stateRoot\state.json 实际写出版本 | 运行时 / launcher-ui |
 | `current.json.schemaVersion` | on-disk 写出 | 1 | 安装态程序根\current.json 实际写出版本 | 运行时生成 |
 
-**规则**：升级 `STATE_SCHEMA_VERSION` 必须同步迁移 `state.json.schemaVersion` 读写；`THEME_SCHEMA_VERSION` 升级必须同步 `theme-schema.test.mjs`。禁止把 `STATE_SCHEMA_VERSION` 当作 on-disk 写出版本（见 constants 注释与 ARCHITECTURE）。
+**规则**：升级 `STATE_SCHEMA_NODE_MARKER` 必须同步迁移 `state.json.schemaVersion` 读写；`THEME_SCHEMA_VERSION` 升级必须同步 `theme-schema.test.mjs`。禁止把 `STATE_SCHEMA_NODE_MARKER`（或弃用别名 `STATE_SCHEMA_VERSION`）当作 on-disk 写出版本（见 constants 注释与 ARCHITECTURE）。
 
 ---
 

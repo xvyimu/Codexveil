@@ -1,0 +1,5 @@
+Codex Skin (codex-skin) product-line code is MIT-licensed; see LICENSE.
+
+vendor/dreamskin/ is a read-only mirror of upstream Fei-Away/Codex-Dream-Skin
+for promote/sync only. It is not re-licensed by this repository. Do not treat
+vendor/ as first-party MIT grant beyond upstream terms.
