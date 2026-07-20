@@ -270,26 +270,39 @@ if (-not [string]::IsNullOrWhiteSpace($stdoutText)) {
   }
 }
 
-if ($null -ne $summary.inConversation -and -not [bool]$summary.inConversation) {
-  Write-Host "note: inConversation=false — conversation not covered; open a chat and re-run for conversationPass."
+$conversationCovered = $false
+if ($null -ne $summary.inConversation) {
+  $conversationCovered = [bool]$summary.inConversation
+}
+if (-not $conversationCovered) {
+  Write-Host "note: inConversation=false — conversation NOT covered this run."
+  Write-Host "      Open any chat in Codex, then re-run Run-ReleaseProbes for conversation evidence."
+  Write-Host "      (conversationPass may be vacuous-true when not in a chat; do not tick conversation checkbox.)"
+} else {
+  Write-Host "note: inConversation=true — conversation markers observed this run."
 }
 
 if (-not $NoEvidence) {
   try {
     $payload = [ordered]@{
-      schemaVersion  = 1
-      kind           = "release-probe-session"
-      status         = "ran"
-      reason         = $null
-      generatedAt    = $generatedAt
-      port           = $Port
-      repoRoot       = $RepoRoot
-      probeScript    = "scripts/windows/probe-session-dom.mjs"
-      probeExitCode  = [int]$probeExit
-      cdpReachable   = $true
-      command        = $command
-      summary        = $summary
-      probe          = $probeField
+      schemaVersion         = 1
+      kind                  = "release-probe-session"
+      status                = "ran"
+      reason                = $null
+      generatedAt           = $generatedAt
+      port                  = $Port
+      repoRoot              = $RepoRoot
+      probeScript           = "scripts/windows/probe-session-dom.mjs"
+      probeExitCode         = [int]$probeExit
+      cdpReachable          = $true
+      command               = $command
+      conversationCovered   = [bool]$conversationCovered
+      releaseCheckHints     = [ordered]@{
+        homeOk          = $(if ($null -ne $summary.pass) { [bool]$summary.pass -and [bool]$summary.ok -and [bool]$summary.dreamStyle } else { $null })
+        conversationOk  = $(if ($conversationCovered -and $null -ne $summary.conversationPass) { [bool]$summary.conversationPass } else { $false })
+      }
+      summary               = $summary
+      probe                 = $probeField
     }
     $evidencePath = Write-EvidenceFile -Dir $EvidenceDir -Payload $payload
     Write-Host "Evidence file: $evidencePath"
@@ -302,12 +315,14 @@ if (-not $NoEvidence) {
 }
 
 Write-Host (
-  "summary: status=ran exit={0} ok={1} dreamStyle={2} pass={3} conversationPass={4}" -f `
+  "summary: status=ran exit={0} ok={1} dreamStyle={2} pass={3} conversationPass={4} inConversation={5} conversationCovered={6}" -f `
     $probeExit,
     (Format-NullableBool $summary.ok),
     (Format-NullableBool $summary.dreamStyle),
     (Format-NullableBool $summary.pass),
-    (Format-NullableBool $summary.conversationPass)
+    (Format-NullableBool $summary.conversationPass),
+    (Format-NullableBool $summary.inConversation),
+    ($(if ($conversationCovered) { "true" } else { "false" }))
 )
 
 exit $probeExit

@@ -1,6 +1,17 @@
-/** Pure CDP WebSocket URL guard (loopback-only). Used by injector.mjs. */
+/** Pure CDP WebSocket URL + browser/page id guards (loopback-only). Used by injector.mjs. */
 
 export const LOOPBACK_HOSTS = new Set(["127.0.0.1", "localhost", "[::1]", "::1"]);
+
+/** CDP target / browser id shape (page id, browser id path segment). */
+export const BROWSER_ID_PATTERN = /^[A-Za-z0-9._-]{1,200}$/;
+
+/**
+ * @param {unknown} id
+ * @returns {boolean}
+ */
+export function isValidBrowserId(id) {
+  return typeof id === "string" && id.length > 0 && BROWSER_ID_PATTERN.test(id);
+}
 
 /**
  * @param {{ webSocketDebuggerUrl: string }} target

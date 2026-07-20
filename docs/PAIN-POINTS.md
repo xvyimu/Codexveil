@@ -65,6 +65,7 @@
 | ID | 日期 | 结论 |
 |----|------|------|
 | **SEC-02** | 2026-07-21 | 已审计：`Write-CodexSkinLog` / control-plane `console.error` / kick-inject 路径**未**把 `control.token` 明文写入日志；token 仅作 header/内存比较。health 仅回传 `tokenPresent` 布尔。 |
+| **SECURITY.md** | 2026-07-21 | 威胁模型 + 报告渠道：[`SECURITY.md`](./SECURITY.md) |
 
 ## 相关文档
 

@@ -2,7 +2,12 @@
  * CDP URL guard unit tests (no network).
  * Run: node packages/runtime/scripts/cdp-url-guard.test.mjs
  */
-import { LOOPBACK_HOSTS, validatedDebuggerUrl } from "./cdp-url-guard.mjs";
+import {
+  BROWSER_ID_PATTERN,
+  LOOPBACK_HOSTS,
+  isValidBrowserId,
+  validatedDebuggerUrl,
+} from "./cdp-url-guard.mjs";
 
 let failed = 0;
 function assert(cond, msg) {
@@ -69,6 +74,16 @@ for (const value of invalid) {
     `rejects unsafe URL: ${value}`,
   );
 }
+
+// Browser / page id shape (shared with injector parseArgs / page filter)
+assert(BROWSER_ID_PATTERN.test("abc-123_X.y"), "BROWSER_ID_PATTERN accepts alnum._-");
+assert(!BROWSER_ID_PATTERN.test(""), "BROWSER_ID_PATTERN rejects empty");
+assert(!BROWSER_ID_PATTERN.test("has space"), "BROWSER_ID_PATTERN rejects space");
+assert(!BROWSER_ID_PATTERN.test("a".repeat(201)), "BROWSER_ID_PATTERN rejects >200 chars");
+assert(isValidBrowserId("page-1"), "isValidBrowserId accepts page-1");
+assert(!isValidBrowserId(null), "isValidBrowserId rejects null");
+assert(!isValidBrowserId(12), "isValidBrowserId rejects number");
+assert(!isValidBrowserId(""), "isValidBrowserId rejects empty string");
 
 if (failed > 0) {
   console.error(`cdp-url-guard.test: ${failed} failure(s)`);

@@ -30,6 +30,7 @@
 | [`CHANGELOG.md`](./CHANGELOG.md) | 版本时间线 |
 | [`PAIN-POINTS.md`](./PAIN-POINTS.md) | 已知痛点与状态 |
 | [`GLOSSARY.md`](./GLOSSARY.md) | 领域术语 |
+| [`SECURITY.md`](./SECURITY.md) | 威胁模型 · 报告渠道 · 在/出范围 |
 | [`usage.md`](./usage.md) | 用户侧使用说明 |
 | [`dual-open-policy.md`](./dual-open-policy.md) | 入口纪律与 kick 降级 |
 | [`CONTRIBUTING.md`](./CONTRIBUTING.md) | PR 必答 7 问 · 8 类规范 · 禁止事项速查表 |

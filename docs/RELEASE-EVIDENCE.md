@@ -43,7 +43,8 @@ npm run probe:session
 - [ ] **conversation**  
   **须先打开任一对话**，再跑同上  
   **留痕**：同上路径（建议另存/另次时间戳文件）  
-  **勾选前提**：`status=ran` 且 `summary.conversationPass=true`（建议 `inConversation=true`）；exit 0（失败 exit 3）
+  **勾选前提（硬）**：evidence `status=ran` 且 **`conversationCovered=true`**（或 `summary.inConversation=true`）且 `summary.conversationPass=true`；`releaseCheckHints.conversationOk=true` 时更佳；exit 0（失败 exit 3）  
+  **禁止**：仅因 `conversationPass=true` 而 `inConversation=false`（vacuous true，home 跑也会绿）就勾 conversation
 
 - [ ] 包装纪律（打印 §9.4 期望 + 可选实跑 / skip 留痕）：  
   `pwsh -NoProfile -File scripts/windows/Run-ReleaseProbes.ps1`  

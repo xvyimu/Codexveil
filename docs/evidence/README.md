@@ -58,6 +58,9 @@ node scripts/windows/probe-session-dom.mjs
 | `reason` | skip 时必填：`no-cdp` / `probe-script-missing` 等 |
 | `cdpReachable` | CDP `/json/list` 预检 |
 | `probeExitCode` | 透传 node probe exit；skip 可为 `null` |
+| `conversationCovered` | `ran` 时：是否观测到会话 DOM（`inConversation`） |
+| `releaseCheckHints.homeOk` | 是否可勾 home（ok+dreamStyle+pass） |
+| `releaseCheckHints.conversationOk` | **仅** `conversationCovered` 时才可能为 true |
 | `summary.ok` / `dreamStyle` / `pass` / `conversationPass` | 从 probe stdout 抽取；skip 时全 `null` |
 | `summary.onHome` / `inConversation` | 场景提示 |
 | `probe` | 解析后的 probe 对象；skip 为 `null`；stdout 非 JSON 时可能含 `rawStdout`（截断） |

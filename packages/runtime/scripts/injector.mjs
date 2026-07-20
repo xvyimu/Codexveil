@@ -14,7 +14,7 @@ import { createHash } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { readImageMetadata } from "./image-metadata.mjs";
-import { validatedDebuggerUrl } from "./cdp-url-guard.mjs";
+import { BROWSER_ID_PATTERN, isValidBrowserId, validatedDebuggerUrl } from "./cdp-url-guard.mjs";
 import {
   MAX_THEME_CATALOG_ENTRIES,
   MAX_THEME_CATALOG_BYTES,
@@ -38,7 +38,7 @@ const MAX_ART_BYTES = 16 * 1024 * 1024;
 const DEFAULT_PAYLOAD_BUDGET_BYTES = 4 * 1024 * 1024;
 // Strong audit less often: catalog stamp checks already cover normal switches.
 const STRONG_THEME_AUDIT_MS = 60000;
-const BROWSER_ID_PATTERN = /^[A-Za-z0-9._-]{1,200}$/;
+// BROWSER_ID_PATTERN / isValidBrowserId: packages/runtime/scripts/cdp-url-guard.mjs
 
 class CdpIdentityMismatchError extends Error {}
 
@@ -81,7 +81,7 @@ function parseArgs(argv) {
   if (!Number.isInteger(options.timeoutMs) || options.timeoutMs < 250 || options.timeoutMs > 120000) {
     throw new Error(`Invalid timeout: ${options.timeoutMs}`);
   }
-  if (options.browserId !== null && !BROWSER_ID_PATTERN.test(options.browserId)) {
+  if (options.browserId !== null && !isValidBrowserId(options.browserId)) {
     throw new Error(`Invalid browser ID: ${options.browserId}`);
   }
   if (["watch", "once", "verify", "remove"].includes(options.mode) && !options.browserId) {
@@ -94,15 +94,15 @@ function browserIdFromVersion(version, port) {
   const url = validatedDebuggerUrl(version, port);
   const parsed = new URL(url);
   const match = parsed.pathname.match(/^\/devtools\/browser\/([A-Za-z0-9._-]{1,200})$/);
-  if (!match || parsed.search || parsed.hash || !BROWSER_ID_PATTERN.test(match[1])) {
+  if (!match || parsed.search || parsed.hash || !isValidBrowserId(match[1])) {
     throw new Error("Rejected an invalid CDP browser identity URL");
   }
   return match[1];
 }
 
 function isValidCdpPageTarget(item, port) {
-  if (item?.type !== "page" || !item.url?.startsWith("app://") || typeof item.id !== "string" ||
-      !BROWSER_ID_PATTERN.test(item.id) || !item.webSocketDebuggerUrl) return false;
+  if (item?.type !== "page" || !item.url?.startsWith("app://") || !isValidBrowserId(item.id) ||
+      !item.webSocketDebuggerUrl) return false;
   try {
     const debuggerUrl = new URL(validatedDebuggerUrl(item, port));
     return debuggerUrl.pathname === `/devtools/page/${item.id}`;

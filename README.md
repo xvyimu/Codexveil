@@ -32,6 +32,7 @@
 | 安装态 `current.json` / `runtimeId` | 本机当前引擎，如 `1.3.25-d14cf4` |
 
 全面检查：[`docs/AUDIT-2026-07-20.md`](docs/AUDIT-2026-07-20.md)。  
+安全策略：[`docs/SECURITY.md`](docs/SECURITY.md)。  
 残差规划（G1 CI / G3 mac / G4 #21 / G5 Quiet）：[`docs/plans/residual-g1-g3-g4-g5-2026-07-20.md`](docs/plans/residual-g1-g3-g4-g5-2026-07-20.md)。
 
 **CI**：GitHub Actions `themes-gate` 在 push/PR 跑 `npm test`（= `test:themes` + `test:deps` + `test:freshness`；**不等于**本机 `doctor`/smoke/live probe；完整诊断仍在 Windows 安装态）。
