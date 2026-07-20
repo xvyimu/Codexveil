@@ -26,6 +26,7 @@
 |------|------|
 | [`ARCHITECTURE.md`](./ARCHITECTURE.md) | 目录、调用链、源码映射（实现侧） |
 | [`AUDIT-2026-07-20.md`](./AUDIT-2026-07-20.md) | 全面检查报告（边界 · 模块 · 发现项 · hygiene） |
+| [`plans/residual-g1-g3-g4-g5-2026-07-20.md`](./plans/residual-g1-g3-g4-g5-2026-07-20.md) | 残差 G1/G3/G4/G5 多方案对比与推荐组合 |
 | [`CHANGELOG.md`](./CHANGELOG.md) | 版本时间线 |
 | [`PAIN-POINTS.md`](./PAIN-POINTS.md) | 已知痛点与状态 |
 | [`GLOSSARY.md`](./GLOSSARY.md) | 领域术语 |
@@ -497,6 +498,7 @@ paused/locked: false（正常使用时）
 | ~~P2~~ | ~~修复/回归工具快捷方式 UX（#18）~~ | — | **已完成** · install-ux 唯一源 + Codex 工具文件夹 |
 | ~~P2~~ | ~~清理 heige studio 残留（#20）~~ | — | **已完成** · 扫删 lnk + 文档；本机无独立目录 |
 | 已知限 | Store AUMID / 商店磁贴裸启（#21） | OS | **已文档化** · usage + dual-open-policy；日常钉任务栏 |
+| 规划 | 残差 G1 CI / G3 mac / G4 #21 / G5 Quiet | docs/plans | **方案已定** · 见 residual 规划；实现待确认（推荐 G1-B + G5-C） |
 | ~~文档~~ | ~~CHANGELOG unreleased 并入正式版号~~ | — | **已完成** · 记入 1.3.25 |
 
 ### 12.3 明确不在范围

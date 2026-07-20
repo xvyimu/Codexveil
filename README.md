@@ -80,6 +80,7 @@ powershell -File scripts\windows\publish-runtime.ps1 -RepoRoot D:\orca\codex-ski
 - [`PROJECT.md`](docs/PROJECT.md) — **项目总纲**（边界 · 分层 · 模块契约 · 验收 · 路线图；Agent 先读）
 - [`ARCHITECTURE.md`](docs/ARCHITECTURE.md) — 目录 · 边界 · 调用链 · 源码映射
 - [`AUDIT-2026-07-20.md`](docs/AUDIT-2026-07-20.md) — 全面检查报告（规范 · 模块 · 前后端映射 · 发现项）
+- [`plans/residual-g1-g3-g4-g5-2026-07-20.md`](docs/plans/residual-g1-g3-g4-g5-2026-07-20.md) — 残差 G1/G3/G4/G5 多方案对比与推荐
 - [`CHANGELOG.md`](docs/CHANGELOG.md) — 版本时间线
 - [`PAIN-POINTS.md`](docs/PAIN-POINTS.md) — 痛点合集与状态
 - [`usage.md`](docs/usage.md) — 使用说明

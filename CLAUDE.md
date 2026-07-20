@@ -30,6 +30,7 @@ npm run test:themes
 
 - **先读** [`docs/PROJECT.md`](docs/PROJECT.md)：边界、分层、依赖禁止项、验收门禁、Agent 任务模板
 - 全面检查基线：[`docs/AUDIT-2026-07-20.md`](docs/AUDIT-2026-07-20.md)
+- 残差规划（CI / mac / #21 / Quiet）：[`docs/plans/residual-g1-g3-g4-g5-2026-07-20.md`](docs/plans/residual-g1-g3-g4-g5-2026-07-20.md)
 - 改主题：`themes/<id>/theme.json` + 资源；注册见 `packages/themes/`；改 schema 跑 `npm run test:themes`
 - Windows 启动路径优先 `apps/launcher/*.ps1`（用 **pwsh**）
 - 注入/CDP 相关改动先跑 `doctor` / 既有 smoke，勿盲改端口发现
