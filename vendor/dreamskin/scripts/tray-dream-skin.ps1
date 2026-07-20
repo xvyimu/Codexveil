@@ -291,11 +291,22 @@ try {
     $switchVbs = Join-Path $env:LOCALAPPDATA 'Programs\CodexDreamSkin\launch-switch-theme.vbs'
     $switchUi = Join-Path $env:LOCALAPPDATA 'Programs\CodexDreamSkin\switch-theme-ui.ps1'
     $openDreamSkin = {
-      Set-DreamSkinPaused -Paused $false -StateRoot $StateRoot | Out-Null
-      if (Test-Path -LiteralPath $openScript -PathType Leaf) {
-        Start-DreamSkinPowerShell -Script $openScript -Arguments @('-Port', "$Port", '-NoPrompt')
+      # #8 tray focus native: in-process WinFocus6 when healthy, else CodexFastLaunch.exe.
+      if (Get-Command Invoke-CodexSkinNativeOpenOrFocus -ErrorAction SilentlyContinue) {
+        $mode = Invoke-CodexSkinNativeOpenOrFocus -Port $Port -ProgramRoot $script:ProgramRoot -StateRoot $StateRoot
+        if ($mode -eq 'failed' -and (Test-Path -LiteralPath $openScript -PathType Leaf)) {
+          Start-DreamSkinPowerShell -Script $openScript -Arguments @('-Port', "$Port", '-NoPrompt')
+        }
       } else {
-        Start-DreamSkinPowerShell -Script $startScript -Arguments @('-Port', "$Port", '-PromptRestart')
+        Set-DreamSkinPaused -Paused $false -StateRoot $StateRoot | Out-Null
+        $nativeExe = Join-Path $env:LOCALAPPDATA 'Programs\CodexDreamSkin\CodexFastLaunch.exe'
+        if (Test-Path -LiteralPath $nativeExe -PathType Leaf) {
+          Start-Process -FilePath $nativeExe -WindowStyle Hidden | Out-Null
+        } elseif (Test-Path -LiteralPath $openScript -PathType Leaf) {
+          Start-DreamSkinPowerShell -Script $openScript -Arguments @('-Port', "$Port", '-NoPrompt')
+        } else {
+          Start-DreamSkinPowerShell -Script $startScript -Arguments @('-Port', "$Port", '-PromptRestart')
+        }
       }
     }.GetNewClosure()
     # Primary daily actions first — bare recovery is top CTA when needed
@@ -445,12 +456,19 @@ try {
   $menu.add_Opening({ Rebuild-DreamSkinTrayMenu })
   $notify.add_DoubleClick({
     try {
-      $openScript = Join-Path $env:LOCALAPPDATA 'Programs\CodexDreamSkin\open-codex-dream-skin.ps1'
-      Set-DreamSkinPaused -Paused $false -StateRoot $StateRoot | Out-Null
-      if (Test-Path -LiteralPath $openScript -PathType Leaf) {
-        Start-DreamSkinPowerShell -Script $openScript -Arguments @('-Port', "$Port")
+      if (Get-Command Invoke-CodexSkinNativeOpenOrFocus -ErrorAction SilentlyContinue) {
+        [void](Invoke-CodexSkinNativeOpenOrFocus -Port $Port -ProgramRoot $script:ProgramRoot -StateRoot $StateRoot)
       } else {
-        Start-DreamSkinPowerShell -Script $startScript -Arguments @('-Port', "$Port", '-PromptRestart')
+        $openScript = Join-Path $env:LOCALAPPDATA 'Programs\CodexDreamSkin\open-codex-dream-skin.ps1'
+        $nativeExe = Join-Path $env:LOCALAPPDATA 'Programs\CodexDreamSkin\CodexFastLaunch.exe'
+        Set-DreamSkinPaused -Paused $false -StateRoot $StateRoot | Out-Null
+        if (Test-Path -LiteralPath $nativeExe -PathType Leaf) {
+          Start-Process -FilePath $nativeExe -WindowStyle Hidden | Out-Null
+        } elseif (Test-Path -LiteralPath $openScript -PathType Leaf) {
+          Start-DreamSkinPowerShell -Script $openScript -Arguments @('-Port', "$Port")
+        } else {
+          Start-DreamSkinPowerShell -Script $startScript -Arguments @('-Port', "$Port", '-PromptRestart')
+        }
       }
     } catch {
       Show-DreamSkinTrayError -Message $_.Exception.Message

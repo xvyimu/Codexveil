@@ -772,7 +772,132 @@ function Repair-CodexSkinDisabledRenderWindows {
   }
 }
 
+function Invoke-CodexSkinNativeOpenOrFocus {
+  <#
+  .SYNOPSIS
+    Open/focus Codex without cold-starting a second PowerShell open script.
+  .DESCRIPTION
+    Prefer in-process WinFocus6 focus when Codex already looks running (tray has
+    launcher-ui loaded). Otherwise fire-and-forget CodexFastLaunch.exe
+    (native ~100ms). Last resort: open-codex-dream-skin.ps1.
+    Tray path for PAIN-POINTS #8 / #16.
+  .OUTPUTS
+    string — focused | native-launched | ps-launched | failed
+  #>
+  param(
+    [ValidateRange(1024, 65535)][int]$Port = 9335,
+    [string]$ProgramRoot = (Get-CodexSkinProgramRoot),
+    [string]$StateRoot = (Get-CodexSkinStateRoot),
+    [switch]$PreferNativeExe
+  )
+  $sw = [System.Diagnostics.Stopwatch]::StartNew()
+  try {
+    try {
+      if (Get-Command Set-DreamSkinPaused -ErrorAction SilentlyContinue) {
+        Set-DreamSkinPaused -Paused $false -StateRoot $StateRoot | Out-Null
+      }
+    } catch {}
+
+    $nativeExe = Join-Path $ProgramRoot 'CodexFastLaunch.exe'
+    $openScript = Join-Path $ProgramRoot 'open-codex-dream-skin.ps1'
+
+    if (-not $PreferNativeExe) {
+      try {
+        Ensure-CodexSkinFocusType
+        $cg = @(Get-Process -Name ChatGPT -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowHandle -ne [IntPtr]::Zero })
+        if ($cg.Count -eq 0) {
+          $cg = @(Get-Process -Name ChatGPT,Codex -ErrorAction SilentlyContinue)
+        }
+        if ($cg.Count -gt 0) {
+          try { [void](Repair-CodexSkinDisabledRenderWindows) } catch {}
+          # Ultra-fast path: one MainWindow FocusHwnd attempt (~tens of ms) before
+          # the longer Focus-CodexSkinWindow retry budget.
+          foreach ($proc in $cg) {
+            try {
+              $proc.Refresh()
+              $hwnd = $proc.MainWindowHandle
+              if ($hwnd -ne [IntPtr]::Zero -and [CodexSkin.WinFocus6]::FocusHwnd([IntPtr]$hwnd)) {
+                Write-CodexSkinLog ("tray native focus ok (main-handle) ms=" + $sw.ElapsedMilliseconds)
+                return 'focused'
+              }
+            } catch {}
+          }
+          $codexObj = $null
+          try {
+            if (Get-Command Get-DreamSkinCodexInstall -ErrorAction SilentlyContinue) {
+              $codexObj = Get-DreamSkinCodexInstall
+            }
+          } catch {}
+          $focused = $false
+          if ($null -ne $codexObj -and (Get-Command Focus-CodexSkinWindow -ErrorAction SilentlyContinue)) {
+            $eq = $null
+            if (Get-Command Test-DreamSkinPathEqual -ErrorAction SilentlyContinue) {
+              $eq = { param($a, $b) Test-DreamSkinPathEqual -Left $a -Right $b }
+            }
+            $focused = [bool](Focus-CodexSkinWindow -Codex $codexObj -PathEqual $eq -TimeoutMs 350)
+          } else {
+            foreach ($proc in $cg) {
+              try {
+                $proc.Refresh()
+                $hwnd = $proc.MainWindowHandle
+                if ($hwnd -ne [IntPtr]::Zero -and [CodexSkin.WinFocus6]::FocusHwnd([IntPtr]$hwnd)) {
+                  $focused = $true
+                  break
+                }
+              } catch {}
+            }
+            if (-not $focused) {
+              try {
+                $pids = New-Object 'System.Collections.Generic.HashSet[uint32]'
+                foreach ($proc in $cg) { try { [void]$pids.Add([uint32]$proc.Id) } catch {} }
+                $hits = [CodexSkin.WinFocus6]::FindWindows($pids)
+                foreach ($hit in $hits) {
+                  if ([CodexSkin.WinFocus6]::FocusHwnd($hit.Hwnd)) { $focused = $true; break }
+                }
+              } catch {}
+            }
+            if (-not $focused -and (Get-Command Try-CodexSkinAppActivate -ErrorAction SilentlyContinue)) {
+              $focused = [bool](Try-CodexSkinAppActivate)
+            }
+          }
+          if ($focused) {
+            Write-CodexSkinLog ("tray native focus ok ms=" + $sw.ElapsedMilliseconds)
+            return 'focused'
+          }
+        }
+      } catch {
+        Write-CodexSkinLog ('tray in-process focus skipped: ' + $_.Exception.Message)
+      }
+    }
+
+    if (Test-Path -LiteralPath $nativeExe -PathType Leaf) {
+      try {
+        Start-Process -FilePath $nativeExe -WorkingDirectory $ProgramRoot -WindowStyle Hidden | Out-Null
+        Write-CodexSkinLog ("tray launched CodexFastLaunch.exe ms=" + $sw.ElapsedMilliseconds)
+        return 'native-launched'
+      } catch {
+        Write-CodexSkinLog ('tray native exe failed: ' + $_.Exception.Message)
+      }
+    }
+
+    if (Test-Path -LiteralPath $openScript -PathType Leaf) {
+      $psExe = (Get-Command powershell.exe -ErrorAction Stop).Source
+      Start-Process -FilePath $psExe -ArgumentList @(
+        '-NoProfile','-STA','-WindowStyle','Hidden','-ExecutionPolicy','Bypass',
+        '-File', $openScript, '-Port', "$Port", '-NoPrompt'
+      ) -WindowStyle Hidden | Out-Null
+      Write-CodexSkinLog ("tray launched open-codex-dream-skin.ps1 ms=" + $sw.ElapsedMilliseconds)
+      return 'ps-launched'
+    }
+    return 'failed'
+  } catch {
+    Write-CodexSkinLog ('Invoke-CodexSkinNativeOpenOrFocus failed: ' + $_.Exception.Message)
+    return 'failed'
+  }
+}
+
 function Invoke-CodexSkinControl {
+
   <#
   .SYNOPSIS
     Call watch control plane (127.0.0.1:9336 by default). Returns $null on miss.

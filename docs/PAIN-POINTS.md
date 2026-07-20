@@ -35,7 +35,7 @@
 
 | # | 痛点 | 版本 | 状态 |
 |---|---|---|---|
-| 16 | 控制面 `/focus` ~1s（spawn PS） | 1.3.9 | 已绕过 · 任务栏 native 进程内 focus；`/open-healthy` 不再阻塞等 focus |
+| 16 | 控制面 `/focus` ~1s（spawn PS） | 1.3.9 | 已绕过 · 任务栏/托盘 native 进程内 focus；`/open-healthy` 异步 |
 | 17 | VBS 快路径 ~2.5s（WinHttp + focus PS 冷启动） | 1.3.9 | 已废弃 · 任务栏改 CodexFastLaunch.exe |
 | 18 | 修复/回归工具链偏工程师向，普通用户误点 | 1.3.2 | 未整合 · 快捷方式仍散 |
 | 19 | ChatGPT 8 Electron 进程，MainWindow 难找 | 1.3.9 | 已修 · 进程评分修好后生效 |
