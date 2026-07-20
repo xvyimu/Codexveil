@@ -1,4 +1,4 @@
-# Timed modular E2E + pain capture. ASCII only for PS 5.1 parser safety.
+﻿# Timed modular E2E + pain capture. ASCII only for PS 5.1 parser safety.
 $ErrorActionPreference = 'Continue'
 $ProgressPreference = 'SilentlyContinue'
 $programRoot = Join-Path $env:LOCALAPPDATA 'Programs\CodexDreamSkin'
@@ -17,7 +17,17 @@ function Add-Case($name, $pass, $ms, $detail, $notes = @(), $severity = 'info') 
 
 function Invoke-Timed {
   param([string]$FilePath, [string[]]$ArgumentList, [int]$TimeoutSec = 45)
-  $out = Join-Path $env:TEMP ("e2e-out-" + [guid]::NewGuid().ToString('n') + '.txt')
+  
+$ErrorActionPreference = 'Stop'
+# UTF-8 console bootstrap (PAIN-POINTS #22)
+try {
+  & chcp.com 65001 | Out-Null
+  $utf8 = [System.Text.UTF8Encoding]::new($false)
+  try { [Console]::OutputEncoding = $utf8 } catch {}
+  try { [Console]::InputEncoding = $utf8 } catch {}
+  $OutputEncoding = $utf8
+} catch {}
+$out = Join-Path $env:TEMP ("e2e-out-" + [guid]::NewGuid().ToString('n') + '.txt')
   $err = Join-Path $env:TEMP ("e2e-err-" + [guid]::NewGuid().ToString('n') + '.txt')
   $sw = [Diagnostics.Stopwatch]::StartNew()
   $p = Start-Process -FilePath $FilePath -ArgumentList $ArgumentList -PassThru -WindowStyle Hidden -RedirectStandardOutput $out -RedirectStandardError $err

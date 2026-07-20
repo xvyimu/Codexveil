@@ -15,6 +15,14 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+# UTF-8 console bootstrap (PAIN-POINTS #22). Full helper also runs when launcher-ui is dotted.
+try {
+  & chcp.com 65001 | Out-Null
+  $utf8 = [System.Text.UTF8Encoding]::new($false)
+  try { [Console]::OutputEncoding = $utf8 } catch {}
+  try { [Console]::InputEncoding = $utf8 } catch {}
+  $OutputEncoding = $utf8
+} catch {}
 $script:SwitchLog = Join-Path $env:TEMP "codex-switch-theme-error.log"
 $script:Form = $null
 $script:Tray = $null

@@ -1,6 +1,14 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param([ValidateRange(1024, 65535)][int]$Port = 9335)
-$ErrorActionPreference = 'Stop'
+$ErrorActionPreference = "Stop"
+# UTF-8 console bootstrap (PAIN-POINTS #22). Full helper also runs when launcher-ui is dotted.
+try {
+  & chcp.com 65001 | Out-Null
+  $utf8 = [System.Text.UTF8Encoding]::new($false)
+  try { [Console]::OutputEncoding = $utf8 } catch {}
+  try { [Console]::InputEncoding = $utf8 } catch {}
+  $OutputEncoding = $utf8
+} catch {}
 $programRoot = [System.IO.Path]::GetFullPath($PSScriptRoot)
 $stateRoot = Join-Path $env:LOCALAPPDATA 'CodexDreamSkin'
 $open = Join-Path $programRoot 'open-codex-dream-skin.ps1'

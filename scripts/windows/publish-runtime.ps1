@@ -7,7 +7,10 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+try { & chcp.com 65001 | Out-Null } catch {}
 [Console]::OutputEncoding = [Text.Encoding]::UTF8
+try { [Console]::InputEncoding = [Text.Encoding]::UTF8 } catch {}
+$OutputEncoding = [Text.Encoding]::UTF8
 
 $programRoot = Join-Path $env:LOCALAPPDATA "Programs\CodexDreamSkin"
 if (-not (Test-Path -LiteralPath $programRoot)) {

@@ -29,7 +29,15 @@ param(
   [switch]$ShowReady
 )
 
-$ErrorActionPreference = 'Stop'
+$ErrorActionPreference = "Stop"
+# UTF-8 console bootstrap (PAIN-POINTS #22). Full helper also runs when launcher-ui is dotted.
+try {
+  & chcp.com 65001 | Out-Null
+  $utf8 = [System.Text.UTF8Encoding]::new($false)
+  try { [Console]::OutputEncoding = $utf8 } catch {}
+  try { [Console]::InputEncoding = $utf8 } catch {}
+  $OutputEncoding = $utf8
+} catch {}
 
 # PSModulePath hardening for Windows PowerShell 5.1.
 # 与 post-update-regression.ps1 同理：任何父进程若是 pwsh (PS 7)，会往

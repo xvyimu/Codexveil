@@ -21,6 +21,43 @@ if (Get-Variable -Name CodexSkinLauncherUiLoaded -Scope Script -ErrorAction Sile
 }
 $script:CodexSkinLauncherUiLoaded = $true
 
+function Initialize-CodexSkinConsoleUtf8 {
+  <#
+  .SYNOPSIS
+    Make host console print Chinese without GBK mojibake (PAIN-POINTS #22).
+  .DESCRIPTION
+    Windows PowerShell 5.1 defaults to system ANSI/GBK for console I/O. This
+    switches both input and output encodings to UTF-8 (code page 65001) and
+    aligns $OutputEncoding so native tools piping into PS also see UTF-8.
+    Safe no-op when there is no interactive console (hidden launchers).
+  #>
+  param([switch]$Force)
+  if (-not $Force -and $script:CodexSkinConsoleUtf8Ready) { return $true }
+  try {
+    # code page 65001 = UTF-8. chcp output is discarded (locale noise).
+    try { & chcp.com 65001 | Out-Null } catch {}
+    $utf8 = [System.Text.UTF8Encoding]::new($false)
+    try { [Console]::OutputEncoding = $utf8 } catch {}
+    try { [Console]::InputEncoding = $utf8 } catch {}
+    $global:OutputEncoding = $utf8
+    # PS 7 already defaults to UTF-8; still set for consistency.
+    try {
+      if ($PSVersionTable.PSVersion.Major -ge 6) {
+        $PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
+        $PSDefaultParameterValues['Set-Content:Encoding'] = 'utf8'
+        $PSDefaultParameterValues['Add-Content:Encoding'] = 'utf8'
+      }
+    } catch {}
+    $script:CodexSkinConsoleUtf8Ready = $true
+    return $true
+  } catch {
+    return $false
+  }
+}
+
+# Best-effort at import time so any host that dotsources this lib gets UTF-8.
+[void](Initialize-CodexSkinConsoleUtf8)
+
 function Get-CodexSkinProgramRoot {
   param([string]$Hint)
   if ($Hint -and (Test-Path -LiteralPath $Hint)) {

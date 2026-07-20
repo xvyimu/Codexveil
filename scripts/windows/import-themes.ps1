@@ -1,10 +1,18 @@
-# Unlock DreamSkin themes, import bundled catalog, optionally re-lock.
+﻿# Unlock DreamSkin themes, import bundled catalog, optionally re-lock.
 param(
   [switch]$KeepUnlocked,
   [string]$RepoRoot = (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent)
 )
 
 $ErrorActionPreference = "Stop"
+# UTF-8 console bootstrap (PAIN-POINTS #22). Full helper also runs when launcher-ui is dotted.
+try {
+  & chcp.com 65001 | Out-Null
+  $utf8 = [System.Text.UTF8Encoding]::new($false)
+  try { [Console]::OutputEncoding = $utf8 } catch {}
+  try { [Console]::InputEncoding = $utf8 } catch {}
+  $OutputEncoding = $utf8
+} catch {}
 $lockScript = Join-Path $env:LOCALAPPDATA "Programs\CodexDreamSkin\lock-themes.ps1"
 $node = (Get-Command node -ErrorAction Stop).Source
 $cli = Join-Path $RepoRoot "packages\core\cli.mjs"

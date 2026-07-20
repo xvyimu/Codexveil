@@ -41,7 +41,7 @@
 | 19 | ChatGPT 8 Electron 进程，MainWindow 难找 | 1.3.9 | 已修 · 进程评分修好后生效 |
 | 20 | heige studio 目录残留（无进程） | 1.3.2 | 未清 · 双开诱惑 |
 | 21 | 商店磁贴/AUMID/Codex-X 仍可能裸启 | 1.3.2 | 已知限制 · 无法拦 |
-| 22 | 控制台中文乱码（GBK 工具链） | 1.3.2 | 未修 · 快捷方式本体 Unicode 正常 |
+| 22 | 控制台中文乱码（GBK 工具链） | 1.3.2 | 已修 · `Initialize-CodexSkinConsoleUtf8` + 入口 chcp 65001 / UTF-8 OutputEncoding |
 | 23 | verify 对 chat bubble 选择器 `data-user-message-bubble` not found | 1.3.2 | 已修 · 多 fallback + conversationOk；真会话 verify 通过 |
 
 ---

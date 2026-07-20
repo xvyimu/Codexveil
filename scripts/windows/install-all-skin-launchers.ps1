@@ -8,6 +8,14 @@
   彻底去掉 VBS 层（旧版 WaitOnReturn 会卡死任务栏）。
 #>
 $ErrorActionPreference = "Stop"
+# UTF-8 console bootstrap (PAIN-POINTS #22). Full helper also runs when launcher-ui is dotted.
+try {
+  & chcp.com 65001 | Out-Null
+  $utf8 = [System.Text.UTF8Encoding]::new($false)
+  try { [Console]::OutputEncoding = $utf8 } catch {}
+  try { [Console]::InputEncoding = $utf8 } catch {}
+  $OutputEncoding = $utf8
+} catch {}
 $prog = Join-Path $env:LOCALAPPDATA "Programs\CodexDreamSkin"
 $openPs1 = Join-Path $prog "open-codex-dream-skin.ps1"
 $fastExe = Join-Path $prog "CodexFastLaunch.exe"

@@ -1,8 +1,16 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 # Instant theme kick. Prefer watch control plane; fallback to injector --once.
 # Exit: 0 ok, 2 no-state, 3 incomplete/missing injector, 4 no-node, 5 cdp-closed, other=injector exit
 param()
 $ErrorActionPreference = "Stop"
+# UTF-8 console bootstrap (PAIN-POINTS #22). Full helper also runs when launcher-ui is dotted.
+try {
+  & chcp.com 65001 | Out-Null
+  $utf8 = [System.Text.UTF8Encoding]::new($false)
+  try { [Console]::OutputEncoding = $utf8 } catch {}
+  try { [Console]::InputEncoding = $utf8 } catch {}
+  $OutputEncoding = $utf8
+} catch {}
 $programRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $stateRoot = Join-Path $env:LOCALAPPDATA "CodexDreamSkin"
 $statePath = Join-Path $stateRoot "state.json"
