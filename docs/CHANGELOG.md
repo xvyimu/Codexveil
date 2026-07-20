@@ -6,14 +6,30 @@
 
 ---
 
-## unreleased — multi-theme catalog complete (11 bundled)
+## 1.3.25 — multi-theme catalog + shortcut UX · 1.3.25-4dca30
+
+### 主题 catalog（11 bundled）
 
 - **preset 入库**：`themes/preset-arina-hashimoto/`（hero.jpg + heige schema + copy/art/palette），`import-themes` 覆盖默认 DreamSkin 主题。
 - **schema 双格式透传**：`loadTheme` / `validateThemeManifest` 同时接受 heige（`hero`/`colors`/`copy`）与 DreamSkin catalog（`image`/`palette`/`brandSubtitle`/`tagline`/`art`），避免从用户 catalog 再 `apply` 时冲空 palette。
 - **adapter 圆整**：`heigeManifestToDreamSkin` 保留 statusText / project* / art / 完整 palette；`import` 写 `thumb` 字段时跟真实文件名（`thumb.jpg` 或 `thumb.webp`）。
 - **内置 10 套补 copy/art**：每套有 tagline + 构图 focus，不再全是空 tagline + 通用默认 art。
 - **runtime assets theme.json**：默认 preset 补 palette，与 bundled 源一致。
-- 验证：`import-themes` 11/0 · `list` 11 · apply genshin-night / preset / miku / dalao 二次 round-trip palette 非空 · kick ~55ms · doctor fresh。
+- 验证：`import-themes` 11/0 · `list` 11 · apply genshin-night / preset 二次 round-trip palette 非空 · kick ~55–79ms · doctor fresh · published `1.3.25-4dca30`。
+
+### 快捷方式与入口纪律（PAIN #18 / #20 / #21）
+
+- **`install-ux-shortcuts.ps1` 唯一源**：日常 = Codex / ChatGPT / Codex 换肤；工具只进开始菜单 **Codex 工具**（皮肤修复 · 商店更新后修复 · 使用说明）；桌面不再放修复类入口。
+- **清理误导项**：重复 `Codex Skin.lnk`、旧「Codex Skin 高级」、散落的管理/回归顶层项、名称含 heige / Codex Studio 的残留 lnk。
+- **`refresh-shortcuts.ps1`** 改为转发到 install-ux（避免两套布局打架）。
+- **#21 文档化**：商店磁贴/包 AUMID 裸启为 OS 硬限；`usage.md` + `dual-open-policy.md` 写清「只用任务栏钉」；FastLaunch AUMID=`CodexDreamSkin.FastLaunch`。
+- **#20**：本机 Programs 无独立 heige 目录；文档删除过时 dual-open 调试开关说明。
+
+### 产品包（终端用户分发）
+
+- **`Build-ProductPackage.ps1`** → `dist/CodexDreamSkin-<ver>-win-x64.zip`（~3.5MB，含 11 主题 + runtime + CLI + FastLaunch）。
+- **`Install.ps1` / `Uninstall.ps1`**：写 `Programs\CodexDreamSkin` + 导入主题 + 快捷方式；卸载默认可保留用户 catalog。
+- 结构验收：`STRUCTURAL_PASS`（Install/Uninstall/meta/injector/11 themes/native exe）。
 
 ## 1.3.24 — wait-shell cold-start + tray native focus + UTF-8 console
 

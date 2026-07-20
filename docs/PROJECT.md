@@ -134,7 +134,7 @@
 | 包职责混杂 | core / themes / runtime / core-win 拆包 | 完成 |
 | kick 走 spawn 慢 | control-plane `/kick` ~45ms | 完成 |
 
-**仍待优化（见 §12 路线图）**：工具快捷方式 UX（#18）、heige 残留目录（#20）、Store 裸启硬限（#21）、CHANGELOG unreleased 并入正式版号。
+**仍待优化（见 §12 路线图）**：Store 磁贴裸启为 OS 硬限（#21，已文档化，无法代码消除）；其余 #18/#20 与 CHANGELOG 版号已收敛。
 
 ---
 
@@ -490,10 +490,10 @@ paused/locked: false（正常使用时）
 | ~~P1~~ | ~~post-update 报告自动刷新~~ | — | **已完成** · PSModulePath harden + report 写 current |
 | ~~P1~~ | ~~焦点 EnumWindows 稳定性~~ | — | **已完成/绕过** · bounded retry + native focus |
 | ~~P2~~ | ~~控制台 GBK 乱码~~ | — | **已完成** · UTF-8 入口 |
-| P2 | 修复/回归工具快捷方式 UX（PAIN #18） | launcher / install-ux | 普通用户不易误点 |
-| P2 | 清理 heige studio 残留目录诱惑（#20） | docs / 安装脚本 | 用户无双开入口 |
-| 已知限 | Store AUMID / 商店磁贴裸启（#21） | OS | 文档说明即可 |
-| 文档 | CHANGELOG `unreleased` 主题节并入正式版号 | docs | 与 1.3.25 或下一版对齐 |
+| ~~P2~~ | ~~修复/回归工具快捷方式 UX（#18）~~ | — | **已完成** · install-ux 唯一源 + Codex 工具文件夹 |
+| ~~P2~~ | ~~清理 heige studio 残留（#20）~~ | — | **已完成** · 扫删 lnk + 文档；本机无独立目录 |
+| 已知限 | Store AUMID / 商店磁贴裸启（#21） | OS | **已文档化** · usage + dual-open-policy；日常钉任务栏 |
+| ~~文档~~ | ~~CHANGELOG unreleased 并入正式版号~~ | — | **已完成** · 记入 1.3.25 |
 
 ### 12.3 明确不在范围
 

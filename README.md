@@ -9,7 +9,22 @@
 
 ## 状态
 
-见 [`docs/CHANGELOG.md`](docs/CHANGELOG.md) 里的里程碑与最新 runtime。当前主线 `1.3.18-118f81`。
+见 [`docs/CHANGELOG.md`](docs/CHANGELOG.md)。当前主线 **runtime `1.3.25`** · **11 套内置主题**。
+
+## 产品包（终端用户）
+
+```powershell
+# 从开发仓打 zip
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\windows\Build-ProductPackage.ps1 -Version 1.3.25
+
+# 解压后安装
+powershell -NoProfile -ExecutionPolicy Bypass -File .\Install.ps1
+
+# 卸载（默认保留用户主题；加 -RemoveState 清 catalog）
+powershell -NoProfile -ExecutionPolicy Bypass -File .\Uninstall.ps1
+```
+
+产物：`dist/CodexDreamSkin-<ver>-win-x64.zip`（含 Install / Uninstall / 11 主题 / runtime / CLI）。
 
 ## 架构
 
@@ -21,8 +36,8 @@ packages/core       Node：发现 / CDP / doctor / 常量 / kick + CLI
 packages/themes     主题 schema / catalog / heige→DreamSkin 适配
 packages/runtime    watch injector + 资源（发布到 versions/，self-contained）
 packages/core-win   PowerShell 共享库（launcher-ui / common / theme）
-scripts/windows     发布 / 导入主题 / 快捷方式 / 探针
-themes/             10 套内置主题源（heige 格式）
+scripts/windows     发布 / 产品打包 / 导入主题 / 快捷方式 / 探针
+themes/             11 套内置主题源（heige 格式，含 preset）
 vendor/dreamskin    上游 Fei-Away/Codex-Dream-Skin 只读快照
 ```
 
@@ -37,16 +52,16 @@ node packages/core/cli.mjs apply --theme genshin-night   # 热切换 active-them
 node packages/core/cli.mjs import-themes                 # 导入内置主题到 DreamSkin themes
 ```
 
-发布 runtime：
+发布 runtime（本机开发路径）：
 
 ```powershell
-powershell -File scripts\windows\publish-runtime.ps1 -RepoRoot D:\orca\codex-skin
+powershell -File scripts\windows\publish-runtime.ps1 -RepoRoot D:\orca\codex-skin -Version 1.3.25
 ```
 
 ## 日常使用
 
 1. 点任务栏 **Codex**（启动器 + watch injector）
-2. 换肤走统一 CLI `apply --theme` 或托盘「换肤…」
+2. 换肤走统一 CLI `apply --theme` 或托盘「换肤…」 / F6
 
 ## 文档
 

@@ -16,6 +16,9 @@ _*.err
 *.bak
 *.bak-*
 
+# Product package output (Build-ProductPackage.ps1)
+dist/
+
 # Never commit install-side state (lives in %LOCALAPPDATA%)
 current.json.bak-*
 apps/native/CodexFastLaunch/bin/
