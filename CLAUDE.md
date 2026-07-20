@@ -24,6 +24,7 @@ npm run status
 npm run help
 npm run test:themes
 npm run test:deps
+npm run test:control   # 本机 loopback；不进 CI
 npm test
 # 等价: node packages/core/cli.mjs <cmd>
 ```

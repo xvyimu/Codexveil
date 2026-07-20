@@ -75,5 +75,6 @@
 ## 相关
 
 - [`usage.md`](./usage.md) — 用户侧入口表  
-- [`PAIN-POINTS.md`](./PAIN-POINTS.md) — #18 / #20 / #21  
-- ADR 0001 — 产品线合并  
+- [`PAIN-POINTS.md`](./PAIN-POINTS.md) — #18 / #20 / #21 / #24（SmartScreen）  
+- [`CONTRIBUTING.md`](./CONTRIBUTING.md) — §C-7 `--once` 降级 · §C-8 禁止表  
+- ADR 0001 — 产品线合并 

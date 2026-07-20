@@ -6,6 +6,30 @@
 
 ---
 
+## Unreleased — maintenance on 1.3.25 product line（2026-07-20 → 07-21）
+
+> 产品线版本仍为 **1.3.25**；安装态 runtimeId 以 doctor 为准（例 `1.3.25-107b0e`）。下列为扫描落地 + 任务卡收口，**未**改 SKIN_VERSION 产品线号。
+
+### 安全与控制面
+
+- **SEC-01**：control-plane mutating POST 强制 `x-codex-skin-token`；GET `/health` 免 token；kick-inject / launcher-ui 自动带 token。
+- **TEST-02**：`packages/runtime/scripts/control-plane.test.mjs`（本机 9347+；不进 CI）。
+- **doctor**：顶层 `control: { port, tokenPresent }` · `stateSchema` 三件套标记。
+
+### 可靠性 / 发布
+
+- **soft-reattach.ps1** 共享；`--theme-dir` + `--state-root`；publish G5-C 超时 fallback。
+- **seed art** 动态 fallback（不再钉死已 GC 的旧 runtimeId）。
+- **test:deps** + CI themes-gate 第二步。
+
+### 文档与工程纪律
+
+- **CONTRIBUTING.md** §C-1–C-9 · PR 模板 · 任务卡 `docs/plans/task-cards-2026-07-21.md` · 维护 Agent 提示词。
+- AUDIT/SCAN 基线校准 · PAIN #24 SmartScreen · GLOSSARY 扩展 · WIN-02 冻结表 · residual G5-C 行号反向链接。
+- injector TOC/Region 注释；SKIN_VERSION stamp 注释澄清。
+
+---
+
 ## 1.3.25 — multi-theme catalog + shortcut UX · 1.3.25-4dca30
 
 ### 主题 catalog（11 bundled）

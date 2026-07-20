@@ -1,8 +1,9 @@
 # 任务卡清单 · 2026-07-21
 
-> 基线：HEAD 以 `git rev-parse HEAD` 为准（文档撰写时 `c390d4e`）· runtimeId 以 doctor 为准（撰写时 `1.3.25-107b0e`）  
+> 基线：HEAD 以 `git rev-parse HEAD` 为准 · runtimeId 以 doctor 为准（产品线 `1.3.25`）  
 > 来源：外部扫描 [`SCAN-OPTIMIZE-2026-07-20.md`](../SCAN-OPTIMIZE-2026-07-20.md) + 维护落地后剩余项  
-> 关联：[`CONTRIBUTING.md`](../CONTRIBUTING.md) · [`adr/`](../adr/) · 维护提示词 [`../prompts/agent-maintain-task-cards-zh.md`](../prompts/agent-maintain-task-cards-zh.md)
+> 关联：[`CONTRIBUTING.md`](../CONTRIBUTING.md) · [`adr/`](../adr/) · 维护提示词 [`../prompts/agent-maintain-task-cards-zh.md`](../prompts/agent-maintain-task-cards-zh.md)  
+> **收口**：12 张卡均已完成（2026-07-21）；后续可选见 PROJECT §12.2「可选」行。
 
 **已落地勿重复当债**（2026-07-20）：SEC-01 token 强制 · soft-reattach.ps1 · `--state-root` · `test:deps` · 11 主题 loadTheme · G1-B/G3-A/G4-A/G5-C。
 

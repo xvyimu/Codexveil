@@ -70,6 +70,7 @@ node packages/core/cli.mjs apply --theme genshin-night   # 热切换 active-them
 node packages/core/cli.mjs import-themes                 # 导入内置主题到 DreamSkin themes
 npm run test:themes                                      # 主题 schema 双格式 + 11 套 loadTheme
 npm run test:deps                                        # core↔runtime 静态依赖边界
+npm run test:control                                     # control-plane token（本机 9347+；不进 CI）
 npm test                                                 # themes + deps
 ```
 

@@ -14,6 +14,7 @@
     "help": "node packages/core/cli.mjs help",
     "test:themes": "node packages/themes/theme-schema.test.mjs",
     "test:deps": "node scripts/check-package-deps.mjs",
+    "test:control": "node packages/runtime/scripts/control-plane.test.mjs",
     "test": "npm run test:themes && npm run test:deps"
   },
   "engines": {

@@ -502,8 +502,12 @@ paused/locked: false（正常使用时）
 | ~~P2~~ | ~~修复/回归工具快捷方式 UX（#18）~~ | — | **已完成** · install-ux 唯一源 + Codex 工具文件夹 |
 | ~~P2~~ | ~~清理 heige studio 残留（#20）~~ | — | **已完成** · 扫删 lnk + 文档；本机无独立目录 |
 | 已知限 | Store AUMID / 商店磁贴裸启（#21） | OS | **已文档化** · usage + dual-open；日常钉任务栏；**不**劫持包 AUMID |
+| 已知限 | SmartScreen 未签名入口（#24） | UX | **已文档化** · PAIN #24 + usage；OV 签名属长期可选 |
 | ~~规划~~ | ~~残差 G1/G3/G4/G5~~ | docs/plans | **已实现推荐组合** · G1-B CI · G3-A Windows-only · G4-A 文档 · G5-C publish 超时 |
 | ~~文档~~ | ~~CHANGELOG unreleased 并入正式版号~~ | — | **已完成** · 记入 1.3.25 |
+| ~~维护~~ | ~~任务卡 2026-07-21（12 张）~~ | docs/plans | **已完成** · CONTRIBUTING · token 测试 · doctor control/stateSchema · TOC 等 |
+| 可选 | PR 模板 / 扩 freshness 单测 / seed-art 已修 | — | 见 CONTRIBUTING · 非阻塞 |
+| 可选 | 产品 zip 重打（`Build-ProductPackage`） | scripts | 终端用户分发时再打；开发路径走 publish |
 
 ### 12.3 明确不在范围
 
@@ -534,7 +538,7 @@ codex-skin/
 └── CLAUDE.md                # Agent 短索引
 ```
 
-**体量参考（约，2026-07-20 扫描）**：injector ~1402 · launcher-ui ~1059 · common-windows ~658 · dream-skin.css ~630 · renderer-inject ~479 · control-plane ~275 · cli ~267。
+**体量参考（约，2026-07-21）**：injector ~1420（含 TOC 注释）· launcher-ui ~1081 · common-windows ~658 · dream-skin.css ~630 · renderer-inject ~480 · control-plane ~300 · cli ~280。
 
 ---
 

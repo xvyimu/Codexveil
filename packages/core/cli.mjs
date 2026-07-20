@@ -21,7 +21,13 @@ import {
   discoverCodex,
   runtimeDiagnostics,
 } from "./index.mjs";
-import { DEFAULT_CDP_PORT, DEFAULT_THEME_ID, resolveStudioPaths } from "./constants.mjs";
+import {
+  DEFAULT_CDP_PORT,
+  DEFAULT_THEME_ID,
+  STATE_SCHEMA_VERSION,
+  THEME_SCHEMA_VERSION,
+  resolveStudioPaths,
+} from "./constants.mjs";
 import { detectDreamSkinRuntime } from "./state/dreamskin-guard.mjs";
 import { formatKickResultNote, kickThemeInjectNow } from "./state/kick-inject.mjs";
 import { inspectInjectorPathFreshness } from "./state/state-freshness.mjs";
@@ -253,6 +259,13 @@ export async function runCli(argv, overrides = {}) {
         port: dreamSkin.controlPort ?? null,
         tokenPresent: Boolean(dreamSkin.controlTokenPresent),
       },
+      // Schema markers: STATE_SCHEMA_VERSION is Node docs only; on-disk write is 3.
+      stateSchema: {
+        nodeMarker: STATE_SCHEMA_VERSION,
+        onDiskWrite: 3,
+        accept: [1, 2, 3],
+      },
+      themeSchemaVersion: THEME_SCHEMA_VERSION,
       dreamSkin,
       themeCount: themes.length,
       userThemeCount,
