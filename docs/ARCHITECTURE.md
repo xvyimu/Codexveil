@@ -33,7 +33,7 @@ codex-skin/
 │   │   └── core/            #   ← image-metadata 真实现（scripts 是薄壳）
 │   └── core-win/            # PowerShell 共享库（launcher-ui / common / theme）
 ├── scripts/windows/         # 发布 / 导入主题 / 快捷方式 / 探针 / E2E
-├── themes/                  # 内置主题源（heige 格式，10 套）
+├── themes/                  # 内置主题源（heige 格式，11 套；含 preset-arina-hashimoto）
 ├── vendor/
 │   └── dreamskin/           # 上游 Fei-Away/Codex-Dream-Skin 只读快照
 └── docs/                    # 本文件所在

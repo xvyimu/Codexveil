@@ -4,7 +4,7 @@
 > **仓库**：https://github.com/xvyimu/Codex-Dream-Skin  
 > **开发仓**：`D:\orca\codex-skin`  
 > **安装态**：`%LOCALAPPDATA%\Programs\CodexDreamSkin`  
-> **当前主线**：runtime `1.3.18-118f81` · HEAD `45ee6c5`（heige-fused look）  
+> **当前主线**：runtime `1.3.25-4dca30` · HEAD `f833ee8`（11-theme catalog · heige-fused）  
 > **文档原则**：先约束，后生成｜先架构，后界面｜先验证，后合并  
 > **适用**：Agent / 开源工具 / AI 辅助开发协作
 
@@ -134,7 +134,7 @@
 | 包职责混杂 | core / themes / runtime / core-win 拆包 | 完成 |
 | kick 走 spawn 慢 | control-plane `/kick` ~45ms | 完成 |
 
-**仍待优化（见 §12 路线图）**：list 主题去重、会话页玻璃实锤、post-update 报告刷新、PS 大文件再切分、焦点 EnumWindows 偶发失败。
+**仍待优化（见 §12 路线图）**：工具快捷方式 UX（#18）、heige 残留目录（#20）、Store 裸启硬限（#21）、CHANGELOG unreleased 并入正式版号。
 
 ---
 
@@ -476,19 +476,24 @@ paused/locked: false（正常使用时）
 | 1.3.15 | watch-only |
 | 1.3.16 | 单一版本源 |
 | 1.3.18 | heige-fused 视觉（右半 hero · 左上 brand · 单岛 composer） |
+| 1.3.19–1.3.21 | 会话 probe 实锤 · 气泡去描边 · D3D Enable · open-healthy 异步 · FastLaunch |
+| 1.3.22–1.3.24 | publish reattach · UTF-8 控制台 · tray native focus · wait-shell 冷启 |
+| 1.3.25 + `f833ee8` | 安装 runtime 1.3.25-4dca30；git 主题 catalog 11 套 + schema 双格式 |
 
 ### 12.2 下一阶段建议（按优先级）
 
 | 优先级 | 项 | 模块 | 验收 |
 |--------|----|------|------|
-| P0 | 会话页玻璃 / chat bubble 选择器实锤 | runtime assets · probe | 进真实会话后 probe PASS |
-| P0 | 发布后 reattach 双 injector 根治 | runtime · launcher | 连续 publish 不出现双 pid |
-| P1 | `cli list` 主题去重 | themes / cli | count 不重复 |
-| P1 | post-update 报告自动刷新 | scripts | publish 尾报告=新 runtime |
-| P1 | 焦点 EnumWindows 稳定性 | core-win | focused 成功率可测 |
-| P2 | launcher-ui.ps1 按前缀切分 | core-win | 行为不变 + 加载顺序测试 |
-| P2 | 控制台 GBK 乱码 | launcher 工具链 | 中文日志可读 |
-| P2 | 清理 heige studio 残留目录诱惑 | docs / 安装脚本 | 用户无双开入口 |
+| ~~P0~~ | ~~会话页玻璃 / chat bubble~~ | — | **已完成** · conversationPass + 去描边 |
+| ~~P0~~ | ~~发布后 reattach 双 injector~~ | — | **已完成** · post-update drift reattach |
+| ~~P1~~ | ~~`cli list` 主题去重~~ | — | **已完成** · `listThemes({ dedupe:true })` |
+| ~~P1~~ | ~~post-update 报告自动刷新~~ | — | **已完成** · PSModulePath harden + report 写 current |
+| ~~P1~~ | ~~焦点 EnumWindows 稳定性~~ | — | **已完成/绕过** · bounded retry + native focus |
+| ~~P2~~ | ~~控制台 GBK 乱码~~ | — | **已完成** · UTF-8 入口 |
+| P2 | 修复/回归工具快捷方式 UX（PAIN #18） | launcher / install-ux | 普通用户不易误点 |
+| P2 | 清理 heige studio 残留目录诱惑（#20） | docs / 安装脚本 | 用户无双开入口 |
+| 已知限 | Store AUMID / 商店磁贴裸启（#21） | OS | 文档说明即可 |
+| 文档 | CHANGELOG `unreleased` 主题节并入正式版号 | docs | 与 1.3.25 或下一版对齐 |
 
 ### 12.3 明确不在范围
 
@@ -546,16 +551,17 @@ codex-skin/
 
 ---
 
-## 附录 A · 当前环境快照（2026-07-20 诊断）
+## 附录 A · 当前环境快照（2026-07-20 晚间）
 
 | 项 | 值 |
 |----|-----|
 | Codex 包 | `OpenAI.Codex_26.715.4045.0` |
-| Runtime | `1.3.18-118f81` |
-| Injector | 存活（诊断时 PID 8212） |
-| CDP | 9335（Codex 未运行时 portOpen=false） |
-| 用户主题 | 11 套（preset + 原神/鸣潮/恋与深空/火影/Miku 等） |
-| Git | `main` 已推送含 `45ee6c5` heige-fused look |
+| Runtime | `1.3.25-4dca30`（`injectorPathFreshness.fresh=true`） |
+| Injector | 存活（诊断时 PID 7296 · control 9336） |
+| CDP | 9335 开放 · `Chrome/150.0.7871.124` |
+| 用户主题 | 11 套（import-themes 11/0 · list 去重） |
+| 热切换 | kick genshin-night ~55ms · preset-arina-hashimoto ~79ms |
+| Git | `main` @ `f833ee8`（已 push origin） |
 | 上游基线 | `e776fa6`（nothing absorbed） |
 
 ## 附录 B · 内置/用户主题 ID
