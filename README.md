@@ -24,7 +24,7 @@
 全面检查：[`docs/AUDIT-2026-07-20.md`](docs/AUDIT-2026-07-20.md)。  
 残差规划（G1 CI / G3 mac / G4 #21 / G5 Quiet）：[`docs/plans/residual-g1-g3-g4-g5-2026-07-20.md`](docs/plans/residual-g1-g3-g4-g5-2026-07-20.md)。
 
-**CI**：GitHub Actions `themes-gate` 在 push/PR 跑 `npm run test:themes`（**不等于**本机 `doctor`/smoke；完整诊断仍在 Windows 安装态）。
+**CI**：GitHub Actions `themes-gate` 在 push/PR 跑 `npm run test:themes` + `npm run test:deps`（**不等于**本机 `doctor`/smoke；完整诊断仍在 Windows 安装态）。
 
 ## 产品包（终端用户）
 
@@ -68,7 +68,9 @@ node packages/core/cli.mjs doctor
 node packages/core/cli.mjs list
 node packages/core/cli.mjs apply --theme genshin-night   # 热切换 active-theme
 node packages/core/cli.mjs import-themes                 # 导入内置主题到 DreamSkin themes
-npm run test:themes                                      # 主题 schema 双格式最小门禁
+npm run test:themes                                      # 主题 schema 双格式 + 11 套 loadTheme
+npm run test:deps                                        # core↔runtime 静态依赖边界
+npm test                                                 # themes + deps
 ```
 
 发布 runtime（本机开发路径）：

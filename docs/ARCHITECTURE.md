@@ -93,10 +93,11 @@ codex-skin/
 watch injector 启动
   → packages/runtime/scripts/control-plane.mjs
   → 监听 127.0.0.1:9336（写入 state.controlPort + control.port 文件）
-  → /health · /focus · /kick · /open-healthy
+  → stateRoot：优先 --state-root，否则 dirname(--theme-dir)
+  → GET /health（免 token）· POST /focus · /kick · /open-healthy（需 x-codex-skin-token）
 ```
 
-主路径：POST `/kick` → 毫秒级进程内 apply。  
+主路径：POST `/kick`（带 `control.token`）→ 毫秒级进程内 apply。  
 **降级**：控制面不可达时 spawn 同版本 `injector --once` 做一次 apply——**不是**第二守护、不是 heige 旁路、CLI 不暴露该开关。见 `dual-open-policy.md`。
 
 ---

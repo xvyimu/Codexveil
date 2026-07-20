@@ -23,6 +23,8 @@ npm run list
 npm run status
 npm run help
 npm run test:themes
+npm run test:deps
+npm test
 # 等价: node packages/core/cli.mjs <cmd>
 ```
 

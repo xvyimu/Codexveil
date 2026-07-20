@@ -9,6 +9,14 @@
 3. **主题写入唯一**：`packages/themes` → `active-theme`；CLI `apply --theme` 写 active-theme 后走控制面 kick  
 4. **禁止第二套守护 / 第二产品线**：旧 heige 旁路 CLI 与 `packages/legacy-inject` 已删除；勿再起独立 CDP 注入进程常驻  
 
+### 控制面 token（loopback 内认证）
+
+- 文件：`%LOCALAPPDATA%\CodexDreamSkin\control.token`（watch 启动时 `ensureToken` 生成）
+- **GET** `/health`：无 token（FastLaunch / doctor 探测）
+- **POST** `/kick` · `/focus` · `/open-healthy`：必须带 header `x-codex-skin-token` 或 `?token=`，否则 **401** `token-required`
+- 调用方：`kick-inject.mjs` · `Invoke-CodexSkinControl`（launcher-ui）自动读 token 文件
+- 仍只绑定 `127.0.0.1`；token 防本机其它进程误触/乱 kick，不是跨主机认证
+
 ### kick 降级（不是第二产品线）
 
 控制面 `POST /kick` 是热切换主路径（~45–80ms）。当 control-plane 不可达时，`packages/core/state/kick-inject.mjs` 与 `apps/launcher/kick-theme-now.ps1` 可 **spawn 同 current runtime** 的 `injector.mjs --once` 做**单次** apply：

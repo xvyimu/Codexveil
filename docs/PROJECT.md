@@ -250,6 +250,7 @@ themes/<id>/
 | stateRoot | `%LOCALAPPDATA%\CodexDreamSkin\` | injector / launcher |
 | state.json | stateRoot | injector 更新 pid/port/browserId |
 | controlPort | 默认 **9336**（写入 state + `control.port`） | control-plane |
+| control.token | stateRoot 下；POST `/kick` `/focus` `/open-healthy` 必带 header `x-codex-skin-token`（GET `/health` 免 token） | control-plane · kick-inject · Invoke-CodexSkinControl |
 | CDP | 默认 **9335** | Codex `--remote-debugging-port` |
 | active-theme | stateRoot\active-theme | themes 写入 · runtime 读取 |
 | paused | stateRoot\paused 文件存在即暂停 | 用户/托盘 |
@@ -530,7 +531,7 @@ codex-skin/
 └── CLAUDE.md                # Agent 短索引
 ```
 
-**体量参考（约）**：injector ~1450 LOC · launcher-ui ~850 · dream-skin.css ~694 · renderer-inject ~471 · cli ~287。
+**体量参考（约，2026-07-20 扫描）**：injector ~1402 · launcher-ui ~1059 · common-windows ~658 · dream-skin.css ~630 · renderer-inject ~479 · control-plane ~275 · cli ~267。
 
 ---
 
