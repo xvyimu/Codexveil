@@ -4,7 +4,7 @@
 > **仓库**：https://github.com/xvyimu/Codex-Dream-Skin  
 > **开发仓**：`D:\orca\codex-skin`  
 > **安装态**：`%LOCALAPPDATA%\Programs\CodexDreamSkin`  
-> **当前主线**：runtime `1.3.25` · HEAD 见 git `main`（11-theme catalog · product package · heige-fused）  
+> **当前主线**：runtime `1.3.25` · HEAD 以 `git rev-parse HEAD` 为准（全面检查见 [`AUDIT-2026-07-20.md`](./AUDIT-2026-07-20.md)）  
 > **文档原则**：先约束，后生成｜先架构，后界面｜先验证，后合并  
 > **适用**：Agent / 开源工具 / AI 辅助开发协作
 
@@ -25,11 +25,12 @@
 | 文档 | 职责 |
 |------|------|
 | [`ARCHITECTURE.md`](./ARCHITECTURE.md) | 目录、调用链、源码映射（实现侧） |
+| [`AUDIT-2026-07-20.md`](./AUDIT-2026-07-20.md) | 全面检查报告（边界 · 模块 · 发现项 · hygiene） |
 | [`CHANGELOG.md`](./CHANGELOG.md) | 版本时间线 |
 | [`PAIN-POINTS.md`](./PAIN-POINTS.md) | 已知痛点与状态 |
 | [`GLOSSARY.md`](./GLOSSARY.md) | 领域术语 |
 | [`usage.md`](./usage.md) | 用户侧使用说明 |
-| [`dual-open-policy.md`](./dual-open-policy.md) | 双开规则 |
+| [`dual-open-policy.md`](./dual-open-policy.md) | 入口纪律与 kick 降级 |
 | [`adr/`](./adr/) | 架构决策（0001 合并 · 0002 上游 · 0003 版本源） |
 | 根目录 `CLAUDE.md` | Agent 短索引 |
 
@@ -251,6 +252,8 @@ themes/<id>/
 | CDP | 默认 **9335** | Codex `--remote-debugging-port` |
 | active-theme | stateRoot\active-theme | themes 写入 · runtime 读取 |
 | paused | stateRoot\paused 文件存在即暂停 | 用户/托盘 |
+| state.json | **schemaVersion 3**（launcher-ui 写出；读接受 1..3） | injector / doctor |
+| current.json | **schemaVersion 1**（runtime 指针） | publish / Install |
 
 **runtimeId 格式**：`<semver>-<hash6>`，例 `1.3.18-118f81`。
 
@@ -415,8 +418,8 @@ powershell -File scripts\windows\sync-upstream-assets.ps1
 | 改动类型 | 最低验证 |
 |----------|----------|
 | 文档 only | 链接有效、术语与 GLOSSARY 一致 |
-| 主题资源 | `list` 含 id · `apply` 不炸 |
-| core / themes 逻辑 | `doctor` + 相关 cli 子命令 |
+| 主题资源 | `list` 含 id · `apply` 不炸 · `npm run test:themes` |
+| core / themes 逻辑 | `doctor` + 相关 cli 子命令 · `npm run test:themes` |
 | runtime / CSS / renderer | `publish` + smoke +（有条件）verify / live probe |
 | launcher / core-win | open 路径手动或 check-and-fix exit 0 |
 | 上游 promote | vendor diff 已读 · ADR 0002 流程 · 本地覆盖未丢 |
@@ -552,7 +555,7 @@ codex-skin/
 
 ---
 
-## 附录 A · 当前环境快照（2026-07-20 晚）
+## 附录 A · 当前环境快照（2026-07-20 晚 · 审计后 hygiene）
 
 | 项 | 值 |
 |----|-----|
@@ -560,9 +563,11 @@ codex-skin/
 | Runtime | `1.3.25-*`（以 `current.json` / doctor `injectorPathFreshness` 为准） |
 | 用户主题 | 11 套（import-themes · list 去重） |
 | 热切换 | kick ~55–80ms 量级 |
-| Git | `main`：主题 catalog + 产品包 + review 修复（见 `git log`） |
+| Git | `main`：以 `git rev-parse HEAD` 为准；审计见 AUDIT-2026-07-20 |
 | 上游基线 | `e776fa6`（nothing absorbed） |
 | 产品包 | `Build-ProductPackage.ps1 -Version` → zip；Install soft reattach + GC |
+| package.json | `"version": "1.3.25"`（产品线元数据；stamp 权威仍是 publish `-Version`） |
+| 主题门禁 | `npm run test:themes` |
 
 ## 附录 B · 内置/用户主题 ID
 

@@ -7,18 +7,18 @@
 ```
 runtime/
 ├── assets/              # 打进 versions/<id>/assets/
-│   ├── dream-skin.css   #   注入的 CSS（vendor 上游 + 少量本地覆盖）
-│   ├── renderer-inject.js # 注入的 JS 桥（负责 dreamVersion / kick 应用）
+│   ├── dream-skin.css   #   注入的 CSS（vendor 上游 + 本地覆盖）
+│   ├── renderer-inject.js # 注入的 JS 桥（dreamVersion / brand / art / kick 应用）
 │   ├── dream-reference.jpg # 默认背景（seed）
-│   └── theme.json       # 默认主题 metadata
+│   └── theme.json       # 默认主题 metadata（DreamSkin catalog 格式）
 ├── scripts/             # 打进 versions/<id>/scripts/
-│   ├── injector.mjs     # watch injector 主体 (1434 行)
-│   ├── control-plane.mjs # 127.0.0.1 loopback control plane (/health /kick /focus)
+│   ├── injector.mjs     # watch injector 主体（唯一守护路径）
+│   ├── control-plane.mjs # 127.0.0.1 loopback（/health /kick /focus /open-healthy）
 │   ├── image-metadata.mjs # 薄壳 CLI，动态 import core/image-metadata.mjs
-│   ├── thumb.mjs        # 主题缩略图生成 (Pillow → ImageMagick → System.Drawing)
+│   ├── thumb.mjs        # 主题缩略图（Pillow → ImageMagick → System.Drawing）
 │   └── wait-shell.mjs   # 冷启动 adaptive shell 等待
 └── core/                # 打进 versions/<id>/core/
-    └── image-metadata.mjs # JPEG/PNG/WebP 尺寸解析真实现（scripts/ 的薄壳导入这个）
+    └── image-metadata.mjs # JPEG/PNG/WebP 尺寸解析真实现
 ```
 
 ## 发布
@@ -34,16 +34,52 @@ runtime/
 
 `current.json` 指针翻页后立即生效；旧版本 GC，只留 current + 上一版。
 
+产品 zip 路径见 `Build-ProductPackage.ps1`：**只 stamp payload**，不写回 git tree（ADR 0003）。
+
+## SKIN_VERSION（ADR 0003）
+
+源文件顶部：
+
+```js
+const SKIN_VERSION_TOKEN = "__SKIN_VERSION__"; // 或 publish 后的 "x.y.z"
+const SKIN_VERSION = SKIN_VERSION_TOKEN === "__" + "SKIN_VERSION__" ? "dev" : SKIN_VERSION_TOKEN;
+```
+
+| 动作 | 谁 stamp | 写 git tree？ |
+|------|----------|:-------------:|
+| `publish-runtime.ps1 -Version` | 源文件 + `versions/<id>/` 副本 | **是**（唯一权威写回） |
+| `Build-ProductPackage.ps1` | 仅 zip payload | 否 |
+| `Install-Product.ps1` | 仅安装树 | 否 |
+
+- 所有使用点引用 `SKIN_VERSION`（injector verify · renderer `dataset.dreamVersion` · `window[STATE_KEY].version`）。
+- 未 publish 的全新 clone：token 仍是占位符 → `SKIN_VERSION = "dev"`。
+- **禁止**在 Install/Build 硬编码默认版本号。
+
+当前仓内 token 可能显示上次 publish 的 `1.3.25`（有意 trade-off：git 可见性 > dev 纯净性）。
+
+## 控制面与 kick
+
+`control-plane.mjs` 监听 loopback（默认写入 `9336` 到 `state.controlPort` + `control.port`）。
+
+主路径：
+
+```text
+CLI apply / 托盘 / kick-theme-now
+  → POST http://127.0.0.1:<controlPort>/kick
+  → watch 进程内重 apply（~45–80ms）
+```
+
+**降级（非第二产品线）**：控制面不可达时，`kick-inject` / `kick-theme-now` 可 spawn 同 runtime 的 `injector.mjs --once` 做**单次** apply。这不是 heige 旁路，也不常驻第二条守护。用户 CLI 不再暴露 `--once` / `--force-dual-open`。
+
+日常注入唯一守护路径：**watch injector**。
+
 ## 为什么 `scripts/image-metadata.mjs` 是薄壳
 
-历史原因：早期 heige 把图像 metadata 逻辑放在 `scripts/`，DreamSkin 把它抽到 `core/`；publish 时需要同时保留两种发布布局（`versions/<id>/core/` 和 `versions/<id>/scripts/` 都能找到）。薄壳会先试 `../core/image-metadata.mjs` 再试 `../../core/image-metadata.mjs`。
+历史布局：heige 把 metadata 放在 `scripts/`，DreamSkin 抽到 `core/`。publish 后两种路径都能找到；薄壳先试 `../core/` 再试 `../../core/`。
 
-## SKIN_VERSION
+## 相关
 
-`scripts/injector.mjs` 顶端有 `const SKIN_VERSION = "1.3.13"`。**publish 时** `publish-runtime.ps1 -Version` 参数决定 `versions/<id>/` 目录名；`SKIN_VERSION` 需要跟 install version 手动对齐（1.3.11 里已加了校验；发布前检查一遍）。
-
-## 控制面
-
-`control-plane.mjs` 监听 loopback 端口（自动挑一个空闲，写入 `stateRoot\control.port` 和 `state.controlPort`）。任何外部工具 POST `/kick` 即可让 watch 立刻重新 apply active-theme。
-
-路径：`launcher / kick-theme-now / switch-theme-ui / CLI apply` → HTTP POST `/kick` → 命中就 45ms 完事；命中不到再 spawn 独立 `injector --once`。
+- `docs/adr/0003-single-version-source.md`
+- `docs/ARCHITECTURE.md`
+- `docs/dual-open-policy.md`（入口纪律 + kick 降级）
+- `docs/AUDIT-2026-07-20.md`

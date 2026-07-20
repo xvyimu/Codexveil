@@ -11,6 +11,16 @@
 
 见 [`docs/CHANGELOG.md`](docs/CHANGELOG.md)。当前主线 **runtime `1.3.25`** · **11 套内置主题**。
 
+**版本号怎么读**
+
+| 位置 | 含义 |
+|------|------|
+| `package.json` `"version"` | 与 runtime **产品线**对齐的 npm 元数据（现 `1.3.25`）；**不是** stamp 权威 |
+| `packages/runtime` `SKIN_VERSION_TOKEN` | 由 `publish-runtime.ps1 -Version` 写入（ADR 0003 唯一写回 git） |
+| 安装态 `current.json` / `runtimeId` | 本机当前引擎，如 `1.3.25-d14cf4` |
+
+全面检查：[`docs/AUDIT-2026-07-20.md`](docs/AUDIT-2026-07-20.md)。
+
 ## 产品包（终端用户）
 
 ```powershell
@@ -51,6 +61,7 @@ node packages/core/cli.mjs doctor
 node packages/core/cli.mjs list
 node packages/core/cli.mjs apply --theme genshin-night   # 热切换 active-theme
 node packages/core/cli.mjs import-themes                 # 导入内置主题到 DreamSkin themes
+npm run test:themes                                      # 主题 schema 双格式最小门禁
 ```
 
 发布 runtime（本机开发路径）：
@@ -68,9 +79,10 @@ powershell -File scripts\windows\publish-runtime.ps1 -RepoRoot D:\orca\codex-ski
 
 - [`PROJECT.md`](docs/PROJECT.md) — **项目总纲**（边界 · 分层 · 模块契约 · 验收 · 路线图；Agent 先读）
 - [`ARCHITECTURE.md`](docs/ARCHITECTURE.md) — 目录 · 边界 · 调用链 · 源码映射
+- [`AUDIT-2026-07-20.md`](docs/AUDIT-2026-07-20.md) — 全面检查报告（规范 · 模块 · 前后端映射 · 发现项）
 - [`CHANGELOG.md`](docs/CHANGELOG.md) — 版本时间线
 - [`PAIN-POINTS.md`](docs/PAIN-POINTS.md) — 痛点合集与状态
 - [`usage.md`](docs/usage.md) — 使用说明
-- [`dual-open-policy.md`](docs/dual-open-policy.md) — 过渡期双开规则
+- [`dual-open-policy.md`](docs/dual-open-policy.md) — 入口纪律与 kick 降级
 - [`adr/`](docs/adr/) — 架构决策记录（0001 产品线合并 · 0002 上游同步 · 0003 单一版本源）
 - [`GLOSSARY.md`](docs/GLOSSARY.md) — 领域术语表

@@ -5,9 +5,22 @@
 ## 规则（现行）
 
 1. **日常入口唯一**：任务栏 / 开始菜单 / 桌面 **Codex**（或 ChatGPT）→ `CodexFastLaunch.exe` → 安装态 open 脚本 → watch injector  
-2. **injector 唯一**：`packages/runtime/scripts/injector.mjs --watch`（安装态 `versions/<id>/scripts/injector.mjs`）  
-3. **主题写入唯一**：`packages/themes` → `active-theme`；CLI `apply --theme` 只走 kick  
-4. **禁止第二套注入**：旧 heige `--once` / legacy-inject 已删除；勿从别处再起 CDP 注入  
+2. **injector 守护唯一**：`packages/runtime/scripts/injector.mjs --watch`（安装态 `versions/<id>/scripts/injector.mjs`）  
+3. **主题写入唯一**：`packages/themes` → `active-theme`；CLI `apply --theme` 写 active-theme 后走控制面 kick  
+4. **禁止第二套守护 / 第二产品线**：旧 heige 旁路 CLI 与 `packages/legacy-inject` 已删除；勿再起独立 CDP 注入进程常驻  
+
+### kick 降级（不是第二产品线）
+
+控制面 `POST /kick` 是热切换主路径（~45–80ms）。当 control-plane 不可达时，`packages/core/state/kick-inject.mjs` 与 `apps/launcher/kick-theme-now.ps1` 可 **spawn 同 current runtime** 的 `injector.mjs --once` 做**单次** apply：
+
+| 是 | 否 |
+|----|----|
+| 与 watch 同树、同版本 | 第二守护进程常驻 |
+| 韧性降级（控制面挂了仍能换肤） | 用户 CLI 开关 / heige 旁路 |
+| apply 完即退出 | 与 watch 并行长期双开 |
+
+用户侧 CLI **不**暴露 `--once` / `--force-dual-open`。  
+
 
 ## 入口分层（PAIN #18）
 
