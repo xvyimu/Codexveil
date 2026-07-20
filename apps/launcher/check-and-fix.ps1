@@ -146,9 +146,21 @@ try {
   # Case B：CDP 在但 injector 死/漂移 → 只重挂 injector
   if ($needOpen -and $null -ne $cdp) {
     Log 'reattaching injector on existing CDP session'
-    if ($state) {
-      try { [void](Stop-DreamSkinRecordedInjector -State $state) }
-      catch { Log ('old injector stop: ' + $_.Exception.Message) }
+    try {
+      [void](Stop-DreamSkinRecordedInjector -State $state)
+    } catch {
+      Log ('old injector stop: ' + $_.Exception.Message)
+      $sweep = Stop-DreamSkinWatchInjectors -Port $Port
+      if (-not $sweep.Ok) {
+        $sweep = Stop-DreamSkinWatchInjectors
+      }
+      if (-not $sweep.Ok) {
+        throw ('Refusing reattach with live peer injector(s): PID ' + ($sweep.Left -join ','))
+      }
+    }
+    $pre = Stop-DreamSkinWatchInjectors -Port $Port
+    if (-not $pre.Ok) {
+      throw ('Refusing reattach with live peer injector(s): PID ' + ($pre.Left -join ','))
     }
     $paths = if (Test-Path -LiteralPath (Join-Path $stateRoot 'active-theme\theme.json')) {
       Get-DreamSkinThemePaths -StateRoot $stateRoot
@@ -171,6 +183,14 @@ try {
       if (Test-DreamSkinInjectorAlive -State ([pscustomobject]@{ injectorPid = $daemon.Id })) { break }
     }
     if ($daemon.HasExited) { throw 'injector exited during reattach' }
+    $peers = Stop-DreamSkinWatchInjectors -Port $Port -ExcludeProcessId $daemon.Id
+    if (-not $peers.Ok) {
+      try { Stop-Process -Id $daemon.Id -Force -ErrorAction SilentlyContinue } catch {}
+      throw ('Dual injector race on reattach; peers: PID ' + ($peers.Left -join ','))
+    }
+    if ($peers.Stopped.Count -gt 0) {
+      Log ('Cleared peer injector(s): ' + ($peers.Stopped -join ','))
+    }
     $injectorStartedAt = Get-DreamSkinProcessStartedAt -ProcessId $daemon.Id
     $newState = New-CodexSkinRuntimeState `
       -RuntimeInfo $runtimeInfo `

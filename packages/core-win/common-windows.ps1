@@ -520,71 +520,136 @@ function Get-DreamSkinProcessStartedAt {
   }
 }
 
-function Stop-DreamSkinRecordedInjector {
-  param([AllowNull()][object]$State)
-  if ($null -eq $State -or -not $State.injectorPid) { return $true }
-  $processId = [int]$State.injectorPid
-  $process = Get-CimInstance Win32_Process -Filter "ProcessId = $processId" -ErrorAction SilentlyContinue
-  if (-not $process) { return $true }
+function Test-DreamSkinWatchInjectorCommandLine {
+  param(
+    [string]$CommandLine,
+    [string]$InjectorPath = $null,
+    [AllowNull()][object]$Port = $null
+  )
+  if (-not $CommandLine) { return $false }
+  if ($CommandLine -notmatch '(?i)injector\.mjs') { return $false }
+  if (-not (Test-DreamSkinCommandLineToken -CommandLine $CommandLine -Token '--watch')) { return $false }
+  if ($InjectorPath -and -not (Test-DreamSkinCommandLineToken -CommandLine $CommandLine -Token $InjectorPath)) {
+    return $false
+  }
+  if ($null -ne $Port -and "$Port" -ne '') {
+    $portPattern = '(?i)(?:^|\s)--port(?:=|\s+)' + [regex]::Escape("$Port") + '(?=$|\s)'
+    if (-not [regex]::IsMatch($CommandLine, $portPattern)) { return $false }
+  }
+  return $true
+}
 
-  $expectedInjector = if ($State.injectorPath) {
-    "$($State.injectorPath)"
-  } elseif ($State.skillRoot) {
-    Join-Path "$($State.skillRoot)" 'scripts\injector.mjs'
-  } else {
-    $null
-  }
-  $processPath = Get-DreamSkinProcessExecutablePath -ProcessInfo $process
-  $commandLine = "$($process.CommandLine)"
-  if (-not $processPath -or -not $commandLine) {
-    throw "The recorded injector PID $processId is running, but its identity cannot be inspected. State was preserved."
-  }
-  $isNodeExecutable = [System.IO.Path]::GetFileName("$processPath") -ieq 'node.exe'
-  $nodeMatches = -not $State.nodePath -or
-    (Test-DreamSkinPathEqual -Left $processPath -Right "$($State.nodePath)")
-  $injectorMatches = [bool]($expectedInjector -and
-    (Test-DreamSkinCommandLineToken -CommandLine $commandLine -Token $expectedInjector) -and
-    (Test-DreamSkinCommandLineToken -CommandLine $commandLine -Token '--watch'))
-  if ($State.port) {
-    $portPattern = '(?i)(?:^|\s)--port(?:=|\s+)' + [regex]::Escape("$($State.port)") + '(?=$|\s)'
-    $injectorMatches = $injectorMatches -and [regex]::IsMatch($commandLine, $portPattern)
-  } else {
-    $injectorMatches = $false
-  }
-  if ($State.browserId) {
-    $browserPattern = '(?:^|\s)(?i:--browser-id)(?:=|\s+)' + [regex]::Escape("$($State.browserId)") + '(?=$|\s)'
-    $injectorMatches = $injectorMatches -and [regex]::IsMatch($commandLine, $browserPattern)
-  }
-  $startedAt = Get-DreamSkinProcessStartedAt -ProcessId $processId
-  $startMatches = -not $State.injectorStartedAt -or $startedAt -eq "$($State.injectorStartedAt)"
-  $identityMatches = [bool]($isNodeExecutable -and $nodeMatches -and $injectorMatches -and $startMatches)
-
-  if (-not $identityMatches) {
-    throw "The recorded injector PID $processId is running, but its visible identity does not match the saved Dream Skin process. State was preserved."
-  }
-
-  # Prefer process-tree kill so orphaned child shells cannot keep the old runtime alive.
-  try {
-    $null = & taskkill.exe /PID $processId /T /F 2>$null
-  } catch {}
-  try { Stop-Process -Id $processId -Force -ErrorAction SilentlyContinue } catch {}
-  try { Wait-Process -Id $processId -Timeout 3 -ErrorAction SilentlyContinue } catch {}
-  if (Get-Process -Id $processId -ErrorAction SilentlyContinue) {
-    # Last resort: kill any node process whose command line still points at this injector path.
-    if ($expectedInjector) {
-      Get-CimInstance Win32_Process -Filter "Name = 'node.exe'" -ErrorAction SilentlyContinue | ForEach-Object {
-        $cmd = [string]$_.CommandLine
-        if ($cmd -and (Test-DreamSkinCommandLineToken -CommandLine $cmd -Token $expectedInjector) -and
-          (Test-DreamSkinCommandLineToken -CommandLine $cmd -Token '--watch')) {
-          try { & taskkill.exe /PID $_.ProcessId /T /F 2>$null | Out-Null } catch {}
-          try { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue } catch {}
-        }
+function Stop-DreamSkinWatchInjectors {
+  <#
+    .SYNOPSIS
+      Kill every node --watch injector.mjs (optionally filtered by path/port).
+    .NOTES
+      Single-instance policy: at most one watch injector may live. Callers that
+      are about to Start-Process a new watch MUST call this first and treat a
+      non-zero leftover count as hard failure (do not start a second daemon).
+  #>
+  param(
+    [string]$InjectorPath = $null,
+    [AllowNull()][object]$Port = $null,
+    [int]$ExcludeProcessId = 0
+  )
+  $stopped = @()
+  $left = @()
+  $nodes = @(Get-CimInstance Win32_Process -Filter "Name = 'node.exe'" -ErrorAction SilentlyContinue)
+  foreach ($proc in $nodes) {
+    $procId = [int]$proc.ProcessId
+    if ($ExcludeProcessId -gt 0 -and $procId -eq $ExcludeProcessId) { continue }
+    $cmd = [string]$proc.CommandLine
+    if (-not (Test-DreamSkinWatchInjectorCommandLine -CommandLine $cmd -InjectorPath $InjectorPath -Port $Port)) {
+      # Path/port filter missed, but bare injector.mjs --watch still counts as
+      # a product-line peer (old runtimeId path, publish drift, etc.).
+      if (-not (Test-DreamSkinWatchInjectorCommandLine -CommandLine $cmd)) { continue }
+      if ($InjectorPath -or ($null -ne $Port -and "$Port" -ne '')) {
+        # Prefer filtered kills first; unrestricted sweep is the fallback below.
+        continue
       }
     }
-    try { Wait-Process -Id $processId -Timeout 2 -ErrorAction SilentlyContinue } catch {}
+    try { $null = & taskkill.exe /PID $procId /T /F 2>$null } catch {}
+    try { Stop-Process -Id $procId -Force -ErrorAction SilentlyContinue } catch {}
+    $stopped += $procId
   }
-  if (Get-Process -Id $processId -ErrorAction SilentlyContinue) {
-    throw "The recorded Dream Skin injector did not stop: PID $processId"
+  if ($stopped.Count -gt 0) {
+    Start-Sleep -Milliseconds 400
+  }
+  # Second pass: any remaining watch injector (no path filter) — publish/reattach
+  # must not leave orphans on a previous versions/<id>/scripts/injector.mjs.
+  $nodes = @(Get-CimInstance Win32_Process -Filter "Name = 'node.exe'" -ErrorAction SilentlyContinue)
+  foreach ($proc in $nodes) {
+    $procId = [int]$proc.ProcessId
+    if ($ExcludeProcessId -gt 0 -and $procId -eq $ExcludeProcessId) { continue }
+    $cmd = [string]$proc.CommandLine
+    if (-not (Test-DreamSkinWatchInjectorCommandLine -CommandLine $cmd)) { continue }
+    try { $null = & taskkill.exe /PID $procId /T /F 2>$null } catch {}
+    try { Stop-Process -Id $procId -Force -ErrorAction SilentlyContinue } catch {}
+    if ($stopped -notcontains $procId) { $stopped += $procId }
+  }
+  if ($stopped.Count -gt 0) {
+    try { Wait-Process -Id $stopped[0] -Timeout 2 -ErrorAction SilentlyContinue } catch {}
+    Start-Sleep -Milliseconds 200
+  }
+  $nodes = @(Get-CimInstance Win32_Process -Filter "Name = 'node.exe'" -ErrorAction SilentlyContinue)
+  foreach ($proc in $nodes) {
+    $procId = [int]$proc.ProcessId
+    if ($ExcludeProcessId -gt 0 -and $procId -eq $ExcludeProcessId) { continue }
+    if (Test-DreamSkinWatchInjectorCommandLine -CommandLine ([string]$proc.CommandLine)) {
+      $left += $procId
+    }
+  }
+  return [pscustomobject]@{
+    Stopped = $stopped
+    Left    = $left
+    Ok      = ($left.Count -eq 0)
+  }
+}
+
+function Stop-DreamSkinRecordedInjector {
+  param([AllowNull()][object]$State)
+  # Always sweep watch injectors first so identity-mismatch / stale PID cannot
+  # leave a second daemon when open/check start a new one.
+  $port = $null
+  $expectedInjector = $null
+  if ($null -ne $State) {
+    if ($State.port) { $port = $State.port }
+    if ($State.injectorPath) {
+      $expectedInjector = "$($State.injectorPath)"
+    } elseif ($State.skillRoot) {
+      $expectedInjector = Join-Path "$($State.skillRoot)" 'scripts\injector.mjs'
+    }
+  }
+
+  if ($null -ne $State -and $State.injectorPid) {
+    $processId = [int]$State.injectorPid
+    $process = Get-CimInstance Win32_Process -Filter "ProcessId = $processId" -ErrorAction SilentlyContinue
+    if ($process) {
+      $processPath = Get-DreamSkinProcessExecutablePath -ProcessInfo $process
+      $commandLine = "$($process.CommandLine)"
+      $isNodeExecutable = $processPath -and ([System.IO.Path]::GetFileName("$processPath") -ieq 'node.exe')
+      $looksLikeInjector = $isNodeExecutable -and (
+        (Test-DreamSkinWatchInjectorCommandLine -CommandLine $commandLine -InjectorPath $expectedInjector -Port $port) -or
+        (Test-DreamSkinWatchInjectorCommandLine -CommandLine $commandLine)
+      )
+      if ($looksLikeInjector) {
+        try { $null = & taskkill.exe /PID $processId /T /F 2>$null } catch {}
+        try { Stop-Process -Id $processId -Force -ErrorAction SilentlyContinue } catch {}
+        try { Wait-Process -Id $processId -Timeout 2 -ErrorAction SilentlyContinue } catch {}
+      }
+      # Identity mismatch: do NOT throw — fall through to global sweep so a new
+      # injector can still be started without dual-open. State is rewritten by caller.
+    }
+  }
+
+  $sweep = Stop-DreamSkinWatchInjectors -InjectorPath $expectedInjector -Port $port
+  if (-not $sweep.Ok) {
+    # Last unrestricted attempt
+    $sweep = Stop-DreamSkinWatchInjectors
+  }
+  if (-not $sweep.Ok) {
+    throw ("Dream Skin watch injector(s) still running after stop: PID " + ($sweep.Left -join ','))
   }
   return $true
 }

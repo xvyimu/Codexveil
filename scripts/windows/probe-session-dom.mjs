@@ -95,19 +95,39 @@ const result = await send("Runtime.evaluate", {
     };
     const onHome = Boolean(document.querySelector('.dream-home, [data-home-ambient-suggestions], main.main-surface.dream-home-shell'));
     const inConversation = counts.messages > 0 || Boolean(hit.user) || Boolean(hit.assistant);
+    const styleEl = document.getElementById('codex-dream-skin-style');
+    const cssText = styleEl?.textContent || '';
+    const bubbleCssPresent = /data-user-message-bubble|data-message-author-role/.test(cssText);
+    let userGlass = null;
+    if (hit.user) {
+      try {
+        const node = document.querySelector(hit.user);
+        if (node) {
+          const s = getComputedStyle(node);
+          userGlass = {
+            selector: hit.user,
+            backgroundColor: s.backgroundColor,
+            borderRadius: s.borderRadius,
+            backdropFilter: s.backdropFilter || s.webkitBackdropFilter || 'none',
+          };
+        }
+      } catch {}
+    }
     return {
       ok: true,
       url: location.href,
       title: document.title,
-      dreamStyle: Boolean(document.getElementById('codex-dream-skin-style')),
+      dreamStyle: Boolean(styleEl),
+      bubbleCssPresent,
+      userGlass,
       bodyClass: document.body?.className || '',
       onHome,
       inConversation,
       hit,
       counts,
       dataAttrs: [...dataAttrs].slice(0, 60),
-      // For smoke: require shell + composer always; conversation nodes only when present.
-      pass: Boolean(hit.shell || hit.composer) && Boolean(document.getElementById('codex-dream-skin-style')),
+      // Shell + style + bubble CSS always; conversation nodes only when present.
+      pass: Boolean(hit.shell || hit.composer) && Boolean(styleEl) && bubbleCssPresent,
       conversationPass: !inConversation || Boolean(hit.user || hit.assistant || hit.composer),
     };
   })()`,

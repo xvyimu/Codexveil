@@ -392,6 +392,45 @@ html.codex-dream-skin article {
   color: var(--dream-text);
 }
 
+/* Conversation bubbles (home has none). Selectors stay multi-fallback so Store
+   DOM renames do not blank the glass; verify/probe share the same list. Keep
+   blur light — heavy backdrop on chat threads was a freeze source (1.3.12). */
+html.codex-dream-skin [data-user-message-bubble],
+html.codex-dream-skin [data-message-author-role="user"],
+html.codex-dream-skin [data-message-author-role*="user"],
+html.codex-dream-skin [class*="user-message"],
+html.codex-dream-skin [class*="UserMessage"] {
+  color: var(--dream-text) !important;
+  background: color-mix(in oklab, var(--dream-surface-raised) 88%, var(--dream-accent) 6%) !important;
+  border: 1px solid color-mix(in oklab, var(--dream-accent) 22%, transparent) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 14px color-mix(in oklab, var(--dream-canvas) 16%, transparent) !important;
+  backdrop-filter: blur(6px) saturate(1.04) !important;
+}
+
+html.codex-dream-skin [data-local-conversation-final-assistant],
+html.codex-dream-skin [data-message-author-role="assistant"],
+html.codex-dream-skin [data-message-author-role*="assistant"],
+html.codex-dream-skin [class*="assistant-message"],
+html.codex-dream-skin [class*="AssistantMessage"] {
+  color: var(--dream-text) !important;
+  background: color-mix(in oklab, var(--dream-surface) 90%, transparent) !important;
+  border: 1px solid var(--dream-line-soft) !important;
+  border-radius: 16px !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+html.codex-dream-skin [data-codex-approval-surface],
+html.codex-dream-skin [data-approval],
+html.codex-dream-skin [class*="approval"],
+html.codex-dream-skin [class*="permission"] {
+  color: var(--dream-text) !important;
+  background: color-mix(in oklab, var(--dream-surface-raised) 86%, var(--dream-secondary, var(--dream-accent)) 8%) !important;
+  border: 1px solid color-mix(in oklab, var(--dream-accent) 18%, transparent) !important;
+  border-radius: 14px !important;
+}
+
 /* A 16:9 or wider image is painted once on the native window. The sidebar,
    title bar and route surface become coordinated readability layers instead
    of repeating or cropping the image inside individual panels. */

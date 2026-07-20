@@ -247,9 +247,20 @@ try {
   Set-DreamSkinPaused -Paused $false -StateRoot $stateRoot | Out-Null
   Write-CodexSkinOpenStatus -Phase 'inject-start' -Detail 'starting watch injector' -Code 'inject' -Ok $true
 
-  if ($oldState) {
-    try { [void](Stop-DreamSkinRecordedInjector -State $oldState) }
-    catch { Write-OpenLog ('Old injector stop skipped: ' + $_.Exception.Message) }
+  # Single-instance gate: never start a second watch if an old one cannot die.
+  try {
+    [void](Stop-DreamSkinRecordedInjector -State $oldState)
+  } catch {
+    Write-OpenLog ('Old injector stop failed: ' + $_.Exception.Message)
+    # Unconditional sweep (path/port agnostic) before giving up.
+    $sweep = Stop-DreamSkinWatchInjectors
+    if (-not $sweep.Ok) {
+      throw ("Refusing to start a second injector; still running: PID " + ($sweep.Left -join ','))
+    }
+  }
+  $pre = Stop-DreamSkinWatchInjectors -Port $Port
+  if (-not $pre.Ok) {
+    throw ("Refusing to start a second injector; still running: PID " + ($pre.Left -join ','))
   }
 
   '' | Set-Content -LiteralPath $stdoutPath -Encoding utf8
@@ -265,6 +276,15 @@ try {
   Start-Sleep -Seconds 3
   if ($daemon.HasExited) {
     throw "Dream Skin injector exited during startup. See $stderrPath"
+  }
+  # Detect dual-open race (another launcher won the same window).
+  $peers = Stop-DreamSkinWatchInjectors -Port $Port -ExcludeProcessId $daemon.Id
+  if (-not $peers.Ok) {
+    try { Stop-Process -Id $daemon.Id -Force -ErrorAction SilentlyContinue } catch {}
+    throw ("Dual injector race; peers still up: PID " + ($peers.Left -join ',') + " — aborted new daemon " + $daemon.Id)
+  }
+  if ($peers.Stopped.Count -gt 0) {
+    Write-OpenLog ('Cleared peer injector(s): ' + ($peers.Stopped -join ','))
   }
 
   $injectorStartedAt = Get-DreamSkinProcessStartedAt -ProcessId $daemon.Id

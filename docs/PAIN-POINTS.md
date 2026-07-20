@@ -26,9 +26,9 @@
 | 9 | `versions/` 堆积（1.2 → 1.3.2 共 6 套 5.5MB） | 1.3.2 | 已修 · publish GC 保留 current + 上一版 |
 | 10 | SKIN_VERSION / renderer version 与 install version 脱节 | 1.3.2 | 已修 · SKIN_VERSION 与 install 同步 |
 | 11 | post-update 报告陈旧（还停在旧 runtime） | 1.3.9 | 未修 · publish 后未自动刷新 |
-| 12 | 会话页玻璃未在真实会话验证；probe 只到 home | 1.3.2 / 1.3.9 | 未修 · 需要人工进对话后再 probe |
-| 13 | 发布后 reattach 杀旧 injector 失败 → 短暂双 injector | 1.3.2 | 半好 · 偶发多 injector |
-| 14 | `cli list` 主题重复：repo + user store 都算 | 1.3.2 | 未修 · list/doctor 未去重 |
+| 12 | 会话页玻璃未在真实会话验证；probe 只到 home | 1.3.2 / 1.3.9 | 半好 · CSS 多选择器气泡玻璃 + verify/probe 会话判定；仍需人工进对话实锤 |
+| 13 | 发布后 reattach 杀旧 injector 失败 → 短暂双 injector | 1.3.2 | 已修 · `Stop-DreamSkinWatchInjectors` 全局清扫 + open/check 启动前硬门闩（身份不匹配不再 throw 挡清扫） |
+| 14 | `cli list` 主题重复：repo + user store 都算 | 1.3.2 | 已修 · `listThemes({ dedupe:true })` + user root 后写覆盖 |
 | 15 | 冷启动 shell ready 可 10s+（崩溃/半加载页） | 1.3.2 | 未修 · adaptive wait 极限 |
 
 ## P2 · 边角
@@ -42,7 +42,7 @@
 | 20 | heige studio 目录残留（无进程） | 1.3.2 | 未清 · 双开诱惑 |
 | 21 | 商店磁贴/AUMID/Codex-X 仍可能裸启 | 1.3.2 | 已知限制 · 无法拦 |
 | 22 | 控制台中文乱码（GBK 工具链） | 1.3.2 | 未修 · 快捷方式本体 Unicode 正常 |
-| 23 | verify 对 chat bubble 选择器 `data-user-message-bubble` not found | 1.3.2 | 半好 · 首页 OK，会话页需再验 |
+| 23 | verify 对 chat bubble 选择器 `data-user-message-bubble` not found | 1.3.2 | 半好 · 多 fallback + 会话态 conversationOk；首页不要求 bubble |
 
 ---
 

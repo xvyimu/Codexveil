@@ -922,12 +922,24 @@ async function verifySession(session) {
         y: document.documentElement.scrollHeight > document.documentElement.clientHeight,
       },
     };
-    // Session bubbles are optional: home has none. Pass if skin installed +
-    // composer structural marker exists (sidebar may be collapsed).
+    // Session bubbles are optional on home. When conversation nodes exist, require
+    // at least one bubble surface to be found so chat glass regressions fail verify.
     const shellOk = Boolean(result.composer) || Boolean(result.sidebar) || Boolean(document.querySelector('main, [role="main"]'));
+    const inConversation = Boolean(
+      result.glassSurfaces?.user?.found ||
+      result.glassSurfaces?.assistant?.found ||
+      document.querySelector('[data-message-author-role], [data-user-message-bubble], [data-local-conversation-final-assistant]')
+    );
+    const conversationOk = !inConversation || Boolean(
+      result.glassSurfaces?.user?.found ||
+      result.glassSurfaces?.assistant?.found ||
+      result.composer
+    );
+    result.inConversation = inConversation;
+    result.conversationOk = conversationOk;
     result.pass = result.installed && result.version === result.expectedVersion &&
       result.stylePresent && result.chromePresent &&
-      result.chromePointerEvents === 'none' && shellOk &&
+      result.chromePointerEvents === 'none' && shellOk && conversationOk &&
       (!result.homePresent || (Boolean(result.hero) &&
         (!result.suggestionsPresent || (result.cards.length >= 2 && result.cards.length <= 4))));
     return result;
