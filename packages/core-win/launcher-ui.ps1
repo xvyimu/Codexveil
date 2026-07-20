@@ -444,14 +444,14 @@ function Show-CodexSkinReadyBalloon {
 
 function Ensure-CodexSkinFocusType {
   # Versioned type name: PS cannot unload Add-Type assemblies.
-  if ('CodexSkin.WinFocus5' -as [type]) { return }
+  if ('CodexSkin.WinFocus6' -as [type]) { return }
   $code = @'
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 namespace CodexSkin {
-  public static class WinFocus5 {
+  public static class WinFocus6 {
     public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
     [DllImport("user32.dll")] public static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
     [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr hWnd);
@@ -514,11 +514,35 @@ namespace CodexSkin {
       return hits;
     }
 
+    [DllImport("user32.dll")] public static extern bool EnumChildWindows(IntPtr hWnd, EnumWindowsProc lpEnumFunc, IntPtr lParam);
+    [DllImport("user32.dll")] public static extern bool IsWindowEnabled(IntPtr hWnd);
+    [DllImport("user32.dll")] public static extern bool EnableWindow(IntPtr hWnd, bool bEnable);
+
+    // Electron may leave "Intermediate D3D Window" disabled: top-level focuses,
+    // but mouse/keyboard never reach the page (whole UI feels frozen).
+    public static void EnableDisabledRenderChildren(IntPtr parent) {
+      EnumChildWindows(parent, (hWnd, l) => {
+        if (!IsWindowEnabled(hWnd)) {
+          var sb = new StringBuilder(256);
+          GetClassName(hWnd, sb, sb.Capacity);
+          var cls = sb.ToString() ?? "";
+          if (IsWindowVisible(hWnd)
+              || cls.IndexOf("Intermediate D3D", StringComparison.OrdinalIgnoreCase) >= 0
+              || cls.IndexOf("Chrome_RenderWidget", StringComparison.OrdinalIgnoreCase) >= 0
+              || cls.IndexOf("Chrome_WidgetWin", StringComparison.OrdinalIgnoreCase) >= 0) {
+            EnableWindow(hWnd, true);
+          }
+        }
+        return true;
+      }, IntPtr.Zero);
+    }
+
     public static bool FocusHwnd(IntPtr hWnd) {
       if (hWnd == IntPtr.Zero) return false;
       // Force restore/show even when IsWindowVisible was false.
       ShowWindow(hWnd, 9);      // SW_RESTORE
       ShowWindowAsync(hWnd, 5); // SW_SHOW
+      EnableDisabledRenderChildren(hWnd);
       uint ignoredPid1 = 0;
       uint ignoredPid2 = 0;
       uint targetThread = GetWindowThreadProcessId(hWnd, out ignoredPid1);
@@ -530,7 +554,9 @@ namespace CodexSkin {
         if (fgThread != cur) attached1 = AttachThreadInput(cur, fgThread, true);
         if (targetThread != cur && targetThread != fgThread) attached2 = AttachThreadInput(cur, targetThread, true);
         BringWindowToTop(hWnd);
-        return SetForegroundWindow(hWnd);
+        bool ok = SetForegroundWindow(hWnd);
+        EnableDisabledRenderChildren(hWnd);
+        return ok;
       } finally {
         if (attached2) AttachThreadInput(cur, targetThread, false);
         if (attached1) AttachThreadInput(cur, fgThread, false);
@@ -627,7 +653,7 @@ function Focus-CodexSkinWindow {
           try { $proc.Refresh() } catch {}
           $hwnd = $proc.MainWindowHandle
           if ($hwnd -ne [IntPtr]::Zero) {
-            if ([CodexSkin.WinFocus5]::FocusHwnd($hwnd)) {
+            if ([CodexSkin.WinFocus6]::FocusHwnd($hwnd)) {
               Write-CodexSkinLog ("Focused Codex MainWindow pid=$processId attempt=$attempt ms=$($sw.ElapsedMilliseconds)")
               return $true
             }
@@ -635,11 +661,11 @@ function Focus-CodexSkinWindow {
         } catch {}
       }
       # 2) EnumWindows across process tree
-      $hits = [CodexSkin.WinFocus5]::FindWindows($pids)
+      $hits = [CodexSkin.WinFocus6]::FindWindows($pids)
       $lastHitCount = $hits.Count
       foreach ($hit in $hits) {
         if ($sw.ElapsedMilliseconds -gt $TimeoutMs) { break }
-        $focusedHit = [CodexSkin.WinFocus5]::FocusHwnd($hit.Hwnd)
+        $focusedHit = [CodexSkin.WinFocus6]::FocusHwnd($hit.Hwnd)
         if ($focusedHit) {
           [void](Invoke-CodexSkinFlashWindow -Hwnd $hit.Hwnd)
           [void](Try-CodexSkinAppActivate)

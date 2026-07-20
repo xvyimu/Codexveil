@@ -248,6 +248,10 @@ namespace CodexSkin.FastLaunch {
       // 从最小化/cloak 里救回来
       ShowWindow(hWnd, SW_RESTORE);
       ShowWindowAsync(hWnd, SW_SHOW);
+      // Electron Chromium 有时把 "Intermediate D3D Window" 子窗标成 disabled。
+      // 顶层窗口仍可 SetForeground，但鼠标/键盘进不了页面（整页点不动）。
+      // 每次 focus 时把 disabled 子窗重新 Enable。
+      EnableDisabledChildren(hWnd);
 
       uint _pid1 = 0, _pid2 = 0;
       uint targetThread = GetWindowThreadProcessId(hWnd, out _pid1);
@@ -259,11 +263,37 @@ namespace CodexSkin.FastLaunch {
         if (fgThread != cur) a1 = AttachThreadInput(cur, fgThread, true);
         if (targetThread != cur && targetThread != fgThread) a2 = AttachThreadInput(cur, targetThread, true);
         BringWindowToTop(hWnd);
-        return SetForegroundWindow(hWnd);
+        bool focused = SetForegroundWindow(hWnd);
+        // 再扫一次：某些 restore 路径会在 foreground 之后才创建/禁用 D3D 子窗
+        EnableDisabledChildren(hWnd);
+        return focused;
       } finally {
         if (a2) AttachThreadInput(cur, targetThread, false);
         if (a1) AttachThreadInput(cur, fgThread, false);
       }
+    }
+
+    private static int EnableDisabledChildren(IntPtr parent) {
+      int fixedCount = 0;
+      EnumChildWindows(parent, (hWnd, l) => {
+        if (!IsWindowEnabled(hWnd)) {
+          // 只修可见渲染面；别碰 IME/托盘隐藏窗
+          if (IsWindowVisible(hWnd) || ClassLooksLikeRenderSurface(hWnd)) {
+            if (EnableWindow(hWnd, true)) fixedCount += 1;
+          }
+        }
+        return true;
+      }, IntPtr.Zero);
+      return fixedCount;
+    }
+
+    private static bool ClassLooksLikeRenderSurface(IntPtr hWnd) {
+      var cls = new StringBuilder(256);
+      GetClassName(hWnd, cls, cls.Capacity);
+      string s = cls.ToString() ?? "";
+      return s.IndexOf("Intermediate D3D", StringComparison.OrdinalIgnoreCase) >= 0
+          || s.IndexOf("Chrome_RenderWidget", StringComparison.OrdinalIgnoreCase) >= 0
+          || s.IndexOf("Chrome_WidgetWin", StringComparison.OrdinalIgnoreCase) >= 0;
     }
 
     // ---- Log -----------------------------------------------------------------
@@ -283,7 +313,10 @@ namespace CodexSkin.FastLaunch {
     private const uint ASFW_ANY = 0xFFFFFFFF;
 
     [DllImport("user32.dll")] private static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
+    [DllImport("user32.dll")] private static extern bool EnumChildWindows(IntPtr hWnd, EnumWindowsProc lpEnumFunc, IntPtr lParam);
     [DllImport("user32.dll")] private static extern bool IsWindowVisible(IntPtr hWnd);
+    [DllImport("user32.dll")] private static extern bool IsWindowEnabled(IntPtr hWnd);
+    [DllImport("user32.dll")] private static extern bool EnableWindow(IntPtr hWnd, bool bEnable);
     [DllImport("user32.dll")] private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
     [DllImport("user32.dll")] private static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
     [DllImport("user32.dll")] private static extern bool SetForegroundWindow(IntPtr hWnd);
