@@ -19,6 +19,9 @@ _*.err
 # Product package output (Build-ProductPackage.ps1)
 dist/
 
+# Local 4-agent ship handoff (spec/changes/tests/review)
+.pipeline/
+
 # Never commit install-side state (lives in %LOCALAPPDATA%)
 current.json.bak-*
 apps/native/CodexFastLaunch/bin/
