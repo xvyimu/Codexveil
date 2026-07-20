@@ -395,6 +395,8 @@ html.codex-dream-skin article {
 /* Conversation bubbles (home has none). Selectors stay multi-fallback so Store
    DOM renames do not blank the glass; verify/probe share the same list. Keep
    blur light — heavy backdrop on chat threads was a freeze source (1.3.12). */
+/* heige 原味：气泡靠玻璃底色 + 圆角区分，不画描边（去除 border 线条框）。
+   仅 approval / permission 保留细描边，因为它需要 attention。 */
 html.codex-dream-skin [data-user-message-bubble],
 html.codex-dream-skin [data-message-author-role="user"],
 html.codex-dream-skin [data-message-author-role*="user"],
@@ -402,7 +404,7 @@ html.codex-dream-skin [class*="user-message"],
 html.codex-dream-skin [class*="UserMessage"] {
   color: var(--dream-text) !important;
   background: color-mix(in oklab, var(--dream-surface-raised) 88%, var(--dream-accent) 6%) !important;
-  border: 1px solid color-mix(in oklab, var(--dream-accent) 22%, transparent) !important;
+  border: 0 !important;
   border-radius: 16px !important;
   box-shadow: 0 4px 14px color-mix(in oklab, var(--dream-canvas) 16%, transparent) !important;
   backdrop-filter: blur(6px) saturate(1.04) !important;
@@ -415,7 +417,7 @@ html.codex-dream-skin [class*="assistant-message"],
 html.codex-dream-skin [class*="AssistantMessage"] {
   color: var(--dream-text) !important;
   background: color-mix(in oklab, var(--dream-surface) 90%, transparent) !important;
-  border: 1px solid var(--dream-line-soft) !important;
+  border: 0 !important;
   border-radius: 16px !important;
   box-shadow: none !important;
   backdrop-filter: none !important;
