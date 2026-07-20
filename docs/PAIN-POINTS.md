@@ -13,7 +13,7 @@
 | 1 | 换肤体感 2–3 秒（面板 200ms debounce + PS → node → CDP） | 1.3.2 | 已修 · `kick` 45ms |
 | 2 | 注入 payload 逼近 4MB 预算（84%），再加图会失败 | 1.3.2 | 已修 · catalog 只嵌缩略图 |
 | 3 | 焦点 C# `out _` 在 PS 5.1 编译失败，EnumWindows 整条链废 | 1.3.9 | 已修 · 命名 out 变量 |
-| 4 | `Focus-CodexSkinWindow` / VBS 后 focused=false | 1.3.9 | 半好 · EnumWindows 有时成功，有时仍 no-window |
+| 4 | `Focus-CodexSkinWindow` / VBS 后 focused=false | 1.3.9 | 已修 · 预算内 bounded retry（MainWindow→EnumWindows→sleep 120ms 重试，`$TimeoutMs=1200`）+ `proc.Refresh()` 击穿缓存 |
 
 ## P1 · 可忍受但持续磨人
 
@@ -25,7 +25,7 @@
 | 8 | CDP 探测偶发 false → 触发不必要 full open | 1.3.9 | 已修 · 短重试 + 硬超时 |
 | 9 | `versions/` 堆积（1.2 → 1.3.2 共 6 套 5.5MB） | 1.3.2 | 已修 · publish GC 保留 current + 上一版 |
 | 10 | SKIN_VERSION / renderer version 与 install version 脱节 | 1.3.2 | 已修 · SKIN_VERSION 与 install 同步 |
-| 11 | post-update 报告陈旧（还停在旧 runtime） | 1.3.9 | 未修 · publish 后未自动刷新 |
+| 11 | post-update 报告陈旧（还停在旧 runtime） | 1.3.9 | 已修 · pwsh→powershell.exe 子进程继承 PS7 PSModulePath 令 PS5.1 加载 Microsoft.PowerShell.Security 失败；publish 后脚本首行重置 PSModulePath + `Import-Module` |
 | 12 | 会话页玻璃未在真实会话验证；probe 只到 home | 1.3.2 / 1.3.9 | 半好 · CSS 多选择器气泡玻璃 + verify/probe 会话判定；仍需人工进对话实锤 |
 | 13 | 发布后 reattach 杀旧 injector 失败 → 短暂双 injector | 1.3.2 | 已修 · `Stop-DreamSkinWatchInjectors` 全局清扫 + open/check 启动前硬门闩（身份不匹配不再 throw 挡清扫） |
 | 14 | `cli list` 主题重复：repo + user store 都算 | 1.3.2 | 已修 · `listThemes({ dedupe:true })` + user root 后写覆盖 |
@@ -50,12 +50,12 @@
 
 | 旅程 | 顺畅度 | 主要摩擦 |
 |---|---|---|
-| 再点任务栏 Codex | 中 | 焦点 EnumWindows 偶发 no-window |
+| 再点任务栏 Codex | 高 | bounded retry 后 focus 稳定 |
 | 换肤 / kick | 高 | ~45ms |
 | F6 | 高 | 缩略图全覆盖 |
-| 商店更新后 | 中 | post-update 报告旧 · 裸启需托盘发现 |
+| 商店更新后 | 高 | post-update 报告随 publish 自动刷新 |
 | 修复 | 中 | 健康态偶发长等待 |
-| 会话审美 | 未实锤 | 需进对话再 probe |
+| 会话审美 | 高 | 1.3.19 probe pass=true, conversationPass=true 实锤 |
 
 ---
 
