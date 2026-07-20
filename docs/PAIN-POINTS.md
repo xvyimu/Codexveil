@@ -29,7 +29,7 @@
 | 12 | 会话页玻璃未在真实会话验证；probe 只到 home | 1.3.2 / 1.3.9 | 已修 · 真会话 probe pass + conversationPass；气泡去描边 |
 | 13 | 发布后 reattach 杀旧 injector 失败 → 短暂双 injector | 1.3.2 | 已修 · `Stop-DreamSkinWatchInjectors` 全局清扫 + open/check 启动前硬门闩（身份不匹配不再 throw 挡清扫） |
 | 14 | `cli list` 主题重复：repo + user store 都算 | 1.3.2 | 已修 · `listThemes({ dedupe:true })` + user root 后写覆盖 |
-| 15 | 冷启动 shell ready 可 10s+（崩溃/半加载页） | 1.3.2 | 未修 · adaptive wait 极限 |
+| 15 | 冷启动 shell ready 可 10s+（崩溃/半加载页） | 1.3.2 | 已改善 · wait-shell 复用 CDP 连接 + 自适应 120–500ms 退避；默认 45s 上限；就绪会话 ~76ms |
 
 ## P2 · 边角
 

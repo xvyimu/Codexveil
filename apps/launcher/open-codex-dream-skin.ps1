@@ -98,16 +98,26 @@ function Focus-CodexWindowLocal($Codex) {
 function Wait-CodexShell {
   param(
     [Parameter(Mandatory = $true)][string]$NodePath,
-    [Parameter(Mandatory = $true)][int]$WaitPort
+    [Parameter(Mandatory = $true)][int]$WaitPort,
+    # PAIN-POINTS #15: default 45s (was unbounded 90s inside wait-shell).
+    [ValidateRange(3000, 120000)][int]$TimeoutMs = 45000
   )
   $waitScript = Join-Path $stateRoot 'wait-shell.mjs'
+  if (-not (Test-Path -LiteralPath $waitScript -PathType Leaf)) {
+    # Prefer runtime copy if state root not yet seeded
+    $alt = Join-Path $scriptRoot 'wait-shell.mjs'
+    if (Test-Path -LiteralPath $alt) {
+      Copy-Item -LiteralPath $alt -Destination $waitScript -Force
+    }
+  }
   if (-not (Test-Path -LiteralPath $waitScript -PathType Leaf)) {
     throw "Missing shell waiter: $waitScript"
   }
   Write-CodexSkinOpenStatus -Phase 'shell-wait' -Detail 'waiting for Codex shell' -Code 'shell-wait' -Ok $true
   $swWait = [System.Diagnostics.Stopwatch]::StartNew()
   $lastBalloon = [datetime]::MinValue
-  & $NodePath $waitScript $WaitPort | ForEach-Object {
+  # Pass timeoutMs so node side stops earlier on half-loaded shells.
+  & $NodePath $waitScript $WaitPort $TimeoutMs | ForEach-Object {
     Write-OpenLog $_
     if ($swWait.Elapsed.TotalSeconds -ge 5 -and ((Get-Date) - $lastBalloon).TotalSeconds -ge 8) {
       Show-CodexSkinUserFeedback -Code 'shell-wait' | Out-Null
@@ -116,8 +126,9 @@ function Wait-CodexShell {
     Write-CodexSkinOpenStatus -Phase 'shell-wait' -Detail ([string]$_) -Code 'shell-wait' -Ok $true -ElapsedMs ([int]$swWait.ElapsedMilliseconds)
   }
   if ($LASTEXITCODE -ne 0) {
-    throw 'Codex shell did not become ready for Dream Skin injection.'
+    throw ("Codex shell did not become ready within " + $TimeoutMs + "ms for Dream Skin injection.")
   }
+  Write-OpenLog ("shell ready ms=" + $swWait.ElapsedMilliseconds)
 }
 
 try {

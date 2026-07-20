@@ -1,4 +1,4 @@
-﻿﻿# Publish codex-skin runtime into Programs\CodexDreamSkin\versions\<id>
+﻿# Publish codex-skin runtime into Programs\CodexDreamSkin\versions\<id>
 # and flip current.json. Does not rewrite Start Menu (already points at open-*.ps1).
 param(
   [string]$RepoRoot = (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent),

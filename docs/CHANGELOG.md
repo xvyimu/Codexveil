@@ -6,6 +6,15 @@
 
 ---
 
+## 1.3.24 — wait-shell cold-start + tray native focus + UTF-8 console
+
+- **wait-shell.mjs**: reuse CDP WebSocket across polls; adaptive 120–500ms backoff; default deadline 45s (was 90s hard); structural pass without requiring sidebar. Ready-session bench ~76ms.
+- **open Wait-CodexShell**: passes timeoutMs; seeds wait-shell.mjs from runtime if missing.
+- **tray focus native** (1cbed78): in-process WinFocus6 / CodexFastLaunch instead of PS open script (~40–300ms).
+- **UTF-8 console** (a9d09eb): chcp 65001 + OutputEncoding on entry scripts.
+- **publish auto-reattach** (941757b): post-update reattaches on runtime drift before smoke.
+
+
 ## 1.3.18 — heige 融合视觉 · 1.3.18-118f81
 **基线**：扩展 1.3.15；把观感改回 heige studio + 原项目那样（右半 hero 图 + 左上品牌字），底部输入区收敛为 heige 单框。（1.3.16 = 单一版本源落地，1.3.17 = 融合视觉首版，均为过渡。）
 

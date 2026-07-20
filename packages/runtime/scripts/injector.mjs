@@ -12,7 +12,7 @@ const root = path.resolve(here, "..");
 // (`node packages/runtime/scripts/injector.mjs`) resolve to "dev"; publish
 // rewrites the placeholder to the release version in both this file and in
 // versions/<id>/scripts/injector.mjs.
-const SKIN_VERSION_TOKEN = "1.3.23";
+const SKIN_VERSION_TOKEN = "1.3.24";
 const SKIN_VERSION = SKIN_VERSION_TOKEN === "__" + "SKIN_VERSION__" ? "dev" : SKIN_VERSION_TOKEN;
 const MAX_ART_BYTES = 16 * 1024 * 1024;
 const DEFAULT_PAYLOAD_BUDGET_BYTES = 4 * 1024 * 1024;

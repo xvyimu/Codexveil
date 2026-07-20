@@ -4,7 +4,7 @@
   // Single version source: publish-runtime.ps1 rewrites __SKIN_VERSION__ in
   // both this file (repo copy) and versions/<id>/assets/renderer-inject.js.
   // If the token is still literal, we're running from an unpublished repo.
-  const SKIN_VERSION_TOKEN = "1.3.23";
+  const SKIN_VERSION_TOKEN = "1.3.24";
   const SKIN_VERSION = SKIN_VERSION_TOKEN === "__" + "SKIN_VERSION__" ? "dev" : SKIN_VERSION_TOKEN;
   const CHROME_ID = "codex-dream-skin-chrome";
   const ROOT_CLASSES = [
