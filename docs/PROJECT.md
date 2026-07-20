@@ -459,7 +459,8 @@ paused/locked: false（正常使用时）
 | 可选辅助 | `node scripts\windows\probe-dom.mjs` | home shell 标记如 `dreamStyle` / `mainSurface` |
 | 静态（可选） | `Test-Path scripts\windows\probe-session-dom.mjs` | `True` |
 
-脚本契约见 `scripts/windows/probe-session-dom.mjs`（`pass` / `conversationPass` / exit）。
+脚本契约见 `scripts/windows/probe-session-dom.mjs`（`pass` / `conversationPass` / exit）。  
+发版留痕：`docs/evidence/` + `pwsh -NoProfile -File scripts/windows/Run-ReleaseProbes.ps1`（见 [evidence/README.md](./evidence/README.md)；真实 `runs/*.json` gitignore，skipped ≠ 发版完成）。
 
 ---
 

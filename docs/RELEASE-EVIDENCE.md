@@ -17,18 +17,47 @@
 
 前置：任务栏 Codex、CDP 9335、皮肤已注入。
 
-- [ ] **home**：`npm run probe:session`（等价 `node scripts\windows\probe-session-dom.mjs`）  
-  期望 JSON 关键字：`"ok": true`、`"dreamStyle": true`、`"pass": true`；exit 0  
+**留痕路径（本机生成，真实 JSON 不提交）：**
+
+- 仓库：`docs/evidence/runs/probe-session-*.json`（gitignore；脚手架见 [docs/evidence/README.md](./evidence/README.md)）
+- 运行态：`%LOCALAPPDATA%\CodexDreamSkin\session-dom-probe.json`
+
+**如何生成：**
+
+```powershell
+pwsh -NoProfile -File scripts/windows/Run-ReleaseProbes.ps1
+# 仅打印纪律、不连 CDP：
+pwsh -NoProfile -File scripts/windows/Run-ReleaseProbes.ps1 -SkipRun
+# 直接 probe（不写仓库 evidence 包装层）：
+npm run probe:session
+```
+
+勾选规则：
+
+- [ ] **home**  
+  命令：`pwsh -NoProfile -File scripts/windows/Run-ReleaseProbes.ps1`（或 `npm run probe:session`）  
+  **留痕**：`docs/evidence/runs/probe-session-*.json` 与/或 `%LOCALAPPDATA%\CodexDreamSkin\session-dom-probe.json`  
+  **勾选前提**：某次 evidence `status=ran` 且 `summary.pass=true`（及 `ok` / `dreamStyle`）；JSON 关键字 `"ok": true`、`"dreamStyle": true`、`"pass": true`；exit 0  
   （无 page → exit 2）
-- [ ] **conversation**：**须先打开任一对话**，再跑同上  
-  期望：`"conversationPass": true`；exit 0（失败 exit 3）
-- [ ] 包装（打印 §9.4 期望 + 可选实跑）：  
-  `pwsh -NoProfile -File scripts\windows\Run-ReleaseProbes.ps1`  
+
+- [ ] **conversation**  
+  **须先打开任一对话**，再跑同上  
+  **留痕**：同上路径（建议另存/另次时间戳文件）  
+  **勾选前提**：`status=ran` 且 `summary.conversationPass=true`（建议 `inConversation=true`）；exit 0（失败 exit 3）
+
+- [ ] 包装纪律（打印 §9.4 期望 + 可选实跑 / skip 留痕）：  
+  `pwsh -NoProfile -File scripts/windows/Run-ReleaseProbes.ps1`  
   仅纪律不连 CDP：`…\Run-ReleaseProbes.ps1 -SkipRun`
 
-完整命令与安装树路径见 [PROJECT.md §9.4](./PROJECT.md)。
+**未跑真机不算发版完成：**
+
+- `status=skipped`（如 `reason=no-cdp`）→ **不得**勾 home / conversation 完成  
+- 仅 `-SkipRun` → **不得**勾完成  
+- 无 CDP 时包装默认可 exit 0（脚手架/skip 留痕成功），**不是** probe pass
+
+完整命令、字段与 gitignore 策略见 [evidence/README.md](./evidence/README.md)；安装树路径见 [PROJECT.md §9.4](./PROJECT.md)。
 
 ## 说明
 
 - Quiet post-update exit=2 + soft reattach OK = 正式降级，**不算**发版失败（见 publish 日志 `soft reattach OK` + 失败 check 摘要）
-- 链：PROJECT §6 · CONTRIBUTING §C-3/C-4 · §9.4 · 建议 baseline：`write-baseline.ps1`
+- 链：PROJECT §6 · CONTRIBUTING §C-3/C-4 · §9.4 · 建议 baseline：`write-baseline.ps1` · 留痕：`docs/evidence/`

@@ -22,6 +22,9 @@ dist/
 # Local 4-agent ship handoff (spec/changes/tests/review)
 .pipeline/
 
+# Real machine probe dumps (may contain DOM selectors / titles); keep scaffolding
+docs/evidence/runs/*.json
+
 # Never commit install-side state (lives in %LOCALAPPDATA%)
 current.json.bak-*
 apps/native/CodexFastLaunch/bin/
