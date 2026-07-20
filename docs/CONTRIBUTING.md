@@ -75,6 +75,17 @@
 
 **验收**：doctor `fresh=true`；`apply --theme <id>` 后 CDP 注入成功。安装树 `control-plane.mjs` 含 `timingSafeEqual` 且 mutating 路由 header-only（`x-codex-skin-token`）；`node packages/core/cli.mjs doctor` → `injectorPathFreshness.fresh=true`。
 
+**仓 ↔ 安装树（TD-01）**：publish 后建议跑：
+
+```powershell
+pwsh -NoProfile -File scripts\windows\verify-install-matches-repo.ps1 -RepoRoot D:\orca\codex-skin
+```
+
+- exit `0`：关键文件 hash + control-plane 安全标记对齐  
+- exit `1`：漂移（先 publish 再复跑）  
+- exit `2`：本机未安装 / 无 `current.json`  
+- `-Json`：机器可读报告  
+
 ---
 
 ## 附录 C-4：publish/产品包 PR 验收
@@ -84,7 +95,7 @@
 - [ ] `scripts/windows/publish-runtime.ps1` 改动需用 `-Version` 参数本机 dry-run / 实跑
 - [ ] `scripts/windows/Build-ProductPackage.ps1` / `Install-Product.ps1` 改动需本机安装态验证
 - [ ] 任何版本源改动必须只走 `publish-runtime.ps1 -Version`（ADR 0003）
-- [ ] 改 `packages/runtime/**` 后必须跑 `publish-runtime.ps1 -Version <line>` 才能进安装树；验收安装树 control-plane 含 `timingSafeEqual` / header-only（`x-codex-skin-token`）+ doctor `fresh=true`
+- [ ] 改 `packages/runtime/**` 后必须跑 `publish-runtime.ps1 -Version <line>` 才能进安装树；验收安装树 control-plane 含 `timingSafeEqual` / header-only（`x-codex-skin-token`）+ doctor `fresh=true` + 建议 `verify-install-matches-repo.ps1` exit 0
 - [ ] `soft-reattach.ps1` 改动需同时验证 publish + Install 两条调用链，且传 `--theme-dir` + `--state-root`
 - [ ] G5-C 超时逻辑（publish 尾部 `WaitForExit` + soft reattach fallback）改动需验证超时与非零退出两条路径；Quiet exit=2 后 soft reattach **成功**应见 `soft reattach OK`（非吓人 Warning）
 - [ ] seed art fallback 不得钉死已 GC 的旧 runtimeId；优先 repo `packages/runtime/assets` + 动态扫 `versions/*/assets`

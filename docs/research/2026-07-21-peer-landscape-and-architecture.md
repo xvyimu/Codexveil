@@ -637,7 +637,7 @@ doctor 已暴露 `stateSchema` 顶层字段以降低误用（E1）。
 
 | ID | 标题 | 优先级 | 类型 | 建议出口 |
 |----|------|--------|------|----------|
-| TD-01 | 仓↔安装树一致性校验脚本 | P1 | 工程 | M1 |
+| TD-01 | 仓↔安装树一致性校验脚本 | P1 | 工程 | **已落地** `scripts/windows/verify-install-matches-repo.ps1` · CONTRIBUTING C-3 |
 | TD-02 | post-update Quiet 失败项摘要日志 | P1 | 可靠性 | M2 |
 | TD-03 | 文档基线自动生成（防手改漂移） | P2 | 文档 | 小脚本写 BASELINE.md |
 | TD-04 | 主题 data-only 硬拒绝 | P2 | 安全 | M4 |
