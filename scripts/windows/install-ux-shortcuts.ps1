@@ -47,8 +47,16 @@ function Set-Ps([string]$Path, [string]$FilePath, [string]$Extra, [string]$Descr
   Write-Host ('lnk ' + $Path)
 }
 
-Set-Vbs (Join-Path $programs 'Codex.lnk') 'launch-codex-skin.vbs' 'Open Codex with skin'
-Set-Vbs (Join-Path $desktop 'Codex.lnk') 'launch-codex-skin.vbs' 'Open Codex with skin'
+# 任务栏/开始菜单/桌面 Codex：直接 powershell.exe -File open-codex-dream-skin.ps1
+#
+# 之前走 wscript → launch-codex-skin.vbs → powershell 有两个问题：
+#   - VBS 里 TryFocusScript 用 WaitOnReturn=True 阻塞 wscript 主线程，冷启动 PS +
+#     Add-Type C# 焦点类 ~700-1500ms/次，累积 1.5-3s，用户感觉"任务栏卡死"。
+#   - VBS 的 /open-healthy 快路径其实和 open-codex-dream-skin.ps1 里的一模一样，
+#     PS 版本命中控制面同样 ~200ms。VBS 是纯多余一层。
+# 直连 PS 后，控制面命中 → 快路径 exit 0；miss → 常规 open。
+Set-Ps (Join-Path $programs 'Codex.lnk') (Join-Path $programRoot 'open-codex-dream-skin.ps1') '-Port 9335 -NoPrompt' 'Open Codex with skin'
+Set-Ps (Join-Path $desktop 'Codex.lnk') (Join-Path $programRoot 'open-codex-dream-skin.ps1') '-Port 9335 -NoPrompt' 'Open Codex with skin'
 Set-Vbs (Join-Path $programs ($switchName + '.lnk')) 'launch-switch-theme.vbs' 'Switch theme'
 Set-Vbs (Join-Path $desktop ($switchName + '.lnk')) 'launch-switch-theme.vbs' 'Switch theme'
 Set-Ps (Join-Path $advanced 'check-and-fix.lnk') (Join-Path $programRoot 'check-and-fix.ps1') '-Port 9335 -Quiet' 'Repair'

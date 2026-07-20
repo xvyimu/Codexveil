@@ -30,6 +30,22 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+
+# PSModulePath hardening for Windows PowerShell 5.1.
+# 与 post-update-regression.ps1 同理：任何父进程若是 pwsh (PS 7)，会往
+# PSModulePath 塞 net5/net6 版的 Microsoft.PowerShell.Security，进 PS 5.1 会抛
+# "无法加载该模块"，导致 common-windows.ps1 的 Get-AuthenticodeSignature 整条链废掉。
+# 任务栏点击本身干净，这里是防御 Start-Process 被别的 pwsh 拉起的情况。
+if ($PSVersionTable.PSEdition -eq 'Desktop') {
+  $ps5Modules = @(
+    (Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'WindowsPowerShell\Modules'),
+    (Join-Path $env:ProgramFiles 'WindowsPowerShell\Modules'),
+    (Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\Modules')
+  )
+  $env:PSModulePath = ($ps5Modules -join ';')
+  try { Import-Module Microsoft.PowerShell.Security -ErrorAction Stop } catch {}
+}
+
 $programRoot = [System.IO.Path]::GetFullPath($PSScriptRoot)
 $stateRoot = Join-Path $env:LOCALAPPDATA 'CodexDreamSkin'
 $currentPath = Join-Path $programRoot 'current.json'
