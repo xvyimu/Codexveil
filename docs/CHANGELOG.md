@@ -39,6 +39,7 @@
 - **CONTRIBUTING.md** §C-1–C-9 · PR 模板 · 任务卡 `docs/plans/task-cards-2026-07-21.md` · 维护 Agent 提示词。
 - AUDIT/SCAN 基线校准 · PAIN #24 SmartScreen · GLOSSARY 扩展 · WIN-02 冻结表 · residual G5-C 行号反向链接。
 - injector TOC/Region 注释；SKIN_VERSION stamp 注释澄清。
+- **ADR 0004 Accepted / U1 开工**：依赖双平面 · `packages/contracts`（Zod palette/doctor/control）· pnpm workspace · CI typecheck+contracts 测 · 安装态 runtime 仍默认零第三方 npm。
 
 ---
 

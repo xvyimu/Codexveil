@@ -37,9 +37,9 @@
 - [0001-merge-product-line](./adr/0001-merge-product-line.md) — 合并 heige + DreamSkin 单产品线
 - [0002-upstream-sync-policy](./adr/0002-upstream-sync-policy.md) — 上游 vendor 镜像 + 人工 promote
 - [0003-single-version-source](./adr/0003-single-version-source.md) — 单一版本源
-- [0004-engineering-modernization-u1](./adr/0004-engineering-modernization-u1.md) — **Proposed** U1：双平面依赖 · TS/contracts · probe-kit · stamp · Vitest
+- [0004-engineering-modernization-u1](./adr/0004-engineering-modernization-u1.md) — **Accepted** U1：双平面依赖 · TS/contracts · probe-kit · stamp · Vitest
 - [0005-thin-product-shell-u3](./adr/0005-thin-product-shell-u3.md) — **Proposed** U3：薄 Tauri/L1 壳，不替换 watch 守护
-- 排期：[u1-u3-two-week-plan-2026-07-21](./plans/u1-u3-two-week-plan-2026-07-21.md)
+- 排期：[u1-u3-two-week-plan-2026-07-21](./plans/u1-u3-two-week-plan-2026-07-21.md) · 分支 `feat/u1-workspace`
 
 ## 决策与计划
 

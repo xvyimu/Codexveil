@@ -2,6 +2,11 @@
 node_modules/
 npm-debug.log*
 yarn-error.log*
+pnpm-lock.yaml.bak
+
+# TypeScript build outputs (contracts etc.; CI builds as needed)
+*.tsbuildinfo
+packages/*/dist/
 
 # Editor / OS
 .DS_Store

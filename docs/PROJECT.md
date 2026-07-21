@@ -39,7 +39,7 @@
 | [`prompts/agent-maintain-task-cards-zh.md`](./prompts/agent-maintain-task-cards-zh.md) | 维护 Agent 可粘贴提示词 |
 | [`research/2026-07-21-peer-landscape-and-architecture.md`](./research/2026-07-21-peer-landscape-and-architecture.md) | 同类项目对照 · 技术债 · 架构优化调研（长文） |
 | [`research/2026-07-21-github-peer-matrix.md`](./research/2026-07-21-github-peer-matrix.md) | GitHub 细矩阵 · C/D/E 分层 |
-| [`adr/0004-engineering-modernization-u1.md`](./adr/0004-engineering-modernization-u1.md) | **Proposed** 工程现代化 / 依赖双平面 |
+| [`adr/0004-engineering-modernization-u1.md`](./adr/0004-engineering-modernization-u1.md) | **Accepted** 工程现代化 / 依赖双平面 · 实施中 |
 | [`adr/0005-thin-product-shell-u3.md`](./adr/0005-thin-product-shell-u3.md) | **Proposed** 薄产品壳（不替换守护） |
 | [`plans/u1-u3-two-week-plan-2026-07-21.md`](./plans/u1-u3-two-week-plan-2026-07-21.md) | U1+U3 两周排期 |
 | [`research/2026-07-21-progress-aligned-debt-and-portfolio.md`](./research/2026-07-21-progress-aligned-debt-and-portfolio.md) | 进度对齐：已关债 · 多方案组合 · 打磨卡片（长文） |
@@ -193,6 +193,15 @@
   同时运行两个 injector
   生产路径 import vendor/dreamskin
 ```
+
+**依赖双平面（ADR 0004 Accepted）**
+
+| 平面 | 规则 |
+|------|------|
+| **安装态 runtime**（`versions/<id>/`） | 默认 **零第三方 npm**；打进用户机的脚本须自包含 |
+| **开发 / CI** | 允许 TypeScript、Vitest、Zod、pnpm workspace 等（见根 `package.json` devDependencies） |
+
+`test:deps` 继续守护 core↔runtime **静态互引**；不等于「仓库不得有 node_modules」。
 
 ### 3.3 各包公开接口（稳定面）
 

@@ -1,9 +1,9 @@
 # ADR 0004 — 工程现代化与受控依赖放宽（U1）
 
-- **状态**：Proposed（表单 2026-07-21 确认主方向；**实施前须再 Accept 勾选**）
+- **状态**：**Accepted**（2026-07-21 · 用户确认「Accept 0004 + feat/u1-workspace」）
 - **日期**：2026-07-21
 - **相关**：0001 单产品线 · 0002 上游 · 0003 单一版本源 · **0005** U3 薄壳
-- **表单结论**：主包 **U1+U3** · 硬边界 **长期放宽（需 ADR）** · U1 四组件全选 · 本轮交付 ADR+排期
+- **表单结论**：主包 **U1+U3** · 硬边界 **长期放宽（需 ADR）** · U1 四组件全选 · 实施自 `feat/u1-workspace`
 
 ## 背景
 
@@ -100,8 +100,9 @@
 
 ## 实施状态
 
-**未实施代码。** 排期见 [`plans/u1-u3-two-week-plan-2026-07-21.md`](../plans/u1-u3-two-week-plan-2026-07-21.md)。  
-Accept 条件：维护者确认 D1–D7 无异议后改状态为 **Accepted** 并开 `feat/u1-contracts` 类分支。
+**Accepted · 实施中**（2026-07-21 · 用户确认）。  
+排期：[`plans/u1-u3-two-week-plan-2026-07-21.md`](../plans/u1-u3-two-week-plan-2026-07-21.md)。  
+分支：`feat/u1-workspace` — `packages/contracts` + pnpm workspace + `tsconfig.base.json`。
 
 ## 参考
 

@@ -1,4 +1,4 @@
-# G1-B: light CI gate — npm test = themes + deps + freshness (no Codex/CDP/Windows install state).
+# G1-B + ADR 0004: unit gates + contracts typecheck/test (no Codex/CDP/Windows install state).
 # Full doctor/smoke/probe remain local. See docs/plans/residual-g1-g3-g4-g5-2026-07-20.md
 name: themes-gate
 
@@ -11,15 +11,27 @@ on:
 jobs:
   themes:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: pnpm
 
-      - name: Unit gates (themes + deps + freshness)
-        run: npm test
+      - name: Install (dev plane)
+        run: pnpm install --frozen-lockfile=false
+
+      - name: Typecheck contracts
+        run: pnpm run typecheck:contracts
+
+      - name: Unit gates (legacy + contracts)
+        run: pnpm run test
