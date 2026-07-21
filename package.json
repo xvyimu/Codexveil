@@ -21,14 +21,16 @@
     "test:deps": "node scripts/check-package-deps.mjs",
     "test:control": "node packages/runtime/scripts/control-plane.test.mjs",
     "test:freshness": "node packages/core/state/state-freshness.test.mjs",
+    "test:state-io": "node packages/core/state/state-io.test.mjs",
     "test:cdp-url": "node packages/runtime/scripts/cdp-url-guard.test.mjs",
     "test:catalog-budget": "node packages/runtime/scripts/theme-catalog-budget.test.mjs",
     "test:contracts": "pnpm --filter @codex-skin/contracts test",
     "typecheck:contracts": "pnpm --filter @codex-skin/contracts typecheck",
     "build:contracts": "pnpm --filter @codex-skin/contracts build",
-    "test:unit": "npm run test:themes && npm run test:store && npm run test:adapter && npm run test:deps && npm run test:freshness && npm run test:cdp-url && npm run test:catalog-budget",
+    "test:unit": "npm run test:themes && npm run test:store && npm run test:adapter && npm run test:deps && npm run test:freshness && npm run test:state-io && npm run test:cdp-url && npm run test:catalog-budget && npm run test:fs-io",
     "test": "npm run test:unit && npm run test:contracts",
-    "typecheck": "npm run typecheck:contracts"
+    "typecheck": "npm run typecheck:contracts",
+    "test:fs-io": "node packages/runtime/scripts/fs-io.test.mjs"
   },
   "engines": {
     "node": ">=20"

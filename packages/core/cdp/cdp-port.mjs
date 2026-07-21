@@ -7,6 +7,7 @@ import {
   listWindowsProcessCommandLines,
   parseCdpPortFromCommandLine,
 } from "../discover/process-win.mjs";
+import { isValidPort } from "./cdp-helpers.mjs";
 
 const execFileAsync = promisify(execFile);
 
@@ -14,7 +15,7 @@ export async function probeCdpPort(
   port,
   { fetchImpl = globalThis.fetch, timeoutMs = 1500 } = {},
 ) {
-  if (!Number.isInteger(port) || port < 1024 || port > 65535) {
+  if (!isValidPort(port)) {
     return { port, open: false, browser: null };
   }
   try {
@@ -64,11 +65,11 @@ export async function discoverActiveCdpPort({
   }
 
   // 常见候选兜底：用户手动起过 9335/9222 时，doctor/apply 不带 --port 也能命中
-  for (const fallback of [9335, 9222, DEFAULT_CDP_PORT]) candidates.push(fallback);
+  for (const fallback of [DEFAULT_CDP_PORT, 9335, 9222]) candidates.push(fallback);
 
   const tried = new Set();
   for (const port of candidates) {
-    if (tried.has(port)) continue;
+    if (!isValidPort(port) || tried.has(port)) continue;
     tried.add(port);
     const probe = await probeCdpPort(port, { fetchImpl });
     if (probe.open) {
@@ -92,3 +93,4 @@ export async function discoverActiveCdpPort({
 }
 
 // 运行态诊断：版本号、进程是否带调试参数、端口是否开放。
+// （实现见 discover/codex-app.mjs · runtimeDiagnostics）

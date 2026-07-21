@@ -10,7 +10,8 @@
  * 6) System.Drawing (PNG/JPEG only)
  */
 import { spawn } from "node:child_process";
-import { access, copyFile, stat, writeFile } from "node:fs/promises";
+import { copyFile, stat, writeFile } from "node:fs/promises";
+import { pathExists } from "./fs-io.mjs";
 import { basename, dirname, extname, join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
@@ -19,14 +20,6 @@ const MAX_EDGE = 640;
 const MAX_MEMBER = 96 * 1024;
 const TARGET_BYTES = 64 * 1024;
 
-async function pathExists(p) {
-  try {
-    await access(p);
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 function run(cmd, args, timeoutMs = 20000) {
   return new Promise((resolve) => {

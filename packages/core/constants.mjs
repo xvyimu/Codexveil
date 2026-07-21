@@ -30,6 +30,9 @@ export const DEFAULT_THEME_ID = "miku-488137";
 /** 与 DreamSkin / 现网 Store Codex 会话对齐的默认 CDP 端口 */
 export const DEFAULT_CDP_PORT = 9335;
 
+/** 控制面默认 loopback 端口（与 runtime control-plane.mjs DEFAULT_PORT 对齐） */
+export const DEFAULT_CONTROL_PORT = 9336;
+
 export const EXPECTED_BUNDLE_ID = "com.openai.codex";
 export const EXPECTED_TEAM_ID = "2DC432GLL2";
 

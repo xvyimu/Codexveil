@@ -5,39 +5,16 @@
  * apply（hot-active-theme）默认写 active-theme + kick 控制面；本模块给
  * doctor/CLI 输出运行时状态，方便判断是否已装/是否 paused/是否有 injector。
  */
-import { access, readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { homedir } from "node:os";
-
-const DEFAULT_DREAM_STATE_ROOT = () =>
-  join(process.env.LOCALAPPDATA ?? join(homedir(), "AppData", "Local"), "CodexDreamSkin");
-
-async function pathExists(path) {
-  try {
-    await access(path);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function isProcessAlive(pid) {
-  if (!Number.isInteger(pid) || pid <= 0) return false;
-  try {
-    process.kill(pid, 0);
-    return true;
-  } catch (error) {
-    // Windows: ESRCH / EINVAL 表示不存在；EPERM 表示存在但无权发信号
-    if (error && (error.code === "EPERM" || error.code === "EACCES")) return true;
-    return false;
-  }
-}
+import { resolveStudioPaths } from "../constants.mjs";
+import { isValidPort } from "../cdp/cdp-helpers.mjs";
+import { isProcessAlive, pathExists, readJsonFile, readTextTrim } from "./state-io.mjs";
 
 /**
  * 检测本机 CodexDreamSkin 运行时状态（doctor 诊断用）。
  */
 export async function detectDreamSkinRuntime({
-  stateRoot = DEFAULT_DREAM_STATE_ROOT(),
+  stateRoot = resolveStudioPaths().dreamStateRoot,
   env = process.env,
 } = {}) {
   const root = env.CODEX_DREAM_SKIN_STATE ?? stateRoot;
@@ -84,8 +61,8 @@ export async function detectDreamSkinRuntime({
 
   if (hasPortFile) {
     try {
-      const n = Number((await readFile(controlPortFile, "utf8")).trim());
-      if (Number.isInteger(n) && n >= 1024) result.controlPort = n;
+      const n = Number(await readTextTrim(controlPortFile));
+      if (isValidPort(n)) result.controlPort = n;
     } catch {
       // ignore
     }
@@ -93,16 +70,12 @@ export async function detectDreamSkinRuntime({
 
   if (hasState) {
     try {
-      const state = JSON.parse(await readFile(statePath, "utf8"));
+      const state = await readJsonFile(statePath);
       result.injectorPid = Number.isInteger(state?.injectorPid) ? state.injectorPid : null;
       result.port = Number.isInteger(state?.port) ? state.port : null;
       result.browserId = typeof state?.browserId === "string" ? state.browserId : null;
       result.injectorAlive = isProcessAlive(result.injectorPid);
-      if (
-        result.controlPort == null &&
-        Number.isInteger(state?.controlPort) &&
-        state.controlPort >= 1024
-      ) {
+      if (result.controlPort == null && isValidPort(state?.controlPort)) {
         result.controlPort = state.controlPort;
       }
     } catch {

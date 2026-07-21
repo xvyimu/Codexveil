@@ -7,8 +7,13 @@ export const DEFAULT_COMMAND_TIMEOUT_MS = 5000;
 export const DEFAULT_CONNECT_TIMEOUT_MS = 5000;
 export const DEFAULT_DISCOVERY_TIMEOUT_MS = 5000;
 
+/** @param {unknown} port @returns {boolean} */
+export function isValidPort(port) {
+  return Number.isInteger(port) && port >= MIN_PORT && port <= MAX_PORT;
+}
+
 export function validatePort(port) {
-  if (!Number.isInteger(port) || port < MIN_PORT || port > MAX_PORT) {
+  if (!isValidPort(port)) {
     throw new TypeError(
       `port must be an integer from ${MIN_PORT} through ${MAX_PORT}`,
     );
