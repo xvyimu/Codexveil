@@ -27,13 +27,16 @@ Codex Desktop 换肤：DreamSkin 启动/守护 + 多主题。Node ≥20，ESM。
 ```bash
 npm run doctor | list | status | help
 npm run test:themes
+npm run test:themes-contracts   # themes normalizeColors ⊂ contracts palette (需先 build:contracts)
 npm run test:store
 npm run test:adapter
 npm run test:deps
 npm run test:freshness
 npm run test:cdp-url
 npm run test:catalog-budget
-npm test                  # themes + store + adapter + deps + freshness + cdp-url + catalog-budget
+npm run build:contracts
+npm run test:contracts
+npm test                  # build:contracts + unit（含 themes-contracts）+ contracts
 npm run test:control      # 本机 loopback；不进 CI
 npm run probe:session     # live CDP DOM probe；不进 npm test
 # node packages/core/cli.mjs <cmd>

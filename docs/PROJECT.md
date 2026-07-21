@@ -205,6 +205,14 @@
 
 `test:deps` 继续守护 core↔runtime **静态互引**；不等于「仓库不得有 node_modules」。
 
+**U1 切片 · themes ↔ contracts（ADR 0004）**
+
+- 权威：主题四色落盘仍由 `packages/themes/theme-schema.mjs` 的 `normalizeColors` 负责（六位 `#RRGGBB`，写 active-theme / catalog 的形状）。
+- 契约：`@codex-skin/contracts` 的 `parsePaletteWithSurface` / `isCssColor` 校验跨层 payload（与 injector 的 CSS color 正则同源，比 themes 更宽，兼容 rgb/oklch 等注入路径）。
+- **themes 禁止**静态 `import` contracts（contracts 依赖 zod，属开发平面；打进用户机 = 破坏 D1）。
+- 对齐手段：`npm run test:themes-contracts`（dev/CI，脚本内 `build:contracts`）。把 `validateThemeManifest` 四色输出喂进 `parsePaletteWithSurface`；`CSS_COLOR_RE` 对 **injector.mjs 源文件** 抓取的 `cssColor` 正则做同源断言（不写第三份字面量）。负例/schema 规模由 `test:contracts` / `test:themes` 承担。
+- 入口：`npm test` = `test:unit`（含交叉校验）+ `test:contracts`。
+
 ### 3.3 各包公开接口（稳定面）
 
 #### `packages/core`（见 `index.mjs`）

@@ -16,6 +16,7 @@
     "help": "node packages/core/cli.mjs help",
     "probe:session": "node scripts/windows/probe-session-dom.mjs",
     "test:themes": "node packages/themes/theme-schema.test.mjs",
+    "test:themes-contracts": "npm run build:contracts && node packages/themes/theme-contracts-align.test.mjs",
     "test:store": "node packages/themes/theme-store.test.mjs",
     "test:adapter": "node packages/themes/dream-adapter.test.mjs",
     "test:deps": "node scripts/check-package-deps.mjs",
@@ -26,7 +27,7 @@
     "test:contracts": "pnpm --filter @codex-skin/contracts test",
     "typecheck:contracts": "pnpm --filter @codex-skin/contracts typecheck",
     "build:contracts": "pnpm --filter @codex-skin/contracts build",
-    "test:unit": "npm run test:themes && npm run test:store && npm run test:adapter && npm run test:deps && npm run test:freshness && npm run test:cdp-url && npm run test:catalog-budget",
+    "test:unit": "npm run test:themes && npm run test:themes-contracts && npm run test:store && npm run test:adapter && npm run test:deps && npm run test:freshness && npm run test:cdp-url && npm run test:catalog-budget",
     "test": "npm run test:unit && npm run test:contracts",
     "typecheck": "npm run typecheck:contracts"
   },

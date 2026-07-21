@@ -20,6 +20,11 @@
 - **publish 修**：拷贝清单补 `fs-io.mjs`（control-plane 依赖；漏拷会导致控制面挂）。
 - 身份 / 总纲 / 架构 / 安全 / 术语 / CONTRIBUTING 对齐「仅 origin · 当新项目开发」。
 
+### 工程 / U1（ADR 0004）
+
+- **themes ↔ contracts 对齐（feature/u1-themes-contracts-align）**：新增 `packages/themes/theme-contracts-align.test.mjs` + `npm run test:themes-contracts`（自带 `build:contracts`）。把 `validateThemeManifest`/`normalizeColors` 四色输出喂进 `@codex-skin/contracts` 的 `parsePaletteWithSurface`，内置主题全量交叉；`CSS_COLOR_RE` 对 **injector.mjs 源文件** 抓取的 `cssColor` 正则做同源断言（不写第三份字面量）。负例/schema 规模仍由 `test:contracts` / `test:themes` 承担。
+- **硬边界**：themes 仍不静态 import contracts（zod 属开发平面，不进 `versions/<id>/`）。
+
 ### UX（U3 / U4）
 
 - **U3 换肤成功轻反馈**：`Show-CodexSkinApplyFeedback` + `ui-prefs.json`（`applyBalloonEnabled`，默认真）；托盘菜单可关；换肤面板 / 托盘切换 / CLI `apply` 统一尊重开关；托盘切换补 control-plane kick。
