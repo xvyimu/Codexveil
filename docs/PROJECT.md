@@ -515,6 +515,7 @@ paused/locked: false（正常使用时）
 | 1.3.19–1.3.21 | 会话 probe 实锤 · 气泡去描边 · D3D Enable · open-healthy 异步 · FastLaunch |
 | 1.3.22–1.3.24 | publish reattach · UTF-8 控制台 · tray native focus · wait-shell 冷启 |
 | 1.3.25 + `f833ee8` | 安装 runtime 1.3.25-4dca30；git 主题 catalog 11 套 + schema 双格式 |
+| v6 调研（2026-07-21） | 闪白根因补丁 `48b5bae` 全量透传 palette 四色 · HD art + 气泡双模式（`0326abb`）· ahead 8 · v5 假关闭教训 · BASELINE 自动生成 |
 
 ### 12.2 下一阶段建议（按优先级）
 

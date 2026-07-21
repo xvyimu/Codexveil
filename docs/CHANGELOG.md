@@ -42,6 +42,10 @@
 
 ---
 
+- **v6 调研**：[`research/2026-07-21-master-research-v6-palette-root-and-hd-bubble`](./research/2026-07-21-master-research-v6-palette-root-and-hd-bubble.md)（闪白根因补丁 `48b5bae` 全量透传 palette 四色 + HD art + 气泡双模式 `0326abb` + ahead 8 + v5 假关闭教训 + BASELINE 自动生成）+ [overview.md](./overview.md) 挂链 + PROJECT 索引。
+
+---
+
 ## 1.3.25 — multi-theme catalog + shortcut UX · 1.3.25-4dca30
 
 ### 主题 catalog（11 bundled）
