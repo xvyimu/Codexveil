@@ -44,6 +44,7 @@
 | 22 | 控制台中文乱码（GBK 工具链） | 1.3.2 | 已修 · `Initialize-CodexSkinConsoleUtf8` + 入口 chcp 65001 / UTF-8 OutputEncoding |
 | 23 | verify 对 chat bubble 选择器 `data-user-message-bubble` not found | 1.3.2 | 已修 · 多 fallback + conversationOk；真会话 verify 通过 |
 | 24 | 首次运行 SmartScreen 拦截未签名入口 / FastLaunch | 1.3.25 | **已知** · 未 OV 签名；用户点「更多信息 → 仍要运行」；签名属 P3 长期规划（见 usage）；决策见 [`plans/codesign-decision-2026-07-21.md`](./plans/codesign-decision-2026-07-21.md)（2026-07-21 · 近期 No-Go 购证 / 维持 A） |
+| 25 | 窗内 **F6** 循环换肤 / toast 不可用 | 1.3.25 | **已知 · 文档已对齐**（2026-07-21）· CDP 探针：`__CODEX_DREAM_SKIN_STATE__` 无 `cycleTheme`/`setTheme`/`catalog`；换肤请用托盘 / Codex 换肤 / CLI `apply`。恢复 F6 = 另卡（inject catalog+hotkey+toast，服从 catalog 预算，**必 publish**）；探针：`scripts/windows/probe-white-flash.mjs` 亦报 F6 缺 |
 
 ---
 
@@ -52,8 +53,9 @@
 | 旅程 | 顺畅度 | 主要摩擦 |
 |---|---|---|
 | 再点任务栏 Codex | 高 | bounded retry 后 focus 稳定 |
-| 换肤 / kick | 高 | ~45ms |
-| F6 | 高 | 缩略图全覆盖 |
+| 换肤 / kick | 高 | ~45ms；U3 气泡可关 |
+| 开项目视觉 | 高 | 2026-07-21 修：palette 全量透传 + dark 判定；探针 pass |
+| F6 | **低（预期）** | #25 无 cycleTheme；用托盘/面板/CLI |
 | 商店更新后 | 高 | post-update 报告随 publish 自动刷新 |
 | 修复 | 中 | 健康态偶发长等待 |
 | 会话审美 | 高 | 1.3.19 probe pass=true, conversationPass=true 实锤 |

@@ -374,12 +374,18 @@ async function loadTheme(themeDir) {
     },
     palette: {},
   };
-  if (typeof palette.accent === "string" && palette.accent.trim()) {
-    const accent = palette.accent.trim();
-    if (!/^(?:#[\da-f]{3,8}|(?:rgb|hsl|oklch|oklab)\([^;{}]{1,96}\))$/i.test(accent)) {
-      throw new Error("palette.accent is not a supported CSS color");
+  // Pass full heige/DreamSkin palette (not just accent). surface/text drive
+  // renderer resolveAppearance + optional CSS vars; omitting surface forced
+  // appearance:auto onto flaky shell light → white flash on project open.
+  const cssColor = /^(?:#[\da-f]{3,8}|(?:rgb|hsl|oklch|oklab)\([^;{}]{1,96}\))$/i;
+  for (const key of ["accent", "secondary", "surface", "text"]) {
+    if (typeof palette[key] === "string" && palette[key].trim()) {
+      const value = palette[key].trim();
+      if (!cssColor.test(value)) {
+        throw new Error(`palette.${key} is not a supported CSS color`);
+      }
+      theme.palette[key] = value;
     }
-    theme.palette.accent = accent;
   }
   const [themeStat, imageStat] = await Promise.all([fs.stat(themePath), fs.stat(realImagePath)]);
   if (!imageStat.isFile()) throw new Error("Theme image is not a file");
@@ -476,8 +482,14 @@ async function loadCatalogMember(themeDir) {
         } : { focusX: null, focusY: null, safeArea: "auto", taskMode: "auto" },
         palette: {},
       };
-      if (raw.palette && typeof raw.palette.accent === "string" && raw.palette.accent.trim()) {
-        theme.palette.accent = raw.palette.accent.trim();
+      if (raw.palette && typeof raw.palette === "object" && !Array.isArray(raw.palette)) {
+        const cssColor = /^(?:#[\da-f]{3,8}|(?:rgb|hsl|oklch|oklab)\([^;{}]{1,96}\))$/i;
+        for (const key of ["accent", "secondary", "surface", "text"]) {
+          if (typeof raw.palette[key] === "string" && raw.palette[key].trim()) {
+            const value = raw.palette[key].trim();
+            if (cssColor.test(value)) theme.palette[key] = value;
+          }
+        }
       }
       const thumbBytes = await fs.readFile(thumbPath);
       const ext = path.extname(thumbPath).toLowerCase();

@@ -539,7 +539,18 @@
   });
   const timer = setInterval(() => scheduleEnsure(true), 5000);
   window[STATE_KEY] = {
-    ensure, cleanup, observer, timer, scheduler, artUrl, profile, config, installToken, version: SKIN_VERSION,
+    ensure,
+    cleanup,
+    observer,
+    timer,
+    scheduler,
+    artUrl,
+    profile,
+    // Expose appearance inputs for doctor/probes (surfaceLuma, appearance, …).
+    config,
+    installToken,
+    version: SKIN_VERSION,
+    resolveAppearance,
   };
   ensure();
   analyzeArt().then((result) => {
