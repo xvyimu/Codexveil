@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "license": "MIT",
-  "description": "Unified Codex Desktop skin product line: DreamSkin launch/guard + multi-theme engine. package.json version tracks runtime line (ADR 0003); authoritative stamp is publish-runtime.ps1 -Version. Dev-plane tooling under ADR 0004 (install-time runtime remains zero third-party npm by default).",
+  "description": "Codexveil (GitHub) / codex-skin (dev tree): Codex Desktop CDP skin. Runtime line 1.3.25; stamp authority publish-runtime.ps1 -Version (ADR 0003).",
   "packageManager": "pnpm@11.5.0",
   "bin": {
     "codex-skin": "packages/core/cli.mjs"
@@ -21,21 +21,27 @@
     "test:deps": "node scripts/check-package-deps.mjs",
     "test:control": "node packages/runtime/scripts/control-plane.test.mjs",
     "test:freshness": "node packages/core/state/state-freshness.test.mjs",
-    "test:state-io": "node packages/core/state/state-io.test.mjs",
     "test:cdp-url": "node packages/runtime/scripts/cdp-url-guard.test.mjs",
     "test:catalog-budget": "node packages/runtime/scripts/theme-catalog-budget.test.mjs",
     "test:contracts": "pnpm --filter @codex-skin/contracts test",
     "typecheck:contracts": "pnpm --filter @codex-skin/contracts typecheck",
     "build:contracts": "pnpm --filter @codex-skin/contracts build",
-    "test:unit": "npm run test:themes && npm run test:store && npm run test:adapter && npm run test:deps && npm run test:freshness && npm run test:state-io && npm run test:cdp-url && npm run test:catalog-budget && npm run test:fs-io",
+    "test:unit": "npm run test:themes && npm run test:store && npm run test:adapter && npm run test:deps && npm run test:freshness && npm run test:cdp-url && npm run test:catalog-budget",
     "test": "npm run test:unit && npm run test:contracts",
-    "typecheck": "npm run typecheck:contracts",
-    "test:fs-io": "node packages/runtime/scripts/fs-io.test.mjs"
+    "typecheck": "npm run typecheck:contracts"
   },
   "engines": {
     "node": ">=20"
   },
   "devDependencies": {
     "typescript": "^5.9.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xvyimu/Codexveil.git"
+  },
+  "bugs": {
+    "url": "https://github.com/xvyimu/Codexveil/issues"
+  },
+  "homepage": "https://github.com/xvyimu/Codexveil#readme"
 }

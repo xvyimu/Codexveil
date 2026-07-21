@@ -1,6 +1,7 @@
-# Security policy (codex-skin / Codex Dream Skin fork)
+# Security policy (Codexveil / codex-skin)
 
 Unofficial **Windows CDP Skin** for OpenAI Codex Desktop.  
+GitHub: [xvyimu/Codexveil](https://github.com/xvyimu/Codexveil) (formerly `Codex-Dream-Skin`, left fork network).  
 Not affiliated with OpenAI. Does **not** modify `app.asar`, WindowsApps packages, or code signatures.
 
 ## Supported versions

@@ -1,14 +1,15 @@
-# Codex Dream Skin — 架构
+# Codexveil / codex-skin — 架构
 
-> 合并自 `architecture.md` + `modularization.md` + `source-map.md`（1.3.1 起草；1.3.25 校准）。
+> 合并自 `architecture.md` + `modularization.md` + `source-map.md`（1.3.1 起草；1.3.25 校准）。  
+> GitHub：`xvyimu/Codexveil`（原 `Codex-Dream-Skin`）。
 
 ## 目标
 
 一条产品线，清晰边界，安装态与开发仓同源。
 
 - **日常入口**：开始菜单 / 任务栏 / 桌面 **Codex**（→ `CodexFastLaunch.exe`）
-- **安装态根**：`%LOCALAPPDATA%\Programs\CodexDreamSkin\`
-- **开发仓**：`D:\orca\codex-skin`
+- **安装态根**：`%LOCALAPPDATA%\Programs\CodexDreamSkin\`（产品显示名未随 GitHub 改名）
+- **开发仓**：`D:\orca\codex-skin`（入口 junction：`D:\orca\Codexveil`）
 - **默认 CDP 端口**：9335
 - **控制面端口**：9336（loopback）
 - **产品线**：DreamSkin 级守护 + heige 级多主题（合并前是两条独立线）

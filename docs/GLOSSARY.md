@@ -1,15 +1,16 @@
 # 术语表（Glossary）
 
-Codex Dream Skin / codex-skin 项目的领域术语。按字母/拼音归类，随讨论增补。
+**Codexveil**（GitHub）/ **codex-skin**（开发树）/ **CodexDreamSkin**（安装态产品名）领域术语。按字母/拼音归类，随讨论增补。
 
 ## 产品线
 
 | 术语 | 定义 |
 |---|---|
+| **Codexveil** | GitHub 仓库名 `xvyimu/Codexveil`（原 `Codex-Dream-Skin`，已脱离 fork）。 |
 | **DreamSkin** | 原 Windows 皮肤产品（启动器 + watch 守护）。本项目继承其安装态布局 `%LOCALAPPDATA%\Programs\CodexDreamSkin`。 |
 | **heige** | 原多主题引擎（theme schema / store / 一次性 CDP 注入）。M1 合并进本仓 `packages/`；其 `--once` 旁路已于 1.3.15 删除。 |
-| **upstream / Fei-Away** | GitHub 上游 `Fei-Away/Codex-Dream-Skin`。本仓曾是其 fork，已脱离 fork 网络；`main` 已重构覆盖，零共同历史。 |
-| **本仓** | `xvyimu/Codexveil`（原 `Codex-Dream-Skin`）。`origin` remote，`main` 为重构主线。 |
+| **upstream / Fei-Away** | GitHub 上游 `Fei-Away/Codex-Dream-Skin`（`upstream` remote，只读对照）。本仓 `main` 已重构覆盖，零共同历史。 |
+| **本仓（GitHub）** | `xvyimu/Codexveil`。`origin` remote，`main` 为重构主线。产品显示名仍为 CodexDreamSkin。 |
 
 ## 运行时 / 注入
 

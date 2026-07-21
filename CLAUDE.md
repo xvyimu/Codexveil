@@ -1,7 +1,7 @@
 # codex-skin
 
 Codex Desktop 换肤：DreamSkin 启动/守护 + 多主题。Node ≥20，ESM。  
-仓：`D:\orca\codex-skin` · GitHub：`xvyimu/Codexveil`（原 Codex-Dream-Skin，已脱离 fork） · 安装态：`%LOCALAPPDATA%\Programs\CodexDreamSkin`
+仓：`D:\orca\codex-skin`（推荐入口 `D:\orca\Codexveil` junction）· GitHub `xvyimu/Codexveil` · 安装态：`%LOCALAPPDATA%\Programs\CodexDreamSkin`
 
 ## 先读
 
