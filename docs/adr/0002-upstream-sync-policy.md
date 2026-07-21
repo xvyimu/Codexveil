@@ -1,8 +1,11 @@
 # ADR 0002 — 上游同步策略（Upstream Sync Policy）
 
-- **状态**：Accepted
+- **状态**：**Superseded by [ADR 0006](./0006-independent-product-line.md)**（2026-07-22）
 - **日期**：2026-07-20
-- **相关**：0001（产品线合并）、0003（单一版本源）
+- **相关**：0001（产品线合并）、0003（单一版本源）、**0006（独立产品线）**
+
+> **废止说明（ADR 0006）**：本仓已删除 `upstream` remote；`sync-upstream-assets.ps1`
+> 退役；`vendor/dreamskin` 仅作冻结快照。下文保留为历史决策记录，**不再执行**。
 
 ## 背景
 

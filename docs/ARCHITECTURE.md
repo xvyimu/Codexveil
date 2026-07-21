@@ -1,7 +1,7 @@
 # Codexveil / codex-skin — 架构
 
 > 合并自 `architecture.md` + `modularization.md` + `source-map.md`（1.3.1 起草；1.3.25 校准）。  
-> GitHub：`xvyimu/Codexveil`（原 `Codex-Dream-Skin`）。
+> GitHub：`xvyimu/Codexveil`（独立产品线 · ADR 0006 · 仅 `origin`）。
 
 ## 目标
 
@@ -40,7 +40,7 @@ codex-skin/
 ├── scripts/windows/         # 发布 / 产品包 / 导入主题 / 快捷方式 / 开发探针 / E2E
 ├── themes/                  # 内置主题源（heige 格式，11 套；含 preset-arina-hashimoto）
 ├── vendor/
-│   └── dreamskin/           # 上游 Fei-Away/Codex-Dream-Skin 只读快照
+│   └── dreamskin/           # 冻结第三方快照（NOTICE · 生产勿 import）
 └── docs/                    # 本文件所在
 ```
 
@@ -182,9 +182,9 @@ Install / Uninstall 只 stamp 安装树。见 ADR 0003 产品包表。
 | `packages/runtime/scripts/injector.mjs` | DreamSkin watch 引擎（扩展至 1.3.25） |
 | `packages/runtime/assets/*` | DreamSkin CSS/JS + heige-fused 视觉 |
 | `themes/*` | heige 内置主题 + preset-arina-hashimoto（11 套） |
-| `apps/launcher/*` | DreamSkin 入口脚本 |
+| `apps/launcher/*` | DreamSkin 入口脚本 · **tray / launch / restore 第一方源** |
 | `apps/native/CodexFastLaunch` | 本仓原生任务栏入口 |
-| `vendor/dreamskin/*` | Fei-Away/Codex-Dream-Skin 上游只读参考 |
+| `vendor/dreamskin/*` | 冻结第三方快照（NOTICE · 非在线上游 · **不 ship**） |
 
 ---
 
@@ -236,7 +236,7 @@ Install / Uninstall 只 stamp 安装树。见 ADR 0003 产品包表。
 - `README.md` — 项目入口
 - `CHANGELOG.md` — 版本时间线
 - `PAIN-POINTS.md` — 痛点合集
-- `adr/` — 架构决策（0001 合并 · 0002 上游 · 0003 版本源）
+- `adr/` — 架构决策（0001 合并 · 0002 废止 · 0003 版本源 · 0006 独立）
 - `GLOSSARY.md` — 领域术语表
 - `usage.md` — 使用说明
 - `dual-open-policy.md` — 入口纪律与 kick 降级

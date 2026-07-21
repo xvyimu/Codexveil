@@ -1,9 +1,9 @@
 # codex-skin 项目文档
 
 > **产品**：统一 Codex Desktop 换肤产品线（DreamSkin 守护 + heige 多主题）  
-> **GitHub 仓库**：https://github.com/xvyimu/Codexveil（原 `Codex-Dream-Skin`，已脱离 fork）  
+> **GitHub 仓库**：https://github.com/xvyimu/Codexveil（**独立产品线** · ADR 0006 · 仅 `origin`）  
 > **开发仓**：`D:\orca\codex-skin`（入口 junction：`D:\orca\Codexveil`）  
-> **安装态 / 产品显示名**：`%LOCALAPPDATA%\Programs\CodexDreamSkin`（**未**随 GitHub 改名）  
+> **安装态 / 产品显示名**：`%LOCALAPPDATA%\Programs\CodexDreamSkin`（与 GitHub 仓名分离）  
 > **当前主线**：runtime `1.3.25` · HEAD 以 `git rev-parse HEAD` 为准（全面检查见 [`AUDIT-2026-07-20.md`](./AUDIT-2026-07-20.md)）  
 > **文档原则**：先约束，后生成｜先架构，后界面｜先验证，后合并  
 > **适用**：Agent / 开源工具 / AI 辅助开发协作
@@ -17,7 +17,7 @@
 | 新人上手 | §1 产品边界 · §2 分层 | §7 开发命令 · §9 验收 |
 | 改功能 | §3 模块契约 · §4 依赖规则 | §5 关键路径 · §8 任务模板 |
 | 发版 | §6 发布与版本 | ADR 0003 · CHANGELOG |
-| 同步上游 | ADR 0002 · §10 上游 | `docs/upstream-sync.json` |
+| 产品线身份 | ADR 0006 · §10 · GITHUB_IDENTITY | `NOTICE` · 冻结 `vendor/` |
 | 排查故障 | §11 诊断矩阵 · PAIN-POINTS | `doctor` / smoke |
 
 **相关文档索引**
@@ -41,6 +41,7 @@
 | [`research/2026-07-21-github-peer-matrix.md`](./research/2026-07-21-github-peer-matrix.md) | GitHub 细矩阵 · C/D/E 分层 |
 | [`adr/0004-engineering-modernization-u1.md`](./adr/0004-engineering-modernization-u1.md) | **Accepted** 工程现代化 / 依赖双平面 · 实施中 |
 | [`adr/0005-thin-product-shell-u3.md`](./adr/0005-thin-product-shell-u3.md) | **Proposed** 薄产品壳（不替换守护） |
+| [`adr/0006-independent-product-line.md`](./adr/0006-independent-product-line.md) | **Accepted** 独立产品线 · 无 upstream remote |
 | [`plans/u1-u3-two-week-plan-2026-07-21.md`](./plans/u1-u3-two-week-plan-2026-07-21.md) | U1+U3 两周排期 |
 | [`research/2026-07-21-progress-aligned-debt-and-portfolio.md`](./research/2026-07-21-progress-aligned-debt-and-portfolio.md) | 进度对齐：已关债 · 多方案组合 · 打磨卡片（长文） |
 | [`research/2026-07-21-integrated-master-research.md`](./research/2026-07-21-integrated-master-research.md) | 整合总册（中期） |
@@ -48,7 +49,7 @@
 | [`research/2026-07-21-master-research-v3-ux-visual.md`](./research/2026-07-21-master-research-v3-ux-visual.md) | 选代入口 v3：工程冻结 + UX/视觉升级方案库 |
 | [`research/2026-07-21-master-research-v4-u3u4-product.md`](./research/2026-07-21-master-research-v4-u3u4-product.md) | 选代入口 v4：U3/U4 后进度 + 五件套 + 方案评分 |
 | [`research/2026-07-21-master-research-v5-visual-sync-and-next.md`](./research/2026-07-21-master-research-v5-visual-sync-and-next.md) | **选代入口 v5**：闪白修后 · ahead 交付 · 市场/架构/规范/路线图/API + 方案评分 |
-| [`adr/`](./adr/) | 架构决策（0001 合并 · 0002 上游 · 0003 版本源） |
+| [`adr/`](./adr/) | 架构决策（0001 合并 · 0002 废止 · 0003 版本源 · 0006 独立） |
 | 根目录 `CLAUDE.md` | Agent 短索引 |
 
 ---
@@ -64,10 +65,10 @@
 | 做 | 不做 |
 |----|------|
 | 一条 injector 常驻守护（watch） | 修改 Codex `.asar` / 安装包 |
-| CDP 注入 CSS/JS（默认端口 9335） | **macOS / 跨平台主路径**（永久非目标；上游有，本 fork **Windows only**） |
+| CDP 注入 CSS/JS（默认端口 9335） | **macOS / 跨平台主路径**（永久非目标；**Windows only**） |
 | 多主题 catalog + F6 / 托盘 / CLI 切换 | 商店磁贴/AUMID 裸启拦截（OS 限制 · #21） |
 | 控制面 `/kick` 毫秒级热应用 | 多 injector 并行 |
-| publish 自包含 `versions/<id>/` | 自动 merge 上游（结构已分叉） |
+| publish 自包含 `versions/<id>/` | 绑定第三方仓 remote / 自动 merge 外仓 |
 | doctor / smoke / verify · CI `test:themes` | 把 UI 皮肤逻辑塞进 `packages/core` |
 
 **本仓 = CDP Skin（Windows only）**，不是 CLI TUI 主题串，也不是官方 Appearance。三层对照与链接见根目录 [`README.md`](../README.md)「三层 Codex 换肤」。
@@ -141,7 +142,7 @@
 | Git 从第一天 | `main` 稳定；功能/修复走分支；合并前 doctor + smoke |
 | 先定规范再写码 | 本文档 + ARCHITECTURE + ADR + 包 `index.mjs` 边界注释 |
 | 架构优先于 UI | 先保证 injector 单路径 / 包边界，再改 CSS 观感 |
-| 与成熟实践校准 | 上游 Fei-Away 视觉线；heige 主题模型；Electron CDP 惯例 |
+| 与成熟实践校准 | heige 主题模型；Electron CDP 惯例；本仓自有视觉覆盖 |
 
 ### 2.3 架构优化目标（相对历史双产品线）
 
@@ -151,7 +152,7 @@
 | 注入多路径（watch + `--once`） | watch-only（1.3.15） | 完成 |
 | 版本 5 处硬编码 | 单一版本源 token（ADR 0003） | 完成 |
 | 文档碎片 25 份 | 合并为 ARCHITECTURE / CHANGELOG / … | 完成 |
-| 上游无法 merge | vendor 镜像 + 人工 promote（ADR 0002） | 完成 |
+| 绑定第三方仓 remote | 独立产品线 · 仅 origin（ADR 0006；废止 0002 同步） | 完成 |
 | 包职责混杂 | core / themes / runtime / core-win 拆包 | 完成 |
 | kick 走 spawn 慢 | control-plane `/kick` ~45ms | 完成 |
 
@@ -169,10 +170,10 @@
 | `packages/themes` | Node ESM | → core（常量）；动态 → runtime/thumb | schema 校验、catalog 列表、heige→DreamSkin 适配与写入 | 启动进程；CDP evaluate |
 | `packages/runtime` | Node ESM + assets | **自包含**，不依赖 core | watch injector、control-plane、CSS/JS 资源、wait-shell、thumb | 主题业务规则；快捷方式；CLI 用户命令解析 |
 | `packages/core-win` | PowerShell 5.1 | 无 | launcher 共享库：日志/托盘/焦点/state IO/runtime 解析 | 主题 schema；CDP 协议实现 |
-| `apps/launcher` | PowerShell | dot-source core-win | 薄入口：open / check / switch / smoke / kick | 业务算法（只编排） |
+| `apps/launcher` | PowerShell | dot-source core-win | 薄入口：open / check / switch / smoke / kick · **tray / launch / restore 第一方源** | 业务算法（只编排） |
 | `themes/` | JSON + 图 | 无 | 内置主题源（heige 格式） | 运行时逻辑 |
-| `scripts/windows` | PS / mjs | 读仓库 | publish、import、sync 上游、探针 | 常驻守护 |
-| `vendor/dreamskin` | 上游快照 | 只读 | 上游资产镜像 | 任何运行时引用（禁止直接 import 进生产路径） |
+| `scripts/windows` | PS / mjs | 读仓库 | publish、import、探针（`publish` **不**读 vendor） | 常驻守护 |
+| `vendor/dreamskin` | 冻结第三方快照 | 只读 | 离线对照（NOTICE） | **任何**运行时引用 / 自动同步 / **publish 拷贝** |
 
 ### 3.2 硬性依赖规则（框架限定 · 违反即拒合）
 
@@ -192,6 +193,7 @@
   第二条 heige --once / legacy-inject 注入旁路
   同时运行两个 injector
   生产路径 import vendor/dreamskin
+  publish-runtime.ps1 从 vendor/ 拷贝任何文件进 versions/ 或 programRoot
 ```
 
 **依赖双平面（ADR 0004 Accepted）**
@@ -338,15 +340,13 @@ publish-runtime.ps1 -RepoRoot D:\orca\codex-skin [-Version x.y.z]
   → （可选）import themes / post-update
 ```
 
-### 5.4 上游同步（不自动进生产）
+### 5.4 第三方快照（ADR 0006 · 无自动同步）
 
 ```text
-sync-upstream-assets.ps1
-  → 刷新 vendor/dreamskin 镜像
-  → 打印 assets diff 摘要
-  → 列出上游 PS 相关 commit 标题
-  → 人决定是否 promote 到 packages/runtime/assets
-  → 更新 docs/upstream-sync.json 基线
+vendor/dreamskin/          冻结离线快照（NOTICE）
+sync-upstream-assets.ps1   已退役（exit 2 · 指向 ADR 0006）
+docs/upstream-sync.json    status: retired
+可选：对某资产做人工 diff → 一次性搬进 packages/runtime（非例行）
 ```
 
 ---
@@ -394,9 +394,6 @@ node packages/core/cli.mjs import-themes
 
 # 发布
 powershell -File scripts\windows\publish-runtime.ps1 -RepoRoot D:\orca\codex-skin
-
-# 上游只读同步
-powershell -File scripts\windows\sync-upstream-assets.ps1
 ```
 
 **Shell 约定**：Windows 脚本优先 **pwsh / PowerShell 7**；安装态兼容 5.1 的 launcher 保持可运行。
@@ -453,7 +450,7 @@ powershell -File scripts\windows\sync-upstream-assets.ps1
 | core / themes 逻辑 | `doctor` + 相关 cli 子命令 · `npm run test:themes` |
 | runtime / CSS / renderer | `publish` + smoke +（有条件）verify / live probe |
 | launcher / core-win | open 路径手动或 check-and-fix exit 0 |
-| 上游 promote | vendor diff 已读 · ADR 0002 流程 · 本地覆盖未丢 |
+| 可选 vendor 资产移植 | 人工 diff · ADR 0006 · 不重建 remote |
 
 ### 9.3 doctor 健康画像（参考基线 2026-07-20）
 
@@ -483,16 +480,17 @@ paused/locked: false（正常使用时）
 
 ---
 
-## 10. 上游与 fork 关系
+## 10. 产品线身份（独立 · ADR 0006）
 
 | 远程 | URL | 角色 |
 |------|-----|------|
-| origin | `xvyimu/Codexveil` | 开发主线（原 Codex-Dream-Skin） |
-| upstream | `Fei-Away/Codex-Dream-Skin` | 上游视觉/行为参考（只读 vendor） |
+| **origin**（唯一） | `xvyimu/Codexveil` | 开发与发布主线 |
+| ~~upstream~~ | — | **已删除**；禁止再 `git remote add` 第三方皮肤仓作上游 |
 
-- `main` 与上游 **零共同历史**（重构 force-push 后），禁止幻想 `git merge upstream/main`。  
-- 吸收通道仅：**视觉资产文件级** + **PS 修复人工移植**（ADR 0002）。  
-- 基线：`docs/upstream-sync.json` → `lastSyncedUpstreamSha`（当前 `e776fa6`；**2026-07-21 D-sync 已复跑**：上游无新提交；runtime 资产与 vendor **有意分叉**，勿盲 promote，见 JSON `note`）。  
+- 本仓 **不是 fork**（GitHub `isFork: false`）；按**新项目**演进。  
+- `vendor/dreamskin/` = 冻结第三方快照（`NOTICE`），**不**自动同步。  
+- 退役：`sync-upstream-assets.ps1` · `docs/upstream-sync.json`（`status: retired`）。  
+- 身份卡：[`GITHUB_IDENTITY.md`](../GITHUB_IDENTITY.md) · ADR：[`0006-independent-product-line.md`](./adr/0006-independent-product-line.md)。
 
 ---
 
@@ -558,7 +556,7 @@ paused/locked: false（正常使用时）
 
 - 修改 OpenAI 签名包  
 - 在 core 内实现 UI 皮肤  
-- 自动无审 promote 上游 CSS  
+- 重建 `upstream` remote / 自动无审 promote 第三方 CSS  
 - macOS 一等公民支持（**永久非目标**，见 residual 规划 G3-A）
 - 劫持 / 改写微软商店 Codex 包 AUMID（#21 OS 硬限）
 - 云端 CI 跑完整 doctor/smoke（无 Store Codex/CDP；仅 `test:themes`）
@@ -575,9 +573,9 @@ codex-skin/
 │   ├── themes/              # L3b 主题领域
 │   ├── runtime/             # L4 自包含发布蓝图
 │   └── core-win/            # L1/L2 Windows 共享库
-├── scripts/windows/         # 发布 · 同步 · 探针 · E2E
+├── scripts/windows/         # 发布 · 探针 · E2E
 ├── themes/                  # 11 套内置主题源（含 preset-arina-hashimoto）
-├── vendor/dreamskin/        # 上游只读镜像
+├── vendor/dreamskin/        # 冻结第三方快照（NOTICE）
 ├── docs/                    # 本文件与 ADR 等
 ├── package.json             # bin: codex-skin → cli.mjs
 └── CLAUDE.md                # Agent 短索引
@@ -606,7 +604,7 @@ codex-skin/
   2）runtime 自包含与 core 双向隔离；  
   3）主题写入只经 `packages/themes`；  
   4）版本只认 publish `-Version`；  
-  5）上游只镜像、不盲合。  
+  5）独立产品线：仅 origin · 无 upstream · vendor 冻结（ADR 0006）。  
 
 违反以上任一条件的 PR / Agent 产出：**默认拒绝合并**，先回到本文件 §3 / §8 改任务边界。
 
@@ -621,8 +619,8 @@ codex-skin/
 | 用户主题 | 11 套（import-themes · list 去重） |
 | 热切换 | kick ~55–80ms 量级 |
 | Git | `main`：以 `git rev-parse HEAD` 为准；审计见 AUDIT-2026-07-20 |
-| 上游基线 | `e776fa6`（nothing absorbed） |
-| 产品包 | Release [v1.3.25](https://github.com/xvyimu/Codexveil/releases/tag/v1.3.25)（旧 URL 会重定向）；本地 `Build-ProductPackage` → dist（gitignore） |
+| 产品线身份 | ADR 0006 · 仅 `origin` · vendor 冻结 |
+| 产品包 | Release [v1.3.25](https://github.com/xvyimu/Codexveil/releases/tag/v1.3.25)；本地 `Build-ProductPackage` → dist（gitignore） |
 | package.json | `"version": "1.3.25"`（产品线元数据；stamp 权威仍是 publish `-Version`） |
 | 主题门禁 | `npm run test:themes` |
 
@@ -635,8 +633,11 @@ codex-skin/
 | ID | 标题 | 状态 |
 |----|------|------|
 | 0001 | 合并 DreamSkin 与 heige 为一条产品线 | Accepted |
-| 0002 | 上游同步策略 | Accepted |
+| 0002 | 上游同步策略 | **Superseded by 0006** |
 | 0003 | 单一版本源 | Accepted · 1.3.16 起实施 |
+| 0004 | 工程现代化 U1 | Accepted · 实施中 |
+| 0005 | 薄产品壳 U3 | Proposed |
+| 0006 | 独立产品线（脱离原仓） | Accepted |
 
 ## 附录 D · 贡献规范与任务卡
 

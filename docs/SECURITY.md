@@ -1,7 +1,7 @@
 # Security policy (Codexveil / codex-skin)
 
 Unofficial **Windows CDP Skin** for OpenAI Codex Desktop.  
-GitHub: [xvyimu/Codexveil](https://github.com/xvyimu/Codexveil) (formerly `Codex-Dream-Skin`, left fork network).  
+GitHub: [xvyimu/Codexveil](https://github.com/xvyimu/Codexveil) (independent product line · ADR 0006 · `origin` only).  
 Not affiliated with OpenAI. Does **not** modify `app.asar`, WindowsApps packages, or code signatures.
 
 ## Supported versions
@@ -45,7 +45,7 @@ Out-of-scope examples:
 
 - SmartScreen prompts on unsigned binaries (documented #24; see `docs/plans/codesign-decision-2026-07-21.md`)  
 - Store tile bare launch without skin (OS AUMID limit #21)  
-- Issues only in upstream `Fei-Away/Codex-Dream-Skin` without a path in this repo  
+- Issues that only exist in third-party skins outside this repository  
 
 ## Operational controls (maintainers)
 
@@ -58,9 +58,9 @@ Out-of-scope examples:
 | Post-update failure observability | `docs/contracts/post-update-report.md` |
 | Release evidence (DOM) | `docs/evidence/` · `Run-ReleaseProbes.ps1` (real dumps gitignored) |
 
-## Vendor / upstream
+## Vendor snapshot
 
-`vendor/dreamskin/` is a **read-only mirror**. It is not re-licensed by this document; see root `NOTICE`. Production paths must not import `vendor/`.
+`vendor/dreamskin/` is a **frozen third-party snapshot** (not an active upstream). It is not re-licensed by this document; see root `NOTICE` and ADR 0006. Production paths must not import `vendor/`. `publish-runtime.ps1` must not copy from `vendor/` into `versions/<id>/` or programRoot — load-bearing tray/launch/restore live under `apps/launcher/`.
 
 ## Related
 

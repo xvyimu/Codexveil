@@ -17,9 +17,9 @@ Codex Desktop 换肤：DreamSkin 启动/守护 + 多主题。Node ≥20，ESM。
 | `packages/core-win/` | Windows pwsh 运行时封装 |
 | `packages/runtime/` | 注入/元数据/控制面 |
 | `packages/themes/` | 主题 schema / store / adapter |
-| `apps/launcher/` | 启动器、切主题、冒烟 |
+| `apps/launcher/` | 启动器、切主题、冒烟 · tray/launch/restore 第一方源 |
 | `themes/` | 主题资源 |
-| `vendor/dreamskin/` | 上游镜像（生产勿 import） |
+| `vendor/dreamskin/` | 冻结第三方快照（生产勿 import/ship · NOTICE） |
 | `docs/` | PROJECT / ADR / 痛点 / 任务卡 |
 
 ## 命令
@@ -49,7 +49,7 @@ npm run probe:session     # live CDP DOM probe；不进 npm test
 2. `packages/core` ↔ `packages/runtime` **禁止**双向依赖  
 3. 主题写入只经 `packages/themes` + `themes/<id>/`  
 4. 版本只认 `publish-runtime.ps1 -Version`（ADR 0003）；产品包只 stamp payload  
-5. 上游只 vendor + 人工 promote（ADR 0002）；生产禁止 import `vendor/`（kick `--once` 例外见 dual-open-policy）
+5. 独立产品线（ADR 0006）：仅 `origin`；无 upstream remote；`vendor/` 冻结快照、生产禁止 import（kick `--once` 例外见 dual-open-policy）
 
 ## 不要做
 

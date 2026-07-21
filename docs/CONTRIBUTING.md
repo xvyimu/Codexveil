@@ -2,7 +2,7 @@
 
 > 适用范围：所有 PR、所有包（core / themes / runtime / core-win / apps/launcher / scripts/windows / docs / apps/native）  
 > 基线：HEAD 以 `git rev-parse HEAD` 为准 · runtime 产品线 `1.3.25` · 本机安装态以 doctor `runtimeId` 为准（文档撰写时 `1.3.25-107b0e`）  
-> 关联：[`PROJECT.md`](./PROJECT.md) §3 依赖规则 · [`adr/0001`](./adr/0001-merge-product-line.md) · [`adr/0002`](./adr/0002-upstream-sync-policy.md) · [`adr/0003`](./adr/0003-single-version-source.md) · [`PAIN-POINTS.md`](./PAIN-POINTS.md) · 任务卡 [`plans/task-cards-2026-07-21.md`](./plans/task-cards-2026-07-21.md)
+> 关联：[`PROJECT.md`](./PROJECT.md) §3 依赖规则 · [`adr/0001`](./adr/0001-merge-product-line.md) · [`adr/0003`](./adr/0003-single-version-source.md) · [`adr/0006`](./adr/0006-independent-product-line.md) · [`PAIN-POINTS.md`](./PAIN-POINTS.md) · 任务卡 [`plans/task-cards-2026-07-21.md`](./plans/task-cards-2026-07-21.md)
 
 ---
 

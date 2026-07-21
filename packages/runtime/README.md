@@ -7,7 +7,7 @@
 ```
 runtime/
 ├── assets/              # 打进 versions/<id>/assets/
-│   ├── dream-skin.css   #   注入的 CSS（vendor 上游 + 本地覆盖）
+│   ├── dream-skin.css   #   注入的 CSS（first-party；历史对照见 vendor 快照）
 │   ├── renderer-inject.js # 注入的 JS 桥（dreamVersion / brand / art / kick 应用）
 │   ├── dream-reference.jpg # 默认背景（seed）
 │   └── theme.json       # 默认主题 metadata（DreamSkin catalog 格式）

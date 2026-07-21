@@ -1,6 +1,9 @@
 {
+  "status": "retired",
+  "retiredAt": "2026-07-22",
+  "retiredBy": "ADR 0006 independent product line",
+  "note": "No active upstream remote. vendor/dreamskin is a frozen third-party snapshot only. Do not git fetch a former upstream; do not run sync-upstream-assets.ps1 expecting network sync.",
   "lastSyncedUpstreamSha": "e776fa6",
   "syncedAt": "2026-07-20T18:32:30.3866112Z",
-  "note": "D-sync 2026-07-21: fetch upstream/main still e776fa6 (no new commits since prior baseline). Line A: vendor refreshed from upstream; runtime assets still differ (us-ahead: local CSS/JS overrides — de-blur / artDataUrl null-safety / SKIN_VERSION_TOKEN) — DO NOT blind-promote. Line B: no windows/scripts PS commits since e776fa6. Promote deferred; re-run sync-upstream-assets.ps1 after upstream moves."
+  "historicalNote": "Frozen record of the last optional vendor refresh before independence. Not a living baseline."
 }
-

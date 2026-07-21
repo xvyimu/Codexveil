@@ -6,9 +6,19 @@
 
 ---
 
-## Unreleased — maintenance on 1.3.25 product line（2026-07-20 → 07-21）
+## Unreleased — maintenance on 1.3.25 product line（2026-07-20 → 07-22）
 
 > 产品线版本仍为 **1.3.25**；安装态 runtimeId 以 doctor 为准（例 `1.3.25-107b0e`）。下列为扫描落地 + 任务卡收口，**未**改 SKIN_VERSION 产品线号。
+
+### 工程 / 独立产品线（ADR 0006）
+
+- **彻底脱离原仓工作流**：删除 git remote `upstream`；GitHub 本仓已非 fork（`isFork: false`）。
+- **ADR 0006 Accepted**：独立产品线；**废止** ADR 0002 在线同步。
+- **`sync-upstream-assets.ps1` 退役**（exit 2 + 指向 0006）；`docs/upstream-sync.json` → `status: retired`。
+- **`vendor/dreamskin/` 定性为冻结第三方快照**（`NOTICE` 重写）；生产路径仍禁止 import。
+- **装机脚本 first-party 化**：`tray` / `launch` / `restore` `git mv` → `apps/launcher/`；`publish-runtime.ps1` 只从 `apps/launcher` 拷贝（**不再**读 `vendor/`）；`install`/`verify` 遗留脚本停止 ship。
+- **publish 修**：拷贝清单补 `fs-io.mjs`（control-plane 依赖；漏拷会导致控制面挂）。
+- 身份 / 总纲 / 架构 / 安全 / 术语 / CONTRIBUTING 对齐「仅 origin · 当新项目开发」。
 
 ### UX（U3 / U4）
 

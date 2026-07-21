@@ -6,11 +6,10 @@
 
 | 术语 | 定义 |
 |---|---|
-| **Codexveil** | GitHub 仓库名 `xvyimu/Codexveil`（原 `Codex-Dream-Skin`，已脱离 fork）。 |
-| **DreamSkin** | 原 Windows 皮肤产品（启动器 + watch 守护）。本项目继承其安装态布局 `%LOCALAPPDATA%\Programs\CodexDreamSkin`。 |
-| **heige** | 原多主题引擎（theme schema / store / 一次性 CDP 注入）。M1 合并进本仓 `packages/`；其 `--once` 旁路已于 1.3.15 删除。 |
-| **upstream / Fei-Away** | GitHub 上游 `Fei-Away/Codex-Dream-Skin`（`upstream` remote，只读对照）。本仓 `main` 已重构覆盖，零共同历史。 |
-| **本仓（GitHub）** | `xvyimu/Codexveil`。`origin` remote，`main` 为重构主线。产品显示名仍为 CodexDreamSkin。 |
+| **Codexveil** | GitHub 仓库名 `xvyimu/Codexveil`。**独立产品线**（ADR 0006）；仅 `origin` remote。 |
+| **DreamSkin** | 产品线内部历史代号（启动器 + watch 守护）。安装态布局 `%LOCALAPPDATA%\Programs\CodexDreamSkin`。 |
+| **heige** | 历史多主题引擎能力（theme schema / store）。已吸收进 `packages/`；`--once` 旁路已于 1.3.15 删除。 |
+| **本仓（GitHub）** | `xvyimu/Codexveil`。`origin` only，`main` 主线。产品显示名仍为 CodexDreamSkin。 |
 
 ## 运行时 / 注入
 
@@ -38,17 +37,15 @@
 | **state.json schema** | 安装态运行状态。**现行写出为 schemaVersion 3**（launcher-ui）；读路径接受 1..3。与 `constants.STATE_SCHEMA_NODE_MARKER`（Node 文档标记，非写出版本；旧名 `STATE_SCHEMA_VERSION`）无关。 |
 | **kick 降级 `--once`** | 控制面不可达时，同 runtime 的 `injector --once` **单次** apply；非第二守护、非 heige 旁路。 |
 | **publish** | `scripts/windows/publish-runtime.ps1 -Version X`：拷 runtime 到 `versions/<id>/`、stamp 版本、翻 current.json、GC 旧版、刷快捷方式。 |
-| **promote** | 把 `vendor/dreamskin/assets` 的上游资产择优搬进 `packages/runtime/assets`（人工，见 ADR 0002）。 |
+| **promote（可选）** | 极少数情况下，把 `vendor/dreamskin` 某冻结资产**人工** diff 后搬进 `packages/runtime/assets`；非例行工作流（ADR 0006）。 |
 | **package.json version** | npm 元数据，与 runtime 产品线对齐（如 `1.3.25`）；**不是** ADR 0003 stamp 权威。 |
 
-## 上游同步（ADR 0002）
+## 第三方快照（ADR 0006；原 ADR 0002 已废止）
 
 | 术语 | 定义 |
 |---|---|
-| **vendor 镜像** | `vendor/dreamskin/`，上游只读快照；sync 脚本刷新，作为 promote 的中转层。 |
-| **视觉资产线** | 文件级吸收：`upstream/windows/assets` → vendor → promote → runtime。 |
-| **PS 修复线** | 只自动**发现**上游 `windows/scripts/**` 的 commit，人工判断+手动移植（结构已分叉，不能盲搬）。 |
-| **lastSyncedUpstreamSha** | `docs/upstream-sync.json` 里的基线；`git log <sha>..upstream/main` 的下界。初始 `fd6a118`。 |
+| **vendor 冻结快照** | `vendor/dreamskin/`：离线第三方资产副本，见 `NOTICE`；**不** fetch、**不**自动刷新。 |
+| **独立产品线** | 无 upstream remote；开发只认本仓 `origin` + 本仓文档体系（PROJECT / ARCHITECTURE / ADR / CONTRIBUTING）。 |
 
 ## 校验 / 工具
 

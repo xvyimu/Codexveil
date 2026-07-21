@@ -1,15 +1,14 @@
-# 上游 promote 决策 · 2026-07-21
+# 第三方快照说明 · 归档（原「上游 promote 决策」）
 
-- 上游基线：[`docs/upstream-sync.json`](../upstream-sync.json) → `lastSyncedUpstreamSha: e776fa6`
-- 策略：[`docs/adr/0002-upstream-sync-policy.md`](../adr/0002-upstream-sync-policy.md)（vendor 镜像 + 人工 promote；禁止盲合）
-- 本轮决策：**不 promote**（默认 A；无用户可见上游新修复）
+> **状态**：归档 · 被 [ADR 0006](../adr/0006-independent-product-line.md) 废止在线同步  
+> **日期**：原 2026-07-21；修订 2026-07-22
 
-| 资产 | 与上游关系 | 本地覆盖原因 | 决策 | 重评条件 |
-|------|------------|--------------|------|----------|
-| packages/runtime/assets/dream-skin.css | runtime ≠ vendor（us-ahead 本地覆盖） | de-blur 等本地视觉覆盖 | **不 promote（当前）** | 上游 e776fa6 之后有明确视觉修复且 diff 可人工摘取 |
-| packages/runtime/assets/renderer-inject.js | 同上 | artDataUrl null-safety；`SKIN_VERSION_TOKEN` stamp 机制 | **不 promote（当前）** | 同上；promote 后必须保留 stamp / null-safe |
-| vendor/dreamskin/assets/* | 镜像层 | sync 脚本刷新；非生产 import | 保持镜像；不自动进 runtime | 每次 `sync-upstream-assets.ps1` 后复看 |
+本文件曾记录「对 `Fei-Away/Codex-Dream-Skin` 做 vendor promote」的决策。  
+**现行规则**：
 
-禁止：`Copy-Item` 上游/vendor 覆盖 runtime 而不经人工 diff。
+- 无 `upstream` remote；仅 `origin` → `xvyimu/Codexveil`
+- `vendor/dreamskin/` = **冻结**第三方快照（`NOTICE`），不自动刷新
+- `sync-upstream-assets.ps1` 已退役（exit 2）
+- 若要对某冻结资产做人工移植，写当期 research 笔记 + 人工 diff，**不**重建 remote
 
-验收：本文存在；无 runtime 资产内容变更。
+历史快照记录见 [`docs/upstream-sync.json`](../upstream-sync.json)（`status: retired`）。

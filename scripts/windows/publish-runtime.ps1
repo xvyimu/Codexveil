@@ -33,7 +33,7 @@ Copy-Item (Join-Path $runtime "scripts\injector.mjs") (Join-Path $dest "scripts\
 Copy-Item (Join-Path $runtime "scripts\cdp-url-guard.mjs") (Join-Path $dest "scripts\cdp-url-guard.mjs") -Force
 Copy-Item (Join-Path $runtime "scripts\theme-catalog-budget.mjs") (Join-Path $dest "scripts\theme-catalog-budget.mjs") -Force
 Copy-Item (Join-Path $runtime "scripts\image-metadata.mjs") (Join-Path $dest "scripts\image-metadata.mjs") -Force
-foreach ($extra in @("wait-shell.mjs", "control-plane.mjs", "thumb.mjs", "probe-session-dom.mjs")) {
+foreach ($extra in @("fs-io.mjs", "wait-shell.mjs", "control-plane.mjs", "thumb.mjs", "probe-session-dom.mjs")) {
   $srcExtra = Join-Path $runtime ("scripts\" + $extra)
   if (-not (Test-Path -LiteralPath $srcExtra) -and $extra -eq 'probe-session-dom.mjs') {
     $srcExtra = Join-Path $RepoRoot "scripts\windows\probe-session-dom.mjs"
@@ -98,7 +98,9 @@ if (Test-Path -LiteralPath $launcherUi) {
   Copy-Item $launcherUi (Join-Path $dest "scripts\launcher-ui.ps1") -Force
 }
 
-# Daily entry scripts at program root (not only under versions/)
+# Daily entry scripts at program root (not only under versions/).
+# launch-dream-skin.ps1 must sit at programRoot so Ensure-CodexSkinTray / current.json
+# resolution (PSScriptRoot = programRoot) keep working after the vendor→first-party move.
 $launcherDir = Join-Path $RepoRoot "apps\launcher"
 foreach ($name in @(
   "open-codex-dream-skin.ps1",
@@ -108,7 +110,8 @@ foreach ($name in @(
   "post-update-regression.ps1",
   "kick-theme-now.ps1",
   "show-feedback.ps1",
-  "focus-codex.ps1"
+  "focus-codex.ps1",
+  "launch-dream-skin.ps1"
 )) {
   $src = Join-Path $launcherDir $name
   if (Test-Path -LiteralPath $src) {
@@ -164,18 +167,22 @@ try {
   Write-Warning ("native launcher build: " + $_.Exception.Message)
 }
 
-# start script
-$startSrc = Join-Path $RepoRoot "apps\launcher\start-dream-skin.ps1"
-if (Test-Path -LiteralPath $startSrc) {
-  Copy-Item $startSrc (Join-Path $dest "scripts\start-dream-skin.ps1") -Force
-}
-
-# tray / restore if present in vendor (tray carries S1–S3 UX menu)
-$vendorScripts = Join-Path $RepoRoot "vendor\dreamskin\scripts"
-foreach ($name in @("tray-dream-skin.ps1","restore-dream-skin.ps1","launch-dream-skin.ps1","install-dream-skin.ps1","verify-dream-skin.ps1")) {
-  $src = Join-Path $vendorScripts $name
+# Runtime-root scripts (versions/<id>/scripts/): first-party only (ADR 0006).
+# tray + restore live under apps/launcher after sovereign move out of vendor/;
+# launch is also mirrored here so a versions/<id>/scripts copy exists, but the
+# load-bearing entry is programRoot\launch-dream-skin.ps1 (copied above).
+# install-dream-skin / verify-dream-skin are dead legacy helpers — no longer shipped.
+foreach ($name in @(
+  "start-dream-skin.ps1",
+  "tray-dream-skin.ps1",
+  "restore-dream-skin.ps1",
+  "launch-dream-skin.ps1"
+)) {
+  $src = Join-Path $launcherDir $name
   if (Test-Path -LiteralPath $src) {
-    Copy-Item $src (Join-Path $dest "scripts\$name") -Force
+    Copy-Item $src (Join-Path $dest ("scripts\" + $name)) -Force
+  } else {
+    Write-Warning ("missing first-party launcher script: " + $name)
   }
 }
 
