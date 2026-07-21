@@ -4,7 +4,8 @@
 
 | 版本 | 日期 | 链接 | 要点 |
 |------|------|------|------|
-| **v6** | 2026-07-21 | [v6-palette-root-and-hd-bubble](./research/2026-07-21-master-research-v6-palette-root-and-hd-bubble.md) | 闪白根因补丁 48b5bae + HD art + 气泡双模式 0326abb + ahead 8 + v5 假关闭教训 + BASELINE 自动生成 |
+| **v7** | 2026-07-21 | [v7-gate-hygiene-and-ux](./research/2026-07-21-master-research-v7-gate-hygiene-and-ux.md) | squash 合 main · 双 CI 绿 · probe-project-hd **断言化** · RELEASE-EVIDENCE CI URL · BASELINE 对齐 · surfaceLuma `#rrggbb` 边界 |
+| v6 | 2026-07-21 | [v6-palette-root-and-hd-bubble](./research/2026-07-21-master-research-v6-palette-root-and-hd-bubble.md) | 闪白根因补丁 48b5bae + HD art + 气泡双模式 0326abb · v5 假关闭教训 · BASELINE 自动生成（过程中曾 ahead，已 squash 归零） |
 | v5 | 2026-07-21 | [v5-visual-sync-and-next](./research/2026-07-21-master-research-v5-visual-sync-and-next.md) | 闪白表面修 e01d0ef + ahead 4 + 五件套首版 |
 | v4 | 2026-07-21 | [v4-u3u4-product](./research/2026-07-21-master-research-v4-u3u4-product.md) | U3/U4 产品视角 |
 | v3 | 2026-07-21 | [v3-ux-visual](./research/2026-07-21-master-research-v3-ux-visual.md) | UX/视觉 |

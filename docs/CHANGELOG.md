@@ -42,7 +42,9 @@
 
 ---
 
-- **v6 调研**：[`research/2026-07-21-master-research-v6-palette-root-and-hd-bubble`](./research/2026-07-21-master-research-v6-palette-root-and-hd-bubble.md)（闪白根因补丁 `48b5bae` 全量透传 palette 四色 + HD art + 气泡双模式 `0326abb` + ahead 8 + v5 假关闭教训 + BASELINE 自动生成）+ [overview.md](./overview.md) 挂链 + PROJECT 索引。
+- **v6 调研**：[`research/2026-07-21-master-research-v6-palette-root-and-hd-bubble`](./research/2026-07-21-master-research-v6-palette-root-and-hd-bubble.md)（闪白根因补丁 `48b5bae` 全量透传 palette 四色 + HD art + 气泡双模式 `0326abb` + v5 假关闭教训 + BASELINE）+ [overview.md](./overview.md) 挂链 + PROJECT 索引。
+- **v6 合入**：PR #1 squash → main `b80bf4e`；themes-gate PR/main 双 success（仅 `npm test`）。
+- **v7 门禁收口**：[`research/2026-07-21-master-research-v7-gate-hygiene-and-ux`](./research/2026-07-21-master-research-v7-gate-hygiene-and-ux.md) · `probe-project-hd.mjs` 改为断言型（`pass`/`failed`/exit 1·2，镜像 white-flash）· RELEASE-EVIDENCE 记 CI URL · BASELINE 刷新 · overview/PROJECT 索引 · `surfaceLuma` 仅 `#rrggbb` 边界（ARCHITECTURE 已述）。
 
 ---
 

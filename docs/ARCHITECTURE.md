@@ -121,7 +121,7 @@ watch injector 启动
 **消费实现**：`packages/runtime/assets/renderer-inject.js` 读四色；`surfaceLuma` 当前仅对 `#rrggbb` 6 位 hex 计算（`oklab`/`rgb()` surface → `null` → shell 回落）。  
 **判定阈值**：`surfaceLuma ≤ 0.45` → dark；`≥ 0.62` → light；中间带走 `detectShellAppearance()`，最终 auto 缺省偏 dark。  
 **验收探针**：`node scripts/windows/probe-white-flash.mjs`（需本机 CDP 9335；`pass=true` 且 `surfaceLuma` 有限数字）。  
-**`probe-project-hd.mjs`**：仅 CDP 快照 dump，**无 pass 断言**——不得单独当作「已修」证据。
+**`probe-project-hd.mjs`**（v7）：断言型——`pass`/`failed`/exit 1（CDP 不可达）/ exit 2（检查失败）；校验 dark/not light、`surfaceLuma` 有限、气泡模式类、（若存在 `.dream-task`）任务 art 尺寸与 ambient。**snapshot-only 旧行为已废止。**
 
 改 injector 透传或 renderer 消费时：**两边对照本表**；缺字段不得只靠「本层单测绿」声明完成。
 

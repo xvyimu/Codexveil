@@ -71,4 +71,6 @@ npm run probe:session
 - Quiet post-update exit=2 + soft reattach OK = 正式降级，**不算**发版失败（见 publish 日志 `soft reattach OK` + 失败 check 摘要）
 - 代码签名 / SmartScreen（#24）：近期不购证；决策见 [plans/codesign-decision-2026-07-21.md](./plans/codesign-decision-2026-07-21.md)
 - 链：PROJECT §6 · CONTRIBUTING §C-3/C-4 · §9.4 · 建议 baseline：`write-baseline.ps1` · 留痕：`docs/evidence/`
-- [v6 调研（2026-07-21）](./research/2026-07-21-master-research-v6-palette-root-and-hd-bubble.md)：闪白根因补丁 48b5bae 全量透传 palette 四色 + HD art + 气泡双模式 0326abb + ahead 8 + v5 假关闭教训 + BASELINE 自动生成；probe-white-flash pass
+- [v6 调研（2026-07-21）](./research/2026-07-21-master-research-v6-palette-root-and-hd-bubble.md)：闪白根因补丁 48b5bae 全量透传 palette 四色 + HD art + 气泡双模式 0326abb · v5 假关闭教训 + BASELINE；probe-white-flash pass（过程文献；合入见下）
+- **v6 squash 合入 main（2026-07-21）**：PR [#1](https://github.com/xvyimu/Codex-Dream-Skin/pull/1) · merge `b80bf4e` · themes-gate PR [run 29814826310](https://github.com/xvyimu/Codex-Dream-Skin/actions/runs/29814826310) success · main push [run 29814915657](https://github.com/xvyimu/Codex-Dream-Skin/actions/runs/29814915657) success（**仅 npm test**，不证明 CDP 视觉）
+- [v7 调研（2026-07-21）](./research/2026-07-21-master-research-v7-gate-hygiene-and-ux.md)：门禁诚实化 · `probe-project-hd` 断言型（pass/failed/exitCode）· 证据 URL 入库 · BASELINE 对齐 tip · surfaceLuma `#rrggbb` 边界文档

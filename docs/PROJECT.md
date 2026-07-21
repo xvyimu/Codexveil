@@ -515,12 +515,16 @@ paused/locked: false（正常使用时）
 | 1.3.19–1.3.21 | 会话 probe 实锤 · 气泡去描边 · D3D Enable · open-healthy 异步 · FastLaunch |
 | 1.3.22–1.3.24 | publish reattach · UTF-8 控制台 · tray native focus · wait-shell 冷启 |
 | 1.3.25 + `f833ee8` | 安装 runtime 1.3.25-4dca30；git 主题 catalog 11 套 + schema 双格式 |
-| v6 调研（2026-07-21） | 闪白根因补丁 `48b5bae` 全量透传 palette 四色 · HD art + 气泡双模式（`0326abb`）· ahead 8 · v5 假关闭教训 · BASELINE 自动生成 |
+| v6 调研（2026-07-21） | 闪白根因补丁 `48b5bae` 全量透传 palette 四色 · HD art + 气泡双模式（`0326abb`）· v5 假关闭教训 · BASELINE；**已 squash 合 main**（PR #1 · `b80bf4e`） |
+| v7 门禁/证据（2026-07-21） | `probe-project-hd` 断言化 · RELEASE-EVIDENCE CI URL · BASELINE 对齐 tip · overview/CHANGELOG · surfaceLuma `#rrggbb` 边界文档 | 
 
 ### 12.2 下一阶段建议（按优先级）
 
 | 优先级 | 项 | 模块 | 验收 |
 |--------|----|------|------|
+| ~~P1~~ | ~~probe-project-hd 假 pass~~ | scripts/windows | **v7** · 断言型 pass/failed/exitCode |
+| ~~P1~~ | ~~合入后 CI 证据入库~~ | docs | **v7** · PR #1 + actions run URL |
+| P2 | surfaceLuma 仅 `#rrggbb` | renderer-inject | 文档边界；非 hex 主题再开算法卡 |
 | ~~P0~~ | ~~会话页玻璃 / chat bubble~~ | — | **已完成** · conversationPass + 去描边 |
 | ~~P0~~ | ~~发布后 reattach 双 injector~~ | — | **已完成** · post-update drift reattach |
 | ~~P1~~ | ~~`cli list` 主题去重~~ | — | **已完成** · `listThemes({ dedupe:true })` |
