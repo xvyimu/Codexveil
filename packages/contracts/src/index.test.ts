@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
 import {
   parsePalette,
   parsePaletteWithSurface,
@@ -10,13 +11,13 @@ import {
 
 describe("isCssColor", () => {
   it("accepts hex and functional colors", () => {
-    expect(isCssColor("#0a0a0a")).toBe(true);
-    expect(isCssColor("#abc")).toBe(true);
-    expect(isCssColor("oklab(0.2 0 0)")).toBe(true);
+    assert.equal(isCssColor("#0a0a0a"), true);
+    assert.equal(isCssColor("#abc"), true);
+    assert.equal(isCssColor("oklab(0.2 0 0)"), true);
   });
   it("rejects empty and injection-ish", () => {
-    expect(isCssColor("")).toBe(false);
-    expect(isCssColor("red;}")).toBe(false);
+    assert.equal(isCssColor(""), false);
+    assert.equal(isCssColor("red;}"), false);
   });
 });
 
@@ -28,25 +29,26 @@ describe("parsePalette", () => {
       surface: "#0a0a0a",
       text: "#F0E6C8",
     });
-    expect(p.surface).toBe("#0a0a0a");
+    assert.equal(p.surface, "#0a0a0a");
   });
 
   it("allows partial palette (accent only) for legacy paths", () => {
     const p = parsePalette({ accent: "#E0B458" });
-    expect(p.accent).toBe("#E0B458");
-    expect(p.surface).toBeUndefined();
+    assert.equal(p.accent, "#E0B458");
+    assert.equal(p.surface, undefined);
   });
 
   it("rejects illegal color", () => {
     const r = safeParsePalette({ surface: "not-a-color" });
-    expect(r.success).toBe(false);
+    assert.equal(r.success, false);
   });
 
   it("parsePaletteWithSurface requires surface", () => {
-    expect(() => parsePaletteWithSurface({ accent: "#fff" })).toThrow(/surface/i);
-    expect(
+    assert.throws(() => parsePaletteWithSurface({ accent: "#fff" }), /surface/i);
+    assert.equal(
       parsePaletteWithSurface({ accent: "#fff", surface: "#111111" }).surface,
-    ).toBe("#111111");
+      "#111111",
+    );
   });
 });
 
@@ -59,9 +61,9 @@ describe("doctor slice", () => {
       skippedThemeCount: 0,
       extraIgnored: true,
     });
-    expect(d.control?.tokenPresent).toBe(true);
-    expect(d.injectorPathFreshness?.fresh).toBe(true);
-    expect(d.themeCount).toBe(11);
+    assert.equal(d.control?.tokenPresent, true);
+    assert.equal(d.injectorPathFreshness?.fresh, true);
+    assert.equal(d.themeCount, 11);
   });
 });
 
@@ -72,6 +74,6 @@ describe("control error", () => {
       reason: "token-required",
       detail: "provide header x-codex-skin-token",
     });
-    expect(e.reason).toBe("token-required");
+    assert.equal(e.reason, "token-required");
   });
 });

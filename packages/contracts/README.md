@@ -7,5 +7,6 @@ Shared **Zod** schemas for cross-layer fields (ADR 0004).
 
 ```bash
 pnpm --filter @codex-skin/contracts test
+# = tsc + node --test dist/index.test.js
 pnpm --filter @codex-skin/contracts build
 ```
