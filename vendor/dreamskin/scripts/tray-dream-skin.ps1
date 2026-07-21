@@ -398,6 +398,60 @@ try {
         Show-DreamSkinTrayError -Message $_.Exception.Message
       }
     }.GetNewClosure()
+    # Message bubble style: borderless (heige) vs rounded card
+    $bubbleStyle = 'borderless'
+    try {
+      if (Get-Command Get-CodexSkinBubbleStyle -ErrorAction SilentlyContinue) {
+        $bubbleStyle = [string](Get-CodexSkinBubbleStyle -StateRoot $StateRoot)
+      }
+    } catch {}
+    $bubbleLabel = if ($bubbleStyle -eq 'card') {
+      '消息气泡：圆角卡片（点切无边框）'
+    } else {
+      '消息气泡：无边框（点切圆角卡片）'
+    }
+    $nextBubble = if ($bubbleStyle -eq 'card') { 'borderless' } else { 'card' }
+    $null = Add-DreamSkinTrayItem -Items $menu.Items -Text $bubbleLabel -Action {
+      try {
+        if (Get-Command Set-CodexSkinUiPrefs -ErrorAction SilentlyContinue) {
+          [void](Set-CodexSkinUiPrefs -StateRoot $StateRoot -BubbleStyle $nextBubble)
+        } else {
+          $prefsPath = Join-Path $StateRoot 'ui-prefs.json'
+          $prev = $null
+          try {
+            if (Test-Path -LiteralPath $prefsPath) {
+              $prev = Get-Content -LiteralPath $prefsPath -Raw -Encoding utf8 | ConvertFrom-Json
+            }
+          } catch {}
+          $obj = [ordered]@{
+            schemaVersion = 1
+            applyBalloonEnabled = if ($null -ne $prev -and $null -ne $prev.applyBalloonEnabled) { [bool]$prev.applyBalloonEnabled } else { $true }
+            bubbleStyle = [string]$nextBubble
+            updatedAt = (Get-Date).ToUniversalTime().ToString('o')
+          }
+          $json = ($obj | ConvertTo-Json -Depth 4) + "`n"
+          [System.IO.File]::WriteAllText($prefsPath, $json, [System.Text.UTF8Encoding]::new($false))
+        }
+        # Kick so injector reloads ui-prefs into payload.
+        try {
+          if (Get-Command Invoke-CodexSkinControl -ErrorAction SilentlyContinue) {
+            [void](Invoke-CodexSkinControl -Action 'kick' -TimeoutMs 3500)
+          }
+        } catch {}
+        $tip = if ($nextBubble -eq 'card') {
+          '消息气泡：圆角卡片（细描边）'
+        } else {
+          '消息气泡：无边框（heige 原味）'
+        }
+        if (Get-Command Show-CodexSkinBalloon -ErrorAction SilentlyContinue) {
+          Show-CodexSkinBalloon -Message $tip -Title 'Codex Skin' -Ms 1800 -ThrottleKey 'prefs-bubble' -ThrottleSeconds 2 -Kind Info -Force
+        } else {
+          $notify.ShowBalloonTip(1800, 'Codex Skin', $tip, [System.Windows.Forms.ToolTipIcon]::Info)
+        }
+      } catch {
+        Show-DreamSkinTrayError -Message $_.Exception.Message
+      }
+    }.GetNewClosure()
     $null = Add-DreamSkinTrayItem -Items $menu.Items -Text '更换背景图（写入当前皮肤）' -Action {
       $dialog = [System.Windows.Forms.OpenFileDialog]::new()
       $dialog.Title = '选择 Codex 皮肤背景图'

@@ -89,6 +89,18 @@ powershell -File "$env:LOCALAPPDATA\Programs\CodexDreamSkin\open-codex-dream-ski
 
 恢复窗内 F6 需另开工程卡（注入 catalog + cycleTheme + toast，且服从 catalog 预算；改 runtime **必 publish**）。见 [`PAIN-POINTS.md`](./PAIN-POINTS.md) **#25**。
 
+### 消息气泡样式（对比）
+
+提问 / 回答气泡支持两种样式（**不改功能，只改描边与块面**）：
+
+| 样式 | 观感 | 如何选 |
+|------|------|--------|
+| **无边框**（默认） | heige 原味：无描边、轻阴影、圆角 | 默认；托盘显示「消息气泡：无边框」 |
+| **圆角卡片** | 细描边 + 更清晰卡片块面 | 托盘点「消息气泡：无边框（点切圆角卡片）」 |
+
+配置：`%LOCALAPPDATA%\CodexDreamSkin\ui-prefs.json` → `"bubbleStyle": "borderless" | "card"`。  
+切换后托盘会 **kick** 热应用；也可 CLI 后手动 kick。
+
 ### CLI（推荐脚本/自动化）
 
 ```powershell

@@ -633,16 +633,33 @@ async function loadPayload(themeDir = path.join(root, "assets"), candidateTheme 
   // config (art focus + palette + brand copy) that drives the ::before/::after
   // brand overlay. Catalog stays the F6 channel (best-effort; may be dropped by
   // older renderers that only read 3 args).
+  // bubbleStyle from ui-prefs.json (borderless|card) — conversation chrome.
+  let bubbleStyle = "borderless";
+  try {
+    const stateRoot = path.dirname(path.resolve(themeDir));
+    const prefsPath = path.join(stateRoot, "ui-prefs.json");
+    const prefsRaw = await fs.readFile(prefsPath, "utf8");
+    const prefs = JSON.parse(prefsRaw.replace(/^﻿/, ""));
+    if (prefs && typeof prefs.bubbleStyle === "string") {
+      const bs = prefs.bubbleStyle.trim().toLowerCase();
+      if (bs === "card" || bs === "borderless") bubbleStyle = bs;
+    }
+  } catch {
+    // missing prefs → borderless default
+  }
+  const themeForInject = { ...loadedTheme.theme, bubbleStyle };
   const activeArtDataUrl = imageDataUrl(loadedTheme);
   const payload = template
     .replace("__DREAM_CSS_JSON__", JSON.stringify(css))
     .replace("__DREAM_ART_JSON__", JSON.stringify(activeArtDataUrl))
-    .replace("__DREAM_THEME_JSON__", JSON.stringify(loadedTheme.theme))
+    .replace("__DREAM_THEME_JSON__", JSON.stringify(themeForInject))
     .replace("__DREAM_THEME_CATALOG_JSON__", JSON.stringify(themeCatalog.entries));
   const fingerprint = createHash("sha256")
     .update(loadedTheme.fingerprint)
     .update("\0")
     .update(themeCatalog.fingerprint)
+    .update("\0")
+    .update(bubbleStyle)
     .digest("hex");
   const { imageBytes: _imageBytes, ...themeState } = loadedTheme;
   return {

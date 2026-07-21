@@ -157,6 +157,8 @@ function Get-CodexSkinUiPrefs {
   $defaults = [ordered]@{
     schemaVersion = 1
     applyBalloonEnabled = $true
+    # borderless = heige 无描边；card = 圆角卡片描边
+    bubbleStyle = 'borderless'
   }
   $path = Get-CodexSkinUiPrefsPath -StateRoot $StateRoot
   try {
@@ -168,6 +170,12 @@ function Get-CodexSkinUiPrefs {
         }
         if ($null -ne $raw.schemaVersion) {
           $defaults.schemaVersion = [int]$raw.schemaVersion
+        }
+        if ($raw.bubbleStyle -is [string]) {
+          $bs = $raw.bubbleStyle.Trim().ToLowerInvariant()
+          if ($bs -eq 'card' -or $bs -eq 'borderless') {
+            $defaults.bubbleStyle = $bs
+          }
         }
       }
     }
@@ -182,13 +190,21 @@ function Set-CodexSkinUiPrefs {
   #>
   param(
     [string]$StateRoot = (Get-CodexSkinStateRoot),
-    [Nullable[bool]]$ApplyBalloonEnabled = $null
+    [Nullable[bool]]$ApplyBalloonEnabled = $null,
+    [ValidateSet('borderless', 'card', '')][string]$BubbleStyle = ''
   )
   try {
     $cur = Get-CodexSkinUiPrefs -StateRoot $StateRoot
+    $bubble = if ($BubbleStyle -and $BubbleStyle.Trim()) {
+      $BubbleStyle.Trim().ToLowerInvariant()
+    } else {
+      [string]$cur.bubbleStyle
+    }
+    if ($bubble -ne 'card') { $bubble = 'borderless' }
     $obj = [ordered]@{
       schemaVersion = 1
       applyBalloonEnabled = $(if ($null -ne $ApplyBalloonEnabled) { [bool]$ApplyBalloonEnabled } else { [bool]$cur.applyBalloonEnabled })
+      bubbleStyle = $bubble
       updatedAt = (Get-Date).ToUniversalTime().ToString('o')
     }
     Write-CodexSkinJsonUtf8NoBom -Path (Get-CodexSkinUiPrefsPath -StateRoot $StateRoot) -Object $obj
@@ -196,6 +212,15 @@ function Set-CodexSkinUiPrefs {
   } catch {
     return $null
   }
+}
+
+function Get-CodexSkinBubbleStyle {
+  param([string]$StateRoot = (Get-CodexSkinStateRoot))
+  try {
+    $s = [string]((Get-CodexSkinUiPrefs -StateRoot $StateRoot).bubbleStyle)
+    if ($s -eq 'card') { return 'card' }
+  } catch {}
+  return 'borderless'
 }
 
 function Test-CodexSkinApplyBalloonEnabled {

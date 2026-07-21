@@ -29,6 +29,8 @@
     "dream-has-art",
     "dream-has-brand",
     "dream-has-headline",
+    "dream-bubble-borderless",
+    "dream-bubble-card",
   ];
   const ROOT_PROPERTIES = [
     "--dream-art",
@@ -48,6 +50,24 @@
   let samplingNativeShell = false;
   let observer = null;
   window.__CODEX_DREAM_SKIN_DISABLED__ = false;
+
+  /** Prefer theme payload bubbleStyle; fall back to localStorage / data attr. */
+  const readBubbleStylePref = () => {
+    try {
+      if (config?.bubbleStyle === "card" || config?.bubbleStyle === "borderless") {
+        return config.bubbleStyle;
+      }
+    } catch {}
+    try {
+      const attr = document.documentElement?.getAttribute?.("data-dream-bubble-style");
+      if (attr === "card" || attr === "borderless") return attr;
+    } catch {}
+    try {
+      const ls = window.localStorage?.getItem?.("codexDreamSkin.bubbleStyle");
+      if (ls === "card" || ls === "borderless") return ls;
+    } catch {}
+    return "borderless";
+  };
 
   const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, Number(value)));
   const luminance = (red, green, blue) => {
@@ -122,6 +142,10 @@
       surfaceLuma,
       brandSubtitle: oneLine(config.brandSubtitle, 80),
       tagline: oneLine(config.tagline, 160),
+      bubbleStyle:
+        config.bubbleStyle === "card" || config.bubbleStyle === "borderless"
+          ? config.bubbleStyle
+          : null,
       initialAspect: Number.isFinite(metadataRatio) && metadataRatio > 0 ? metadataRatio : null,
     };
   };
@@ -370,6 +394,12 @@
     root.classList.toggle("dream-theme-dark", appearance === "dark");
     root.classList.toggle("dream-art-wide", profile.aspect >= 1.75);
     root.classList.toggle("dream-art-standard", profile.aspect < 1.75);
+    const bubbleStyle = readBubbleStylePref();
+    root.classList.toggle("dream-bubble-card", bubbleStyle === "card");
+    root.classList.toggle("dream-bubble-borderless", bubbleStyle !== "card");
+    try {
+      root.setAttribute("data-dream-bubble-style", bubbleStyle === "card" ? "card" : "borderless");
+    } catch {}
     for (const value of ["left", "center", "right"]) {
       root.classList.toggle(`dream-focus-${value}`, focus === value);
     }
@@ -551,6 +581,20 @@
     installToken,
     version: SKIN_VERSION,
     resolveAppearance,
+    readBubbleStylePref,
+    setBubbleStyle: (style) => {
+      const next = style === "card" ? "card" : "borderless";
+      try {
+        window.localStorage?.setItem?.("codexDreamSkin.bubbleStyle", next);
+      } catch {}
+      try {
+        document.documentElement?.setAttribute?.("data-dream-bubble-style", next);
+      } catch {}
+      try {
+        ensure();
+      } catch {}
+      return next;
+    },
   };
   ensure();
   analyzeArt().then((result) => {

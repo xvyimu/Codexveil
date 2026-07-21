@@ -16,7 +16,9 @@
 - **U4 首次入口提示**：`Show-CodexSkinFirstRunGuide` 文案强化「任务栏 Codex / 勿商店磁贴」；`first-run-shown.flag` 一次性；**不**劫持 AUMID。
 - **B 可读性门禁**：`validateThemeManifest` 对 `text`/`surface` 做对比度启发式（≥4.5）；`test:themes` 含低对比拒绝夹具；11 套内置主题实测通过。
 - **视觉回归（开项目不闪白）**：`renderer-inject` 用 palette.surface 亮度强制 dark/light；`appearance:auto` 缺省回落 dark；路由短暂无 `main` 时**不清皮肤**。**根因补丁**：`injector.loadTheme` 此前只透传 `palette.accent`，`surface/text/secondary` 未进 CDP payload → surfaceLuma 无效、暗色主题仍挂 `dream-theme-light`；现全量透传四色。本机 CDP 探针 `probe-white-flash.mjs`：**pass**（dark · body oklab≈0.19 · surfaceLuma≈0.105）。
-- **#25 F6**：探针确认无 `cycleTheme`；`usage.md` / `PAIN-POINTS` 对齐「请用托盘/面板/CLI」，不再承诺窗内 F6 toast。
+- **项目页高清皮肤**：提高 `--dream-task-ambient-opacity`、降低 task immersive 洗白；宽图 task 用 cover 而非「条带 + 低透明度」，对齐上游展示图沉浸感（编码可读仍靠左侧 gradient）。
+- **消息气泡双模式**：`borderless`（默认无边框）/ `card`（圆角卡片描边）；`ui-prefs.bubbleStyle` + 托盘切换 + inject 进 payload。
+- **#25 F6**：探针确认无 `cycleTheme`；`usage.md` / `PAIN-POINTS` 对齐「请用托盘/面板/CLI」。
 - **调研 v5**：`docs/research/2026-07-21-master-research-v5-visual-sync-and-next.md` + PROJECT 索引。
 - **BASELINE**：随 HEAD / 安装 runtime 脚本刷新。
 
