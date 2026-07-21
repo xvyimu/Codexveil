@@ -18,8 +18,7 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 11
+        # version from package.json packageManager field (avoid dual version conflict)
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -28,7 +27,7 @@ jobs:
           cache: pnpm
 
       - name: Install (dev plane)
-        run: pnpm install --frozen-lockfile=false
+        run: pnpm install --frozen-lockfile
 
       - name: Typecheck contracts
         run: pnpm run typecheck:contracts
