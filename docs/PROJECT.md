@@ -1,7 +1,7 @@
 # codex-skin 项目文档
 
 > **产品**：统一 Codex Desktop 换肤产品线（DreamSkin 守护 + heige 多主题）  
-> **仓库**：https://github.com/xvyimu/Codex-Dream-Skin  
+> **仓库**：https://github.com/xvyimu/Codexveil（原 `Codex-Dream-Skin`，已脱离 fork）  
 > **开发仓**：`D:\orca\codex-skin`  
 > **安装态**：`%LOCALAPPDATA%\Programs\CodexDreamSkin`  
 > **当前主线**：runtime `1.3.25` · HEAD 以 `git rev-parse HEAD` 为准（全面检查见 [`AUDIT-2026-07-20.md`](./AUDIT-2026-07-20.md)）  
@@ -487,7 +487,7 @@ paused/locked: false（正常使用时）
 
 | 远程 | URL | 角色 |
 |------|-----|------|
-| origin | `xvyimu/Codex-Dream-Skin` | 开发主线 |
+| origin | `xvyimu/Codexveil` | 开发主线（原 Codex-Dream-Skin，已脱离 fork） |
 | upstream | `Fei-Away/Codex-Dream-Skin` | 上游参考 |
 
 - `main` 与上游 **零共同历史**（重构 force-push 后），禁止幻想 `git merge upstream/main`。  
@@ -622,7 +622,7 @@ codex-skin/
 | 热切换 | kick ~55–80ms 量级 |
 | Git | `main`：以 `git rev-parse HEAD` 为准；审计见 AUDIT-2026-07-20 |
 | 上游基线 | `e776fa6`（nothing absorbed） |
-| 产品包 | Release [v1.3.25](https://github.com/xvyimu/Codex-Dream-Skin/releases/tag/v1.3.25)；本地 `Build-ProductPackage` → dist（gitignore） |
+| 产品包 | Release [v1.3.25](https://github.com/xvyimu/Codexveil/releases/tag/v1.3.25)；本地 `Build-ProductPackage` → dist（gitignore） |
 | package.json | `"version": "1.3.25"`（产品线元数据；stamp 权威仍是 publish `-Version`） |
 | 主题门禁 | `npm run test:themes` |
 

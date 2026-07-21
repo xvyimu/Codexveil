@@ -21,7 +21,7 @@ We do **not** claim multi-user OS isolation or that Codex itself is a hardened s
 
 ## Report a vulnerability
 
-Prefer **private** disclosure (GitHub Security Advisories on `xvyimu/Codex-Dream-Skin` when enabled, or private contact to the repo owner).
+Prefer **private** disclosure (GitHub Security Advisories on `xvyimu/Codexveil` when enabled, or private contact to the repo owner).
 
 Please include:
 
@@ -44,7 +44,7 @@ Out-of-scope examples:
 
 - SmartScreen prompts on unsigned binaries (documented #24; see `docs/plans/codesign-decision-2026-07-21.md`)  
 - Store tile bare launch without skin (OS AUMID limit #21)  
-- Issues only in upstream `Fei-Away/Codex-Dream-Skin` without a path in this fork  
+- Issues only in upstream `Fei-Away/Codex-Dream-Skin` without a path in this repo  
 
 ## Operational controls (maintainers)
 

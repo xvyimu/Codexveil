@@ -4,6 +4,7 @@ import { access, readdir } from "node:fs/promises";
 import { homedir } from "node:os";
 import { win32 } from "node:path";
 import { promisify } from "node:util";
+import { isValidPort } from "../cdp/cdp-helpers.mjs";
 import { uniquePaths } from "./path-utils.mjs";
 
 const execFileAsync = promisify(execFile);
@@ -14,7 +15,7 @@ export function parseCdpPortFromCommandLine(commandLine) {
   const match = commandLine.match(CDP_PORT_FLAG);
   if (!match) return null;
   const port = Number(match[1]);
-  if (!Number.isInteger(port) || port < 1024 || port > 65535) return null;
+  if (!isValidPort(port)) return null;
   return port;
 }
 

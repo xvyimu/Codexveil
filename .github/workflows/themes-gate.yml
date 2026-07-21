@@ -4,9 +4,10 @@ name: themes-gate
 
 on:
   push:
-    branches: [main]
+    branches: [main, feat/u1-workspace]
   pull_request:
-    branches: [main]
+    # Base branches that should gate unit + contracts (feature trains included)
+    branches: [main, feat/u1-workspace]
 
 jobs:
   themes:

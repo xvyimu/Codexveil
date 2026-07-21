@@ -8,7 +8,8 @@
  */
 import http from "node:http";
 import { spawn } from "node:child_process";
-import { access, readFile, writeFile, mkdir, rename } from "node:fs/promises";
+import { readFile, writeFile, mkdir, rename } from "node:fs/promises";
+import { pathExists, readJsonFile } from "./fs-io.mjs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { randomBytes, timingSafeEqual } from "node:crypto";
@@ -31,14 +32,6 @@ function tokensEqual(provided, expected) {
   return timingSafeEqual(a, b);
 }
 
-async function pathExists(p) {
-  try {
-    await access(p);
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 function stateRootDefault() {
   // Fallback only when injector did not pass stateRoot (dev / mis-invocation).
@@ -81,8 +74,7 @@ async function writeControlPort(stateRoot, port) {
   try {
     const statePath = join(stateRoot, "state.json");
     if (!(await pathExists(statePath))) return;
-    const raw = await readFile(statePath, "utf8");
-    const state = JSON.parse(raw.replace(/^﻿/, ""));
+    const state = await readJsonFile(statePath);
     state.controlPort = port;
     state.controlUpdatedAt = new Date().toISOString();
     await atomicWriteText(statePath, JSON.stringify(state, null, 2) + "\n");

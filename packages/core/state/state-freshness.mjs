@@ -2,23 +2,9 @@
  * @file state-freshness.mjs
  * @description 检查 state.json 是否与 current.json runtime 对齐。
  */
-import { access, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { resolveStudioPaths } from "../constants.mjs";
-
-async function pathExists(p) {
-  try {
-    await access(p);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-async function readJson(path) {
-  const raw = await readFile(path, "utf8");
-  return JSON.parse(raw.replace(/^﻿/, ""));
-}
+import { pathExists, readJsonFile } from "./state-io.mjs";
 
 /**
  * Pure decision given already-resolved path/runtime fields.
@@ -96,13 +82,13 @@ export async function inspectInjectorPathFreshness({
   let current;
   let state;
   try {
-    current = await readJson(currentPath);
+    current = await readJsonFile(currentPath);
   } catch {
     result.reason = "bad-current-json";
     return result;
   }
   try {
-    state = await readJson(statePath);
+    state = await readJsonFile(statePath);
   } catch {
     result.reason = "bad-state-json";
     return result;
