@@ -113,8 +113,12 @@ if (Test-Path -LiteralPath $taskbar) {
   Set-SkinShortcut -Path (Join-Path $taskbar "Codex.lnk")
   Set-SkinShortcut -Path (Join-Path $taskbar "ChatGPT.lnk")
 }
-# Startup
+# Startup: do NOT auto-create. User may opt in manually; publish must not re-add.
 $startup = Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\Startup"
-Set-SkinShortcut -Path (Join-Path $startup "Codex Dream Skin - Auto Launch.lnk") -Description "Auto launch Codex with skin"
+$startupLnk = Join-Path $startup "Codex Dream Skin - Auto Launch.lnk"
+if (Test-Path -LiteralPath $startupLnk) {
+  Remove-Item -LiteralPath $startupLnk -Force -ErrorAction SilentlyContinue
+  Write-Host ("RM   Startup auto-launch (disabled by policy 2026-07-23): " + $startupLnk)
+}
 
 Write-Host ("DONE changed_or_ensured entries. re-pin Start/taskbar if an old store tile still opens bare Codex.")

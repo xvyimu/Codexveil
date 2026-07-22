@@ -186,8 +186,13 @@ if (Test-Path -LiteralPath $taskbar) {
   }
 }
 
+# Startup auto-launch disabled (2026-07-23): remove if present; do not recreate.
 if (Test-Path -LiteralPath $startup) {
-  Set-DailyCodex (Join-Path $startup 'Codex Dream Skin - Auto Launch.lnk') 'Auto launch Codex with skin'
+  $startupLnk = Join-Path $startup 'Codex Dream Skin - Auto Launch.lnk'
+  if (Test-Path -LiteralPath $startupLnk) {
+    Remove-LinkIfExists $startupLnk
+    Write-Host ("RM   Startup auto-launch (disabled): " + $startupLnk)
+  }
 }
 
 # --- 3) Tools folder only (not desktop) --------------------------------------

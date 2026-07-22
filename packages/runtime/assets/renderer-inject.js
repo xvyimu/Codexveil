@@ -45,7 +45,6 @@
     "--dream-image-luma",
     "--dream-brand",
     "--dream-headline",
-    "--dream-status",
     "--dream-secondary",
     "--dream-text",
   ];
@@ -146,8 +145,6 @@
       surfaceLuma,
       brandSubtitle: oneLine(config.brandSubtitle, 80),
       tagline: oneLine(config.tagline, 160),
-      // V2: align Fei statusText field onto a CSS var (no promo UI / no forced chrome).
-      statusText: oneLine(config.statusText, 80),
       bubbleStyle:
         config.bubbleStyle === "card" || config.bubbleStyle === "borderless"
           ? config.bubbleStyle
@@ -564,11 +561,6 @@
     } else {
       root.style.removeProperty("--dream-headline");
       root.classList.remove("dream-has-headline");
-    }
-    if (config.statusText) {
-      root.style.setProperty("--dream-status", JSON.stringify(config.statusText));
-    } else {
-      root.style.removeProperty("--dream-status");
     }
   };
 
