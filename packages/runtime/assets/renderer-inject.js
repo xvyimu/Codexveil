@@ -1,6 +1,9 @@
-((cssText, artDataUrl, rawConfig) => {
+((cssText, artDataUrl, rawConfig, themeCatalog) => {
   const STATE_KEY = "__CODEX_DREAM_SKIN_STATE__";
   const STYLE_ID = "codex-dream-skin-style";
+  const TOAST_ID = "codex-dream-skin-toast";
+  // Align with theme-catalog-budget MAX_THEME_CATALOG_ENTRIES (no Node import in browser IIFE).
+  const MAX_CATALOG_ENTRIES = 8;
   // Single version source: publish-runtime.ps1 rewrites __SKIN_VERSION__ in
   // both this file (repo copy) and versions/<id>/assets/renderer-inject.js.
   // If the token is still literal "__SKIN_VERSION__", we're on an unpublished
@@ -154,24 +157,133 @@
   if (previous?.observer) previous.observer.disconnect();
   if (previous?.timer) clearInterval(previous.timer);
   if (previous?.scheduler?.timeout) clearTimeout(previous.scheduler.timeout);
+  if (previous?.onKeyDown) {
+    try {
+      window.removeEventListener("keydown", previous.onKeyDown, true);
+    } catch {}
+  }
+  if (previous?.toastEl) {
+    try {
+      previous.toastEl.remove();
+    } catch {}
+  }
   if (previous?.artUrl) URL.revokeObjectURL(previous.artUrl);
+
+  const objectUrlFromDataUrl = (dataUrl) => {
+    const hasArtData = typeof dataUrl === "string" && dataUrl.length > 0
+      && dataUrl.indexOf(",") > 0;
+    if (!hasArtData) return null;
+    try {
+      const comma = dataUrl.indexOf(",");
+      const binary = atob(dataUrl.slice(comma + 1));
+      const bytes = new Uint8Array(binary.length);
+      for (let index = 0; index < binary.length; index += 1) {
+        bytes[index] = binary.charCodeAt(index);
+      }
+      const mime = /^data:([^;,]+)/.exec(dataUrl)?.[1] || "image/png";
+      return URL.createObjectURL(new Blob([bytes], { type: mime }));
+    } catch {
+      return null;
+    }
+  };
+
   // artDataUrl is null when art streams through the theme catalog (current
   // injector); it's a data:… URL from older injectors. Return an object URL
   // in the second case, null otherwise; downstream sites test for null.
-  const hasArtData = typeof artDataUrl === "string" && artDataUrl.length > 0
-    && artDataUrl.indexOf(",") > 0;
-  const artUrl = hasArtData ? (() => {
-    const comma = artDataUrl.indexOf(",");
-    const binary = atob(artDataUrl.slice(comma + 1));
-    const bytes = new Uint8Array(binary.length);
-    for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
-    const mime = /^data:([^;,]+)/.exec(artDataUrl)?.[1] || "image/png";
-    return URL.createObjectURL(new Blob([bytes], { type: mime }));
-  })() : null;
-  const config = normalizeConfig(rawConfig);
+  let artUrl = objectUrlFromDataUrl(artDataUrl);
+  let config = normalizeConfig(rawConfig);
   let profile = {
     ...defaultProfile,
     aspect: config.initialAspect ?? defaultProfile.aspect,
+  };
+
+  const normalizeCatalog = (input, activeRaw, activeArt) => {
+    const source = Array.isArray(input) ? input : [];
+    const out = [];
+    for (const item of source) {
+      if (!item || typeof item !== "object") continue;
+      if (!item.config || typeof item.config !== "object") continue;
+      const key = typeof item.key === "string" && item.key.trim() ? item.key.trim() : null;
+      if (!key) continue;
+      out.push({
+        key,
+        name:
+          typeof item.name === "string" && item.name.trim()
+            ? item.name.trim()
+            : key,
+        config: item.config,
+        artDataUrl:
+          typeof item.artDataUrl === "string" && item.artDataUrl
+            ? item.artDataUrl
+            : null,
+      });
+      if (out.length >= MAX_CATALOG_ENTRIES) break;
+    }
+    if (out.length === 0) {
+      const activeName =
+        activeRaw && typeof activeRaw === "object" && typeof activeRaw.name === "string"
+          ? activeRaw.name
+          : "active";
+      out.push({
+        key: "active",
+        name: activeName || "active",
+        config: activeRaw && typeof activeRaw === "object" ? activeRaw : {},
+        artDataUrl: typeof activeArt === "string" ? activeArt : null,
+      });
+    }
+    return out;
+  };
+
+  const catalog = normalizeCatalog(themeCatalog, rawConfig, artDataUrl);
+  let activeCatalogKey = catalog[0]?.key || "active";
+  // Prefer "active" key when present (injector always seeds it first).
+  if (catalog.some((entry) => entry.key === "active")) {
+    activeCatalogKey = "active";
+  }
+
+  let toastEl = null;
+  const showToast = (text) => {
+    try {
+      const existing = document.getElementById(TOAST_ID);
+      if (existing) existing.remove();
+      const el = document.createElement("div");
+      el.id = TOAST_ID;
+      el.setAttribute("role", "status");
+      el.textContent = String(text || "");
+      el.style.cssText = [
+        "position:fixed",
+        "left:50%",
+        "bottom:28px",
+        "transform:translateX(-50%)",
+        "z-index:2147483646",
+        "padding:8px 14px",
+        "border-radius:999px",
+        "font:12px/1.4 system-ui,Segoe UI,sans-serif",
+        "color:#faf8fb",
+        "background:color-mix(in srgb, var(--dream-accent, #6c838e) 78%, #111 22%)",
+        "box-shadow:0 8px 24px rgba(0,0,0,.35)",
+        "opacity:.94",
+        "pointer-events:none",
+        "max-width:min(80vw,420px)",
+        "white-space:nowrap",
+        "overflow:hidden",
+        "text-overflow:ellipsis",
+      ].join(";");
+      (document.body || document.documentElement)?.appendChild(el);
+      toastEl = el;
+      const state = window[STATE_KEY];
+      if (state && state.installToken === installToken) state.toastEl = el;
+      setTimeout(() => {
+        try {
+          if (el.parentNode) el.remove();
+        } catch {}
+        if (toastEl === el) toastEl = null;
+        const live = window[STATE_KEY];
+        if (live?.toastEl === el) live.toastEl = null;
+      }, 2000);
+    } catch {
+      // toast is best-effort
+    }
   };
   const existingStyle = document.getElementById(STYLE_ID);
   if (existingStyle) {
@@ -519,6 +631,19 @@
     state?.observer?.disconnect();
     if (state?.timer) clearInterval(state.timer);
     if (state?.scheduler?.timeout) clearTimeout(state.scheduler.timeout);
+    if (state?.onKeyDown) {
+      try {
+        window.removeEventListener("keydown", state.onKeyDown, true);
+      } catch {}
+    }
+    if (state?.toastEl) {
+      try {
+        state.toastEl.remove();
+      } catch {}
+    }
+    try {
+      document.getElementById(TOAST_ID)?.remove();
+    } catch {}
     if (state?.artUrl) URL.revokeObjectURL(state.artUrl);
     delete window[STATE_KEY];
     return true;
@@ -568,6 +693,114 @@
     attributeFilter: ["data-theme", "data-appearance", "data-color-mode"],
   });
   const timer = setInterval(() => scheduleEnsure(true), 5000);
+
+  const setTheme = (keyOrIndex) => {
+    if (!catalog.length) {
+      return { ok: false, reason: "empty-catalog" };
+    }
+    let entry = null;
+    let index = -1;
+    if (typeof keyOrIndex === "number" && Number.isFinite(keyOrIndex)) {
+      index = Math.trunc(keyOrIndex);
+      if (index < 0 || index >= catalog.length) {
+        return { ok: false, reason: "index-out-of-range" };
+      }
+      entry = catalog[index];
+    } else {
+      const key = String(keyOrIndex ?? "");
+      index = catalog.findIndex((item) => item.key === key);
+      if (index < 0) {
+        return { ok: false, reason: "unknown-key", key };
+      }
+      entry = catalog[index];
+    }
+
+    const nextArtData =
+      typeof entry.artDataUrl === "string" && entry.artDataUrl
+        ? entry.artDataUrl
+        : null;
+    const nextArtUrl = nextArtData
+      ? objectUrlFromDataUrl(nextArtData)
+      : artUrl;
+    if (nextArtUrl !== artUrl && artUrl) {
+      try {
+        URL.revokeObjectURL(artUrl);
+      } catch {}
+    }
+    artUrl = nextArtUrl;
+    config = normalizeConfig(entry.config);
+    activeCatalogKey = entry.key;
+    profile = {
+      ...defaultProfile,
+      aspect: config.initialAspect ?? defaultProfile.aspect,
+    };
+
+    const state = window[STATE_KEY];
+    if (state && state.installToken === installToken) {
+      state.artUrl = artUrl;
+      state.config = config;
+      state.profile = profile;
+      state.activeCatalogKey = activeCatalogKey;
+      state.catalog = catalog;
+    }
+
+    try {
+      ensure();
+    } catch {}
+    try {
+      scheduleEnsure(true);
+    } catch {}
+    showToast(`${entry.name}（${index + 1}/${catalog.length}）`);
+
+    // Re-sample art when we have a new object URL; ignore stale install tokens.
+    if (artUrl) {
+      analyzeArt().then((result) => {
+        const live = window[STATE_KEY];
+        if (live?.installToken !== installToken || window.__CODEX_DREAM_SKIN_DISABLED__) return;
+        if (live.activeCatalogKey !== activeCatalogKey) return;
+        profile = result;
+        live.profile = result;
+        scheduleEnsure(true);
+      });
+    }
+
+    return {
+      ok: true,
+      key: entry.key,
+      name: entry.name,
+      index,
+      total: catalog.length,
+    };
+  };
+
+  const cycleTheme = (delta = 1) => {
+    const total = catalog.length;
+    if (!total) {
+      return { ok: false, reason: "empty-catalog", total: 0 };
+    }
+    let index = catalog.findIndex((item) => item.key === activeCatalogKey);
+    if (index < 0) index = 0;
+    const step = Number.isFinite(Number(delta)) ? Math.trunc(Number(delta)) : 1;
+    const next = ((index + step) % total + total) % total;
+    return setTheme(next);
+  };
+
+  const onKeyDown = (event) => {
+    try {
+      if (event.key !== "F6" && event.code !== "F6") return;
+      const target = event.target;
+      const tag = String(target?.tagName || "").toLowerCase();
+      if (tag === "input" || tag === "textarea" || tag === "select") return;
+      if (target?.isContentEditable) return;
+      event.preventDefault();
+      event.stopPropagation();
+      cycleTheme(event.shiftKey ? -1 : 1);
+    } catch {
+      // ignore host key races
+    }
+  };
+  window.addEventListener("keydown", onKeyDown, true);
+
   window[STATE_KEY] = {
     ensure,
     cleanup,
@@ -582,6 +815,13 @@
     version: SKIN_VERSION,
     resolveAppearance,
     readBubbleStylePref,
+    catalog,
+    activeCatalogKey,
+    catalogLen: catalog.length,
+    setTheme,
+    cycleTheme,
+    onKeyDown,
+    toastEl,
     setBubbleStyle: (style) => {
       const next = style === "card" ? "card" : "borderless";
       try {
@@ -605,4 +845,4 @@
     scheduleEnsure(true);
   });
   return { installed: true, version: SKIN_VERSION, adaptive: true };
-})(__DREAM_CSS_JSON__, __DREAM_ART_JSON__, __DREAM_THEME_JSON__)
+})(__DREAM_CSS_JSON__, __DREAM_ART_JSON__, __DREAM_THEME_JSON__, __DREAM_THEME_CATALOG_JSON__)

@@ -74,20 +74,19 @@ powershell -File "$env:LOCALAPPDATA\Programs\CodexDreamSkin\open-codex-dream-ski
 
 系统托盘图标 → **切换皮肤（N）** → 点名称（当前项带 ✓）
 
-### 窗口内 F6（当前状态 · 2026-07-21）
+### 窗口内 F6（代码已恢复 · 需 publish）
 
-**历史**：上游/早期 runtime 曾在窗内 **F6** 循环 catalog，并 toast `名称（i/N）`。  
-**现状（CDP 探针）**：当前 `renderer-inject` 的 `__CODEX_DREAM_SKIN_STATE__` **无** `cycleTheme` / `setTheme` / `catalog` 热路径（仅 ensure/cleanup/profile 等）。按 F6 **不会**可靠换肤。
-
-**请改用**（均已验证）：
+仓内 `renderer-inject` 已恢复 **F6** / **Shift+F6** 循环 catalog，并 toast `名称（i/N）`；STATE 暴露 `catalog` / `setTheme` / `cycleTheme`。  
+**安装态** `%LOCALAPPDATA%\Programs\CodexDreamSkin\versions\<id>\` 仍是旧 payload，直到维护者运行 `publish-runtime.ps1 -Version 1.3.25`（或新 patch）。开发可用 repo 树 injector `--watch` 验证。
 
 | 方式 | 操作 |
 |------|------|
+| 窗内（publish 后 / dev watch） | **F6** 下一主题 · **Shift+F6** 上一主题 |
 | 图形 | 开始菜单 / 桌面 **Codex 换肤** |
 | 托盘 | 系统托盘 → **切换皮肤（N）** |
 | CLI | `node packages/core/cli.mjs apply --theme <id>` |
 
-恢复窗内 F6 需另开工程卡（注入 catalog + cycleTheme + toast，且服从 catalog 预算；改 runtime **必 publish**）。见 [`PAIN-POINTS.md`](./PAIN-POINTS.md) **#25**。
+F6 为注入态瞬切，**不**写 active-theme；持久换肤仍用托盘 / 面板 / CLI。见 [`PAIN-POINTS.md`](./PAIN-POINTS.md) **#25**。
 
 ### 消息气泡样式（对比）
 
@@ -193,8 +192,8 @@ powershell -NoProfile -ExecutionPolicy RemoteSigned -File "$env:LOCALAPPDATA\Pro
 |------|------|
 | 窗口在、没皮肤 | **Codex 工具 → 皮肤修复**，或再点任务栏 Codex |
 | 从商店磁贴打开无皮肤 | 正常（#21）；改用任务栏钉着的 Codex |
-| F6 无反应 / 不换肤 | **预期（#25）**：当前无 cycleTheme；用托盘 / Codex 换肤 / CLI apply |
-| F6 提示只有 1 套（历史） | catalog 空或锁定；`import-themes` / unlock（待 F6 恢复后） |
+| F6 无反应 / 不换肤 | 安装态未 publish 新 runtime（#25）；或 catalog 仅 1 条；可用托盘 / Codex 换肤 / CLI apply |
+| F6 提示只有 1 套 | catalog 空或锁定；`import-themes` / unlock 后重开会话 |
 | 托盘菜单还是旧文案 | 退出托盘后重新点 Codex 拉起 |
 | CLI apply 没变化 | 先确认任务栏 Codex 已开且 `doctor` 显示 injectorAlive |
 | apply 无气泡 | 托盘「换肤气泡」已关，或看 `ui-prefs.json`；面板/托盘 ✓ 仍会变 |
@@ -223,5 +222,5 @@ powershell -NoProfile -ExecutionPolicy RemoteSigned -File "$env:LOCALAPPDATA\Pro
 - 不要改 `WindowsApps` 里的 Codex 安装文件  
 - 不要并行跑旧 heige 一次性注入 / 旧 studio 入口  
 - 不要用微软商店磁贴当日常入口（无 CDP = 无皮肤）  
-- 不要默认依赖窗内 **F6** 换肤（#25 未恢复前请用托盘/面板/CLI）  
+- 不要把窗内 **F6** 当持久换肤（不写 active-theme；安装态需先 publish 新 runtime）  
 - 不要在锁定模式下指望托盘多切  
