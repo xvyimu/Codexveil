@@ -133,6 +133,32 @@ console.log(JSON.stringify({ pass: true, export: "loadTheme" }));
     $detail = if ($passImport) { "theme-load import ok (staged ESM graph)" } else { "exit=$($p.ExitCode) stderr=$($stderr.Trim())" }
     Add-Check "node:import-theme-load" $passImport $detail
 
+    # Staged ESM: payload-builder + theme-load (S3 static edge; install missing file → ERR_MODULE_NOT_FOUND).
+    if (Test-Path -LiteralPath (Join-Path $stageScripts "payload-builder.mjs")) {
+      $pbOut = Join-Path $stage "pb-stdout.txt"
+      $pbErr = Join-Path $stage "pb-stderr.txt"
+      $pbCheckJs = @'
+import { loadPayload, earlyPayloadFor } from "./payload-builder.mjs";
+if (typeof loadPayload !== "function" || typeof earlyPayloadFor !== "function") {
+  throw new Error("payload-builder exports missing");
+}
+console.log(JSON.stringify({ pass: true, export: "loadPayload" }));
+'@
+      $pbTmp = Join-Path $stageScripts "check-import-payload-builder.mjs"
+      [System.IO.File]::WriteAllText($pbTmp, $pbCheckJs, [System.Text.UTF8Encoding]::new($false))
+      $pPb = Start-Process -FilePath $node.Source -ArgumentList @($pbTmp) `
+        -WorkingDirectory $stageScripts -Wait -PassThru -NoNewWindow `
+        -RedirectStandardOutput $pbOut `
+        -RedirectStandardError $pbErr
+      $pbStderr = if (Test-Path -LiteralPath $pbErr) { (Get-Content -LiteralPath $pbErr -Raw -ErrorAction SilentlyContinue) } else { "" }
+      if ($null -eq $pbStderr) { $pbStderr = "" }
+      $passPb = ($pPb.ExitCode -eq 0)
+      $detailPb = if ($passPb) { "payload-builder import ok (staged ESM + theme-load)" } else { "exit=$($pPb.ExitCode) stderr=$($pbStderr.Trim())" }
+      Add-Check "node:import-payload-builder" $passPb $detailPb
+    } else {
+      Add-Check "node:import-payload-builder" $false "payload-builder.mjs not staged"
+    }
+
     # Syntax-check staged injector (does not load deps, but catches copy corruption).
     $injectorPath = Join-Path $stageScripts "injector.mjs"
     $checkOut = Join-Path $stage "check-out.txt"
