@@ -1,0 +1,20 @@
+# codebase-memory-mcp — keep graph free of build noise
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+build/
+coverage/
+.pipeline/
+*.min.js
+*.min.css
+*.map
+*.tsbuildinfo
+packages/*/dist/
+apps/native/CodexFastLaunch/bin/
+docs/evidence/runs/
+*.log
+*.bak
+*.bak-*
+pnpm-lock.yaml
+package-lock.json
