@@ -20,7 +20,8 @@ import { validateThemeManifest } from "./theme-schema.mjs";
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, "..", "..");
 const contractsDist = join(repoRoot, "packages", "contracts", "dist", "index.js");
-const injectorPath = join(repoRoot, "packages", "runtime", "scripts", "injector.mjs");
+// Runtime CSS color source of truth lives in theme-load.mjs (extracted from injector S2).
+const themeLoadPath = join(repoRoot, "packages", "runtime", "scripts", "theme-load.mjs");
 const COLOR_KEYS = ["accent", "secondary", "surface", "text"];
 
 let failed = 0;
@@ -48,29 +49,29 @@ const { parsePaletteWithSurface, CSS_COLOR_RE } = await import(
   pathToFileURL(contractsDist).href
 );
 
-// --- S1: contracts CSS_COLOR_RE tracks the real injector source of truth ------
-// contracts/src/css-color.ts documents "aligned with injector.mjs"; pin to the
-// live file instead of a third re-literal (a stale copy would keep greening).
+// --- S1: contracts CSS_COLOR_RE tracks the real theme-load source of truth ------
+// contracts/src/css-color.ts documents alignment with runtime CSS color subset;
+// pin to theme-load.mjs (injector-split S2) instead of a third re-literal.
 {
-  const injectorSrc = await readFile(injectorPath, "utf8");
-  // injector.mjs currently embeds the same literal in two local scopes
-  // (loadTheme + thumb path). Capture every site and require them equal.
+  const themeLoadSrc = await readFile(themeLoadPath, "utf8");
+  // theme-load.mjs embeds the same literal in two local scopes
+  // (loadTheme + loadCatalogMember thumb path). Capture every site and require equal.
   const reLiteral =
     /const cssColor = (\/\^\(\?:#\[\\da-f\]\{3,8\}\|\(\?:rgb\|hsl\|oklch\|oklab\)\\\(\[\^;\{\}]\{1,96\}\\\)\)\$\/i)/g;
-  const sites = [...injectorSrc.matchAll(reLiteral)].map((m) => m[1]);
-  assert(sites.length >= 1, `injector.mjs exposes ≥1 cssColor regex (found ${sites.length})`);
+  const sites = [...themeLoadSrc.matchAll(reLiteral)].map((m) => m[1]);
+  assert(sites.length >= 1, `theme-load.mjs exposes ≥1 cssColor regex (found ${sites.length})`);
   assert(
     sites.every((s) => s === sites[0]),
-    "injector.mjs cssColor regex sites are identical to each other",
+    "theme-load.mjs cssColor regex sites are identical to each other",
   );
 
   // Rebuild the RegExp from the captured source+flags so source/flags match contracts.
   const m = sites[0].match(/^\/(.+)\/([a-z]*)$/);
-  assert(Boolean(m), "captured injector regex is a /pattern/flags literal");
-  const injectorRe = new RegExp(m[1], m[2]);
+  assert(Boolean(m), "captured theme-load regex is a /pattern/flags literal");
+  const themeLoadRe = new RegExp(m[1], m[2]);
   assert(
-    CSS_COLOR_RE.source === injectorRe.source && CSS_COLOR_RE.flags === injectorRe.flags,
-    "contracts CSS_COLOR_RE matches injector.mjs cssColor (live source)",
+    CSS_COLOR_RE.source === themeLoadRe.source && CSS_COLOR_RE.flags === themeLoadRe.flags,
+    "contracts CSS_COLOR_RE matches theme-load.mjs cssColor (live source)",
   );
 }
 
