@@ -24,10 +24,11 @@
     "test:freshness": "node packages/core/state/state-freshness.test.mjs",
     "test:cdp-url": "node packages/runtime/scripts/cdp-url-guard.test.mjs",
     "test:catalog-budget": "node packages/runtime/scripts/theme-catalog-budget.test.mjs",
+    "test:stamp": "node packages/runtime/scripts/stamp.test.mjs",
     "test:contracts": "pnpm --filter @codex-skin/contracts test",
     "typecheck:contracts": "pnpm --filter @codex-skin/contracts typecheck",
     "build:contracts": "pnpm --filter @codex-skin/contracts build",
-    "test:unit": "npm run test:themes && npm run test:themes-contracts && npm run test:store && npm run test:adapter && npm run test:deps && npm run test:freshness && npm run test:cdp-url && npm run test:catalog-budget",
+    "test:unit": "npm run test:themes && npm run test:themes-contracts && npm run test:store && npm run test:adapter && npm run test:deps && npm run test:freshness && npm run test:cdp-url && npm run test:catalog-budget && npm run test:stamp",
     "test": "npm run test:unit && npm run test:contracts",
     "typecheck": "npm run typecheck:contracts"
   },
