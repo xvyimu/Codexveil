@@ -55,6 +55,9 @@
 | `--dream-immersive-edge/mid/far` | 沉浸渐变 | 会话页慎加重 |
 | `--dream-immersive-sidebar` / `--dream-task-immersive-*` | 任务/侧栏沉浸 | 与 taskMode 相关 |
 | `--dream-immersive-composer` | 输入区混合 | 保持输入对比 |
+| `--dream-immersive-composer-solid` | 宽图会话搜索/输入实底 | V2 桥接；略浓于 composer，仍 oklch mix |
+| `--dream-composer-fill` / `--dream-composer-edge` | home composer 岛填充/描边 | V2；blur 仍 8px |
+| `--dream-status` | 主题 statusText（可选 CSS 消费） | inject 写入；无强制 UI |
 | `--dream-immersive-line` | 沉浸分割 | |
 
 **性能**：侧栏实现使用 `backdrop-filter: none`（历史去 blur）。新增大面积 blur 需发版 probe + 弱机手测，默认不恢复全局 blur。
@@ -113,4 +116,5 @@
 
 | 日期 | 说明 |
 |------|------|
+| 2026-07-23 | W1 V2：composer-fill/edge · immersive-composer-solid · status（见 `docs/ops/visual-align-fei-away-diff-2026-07-23.md`） |
 | 2026-07-21 | U1 初版：从 dream-skin.css 提炼 token 表与门禁 |
