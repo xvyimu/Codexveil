@@ -7,10 +7,11 @@ Codex Desktop 换肤：DreamSkin 启动/守护 + 多主题。Node ≥20，ESM。
 
 ## 先读
 
-1. [`docs/PROJECT.md`](docs/PROJECT.md) — 边界、分层、禁止依赖、验收  
+1. [`docs/PROJECT.md`](docs/PROJECT.md) — **形态与栈 SSOT**（§1.5）· 边界、分层、验收  
 2. 改功能：[`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) §C-1 / §C-8  
 3. 实现映射：[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)  
-4. 归档索引：[`docs/overview.md`](docs/overview.md)（文档地图 / ADR / 审计）
+4. 归档索引：[`docs/overview.md`](docs/overview.md)（文档地图 / ADR / 审计）  
+5. 全局门闩：形态/栈未入档禁业务编码 → `~/CLAUDE.md` §8
 
 ## 结构
 

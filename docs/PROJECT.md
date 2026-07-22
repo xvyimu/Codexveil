@@ -81,6 +81,26 @@
 4. 安装态 runtime 与 `current.json` 对齐；`doctor` 报告 `injectorPathFreshness.fresh=true`。  
 5. 改动能回退：publish GC 保留 current + 上一版；git 可审查。
 
+### 1.5 形态与技术栈（SSOT · 防漂移）
+
+> 全局门闩：`~/CLAUDE.md` §8 · `~/.claude/specs/principle.md`「形态与技术栈」。  
+> **本小节 = 本产品形态与唯一栈权威**；换形态/换栈须先 ADR 再改代码。小修沿用本栈，不重开选型。
+
+| 维 | 唯一结论 |
+|----|----------|
+| **产品形态** | **Windows 桌面侧车**（launcher + watch injector），对 Codex Desktop 做 **CDP 皮肤注入**；**不是**独立 Web 产品、不是小程序、不是 macOS 主路径、不是改官方 asar |
+| **主交付** | 安装态 launcher / 托盘 / F6 / CLI；publish 产物 `versions/<id>/` + 产品 zip |
+| **语言运行时** | Node.js ≥20（ESM）+ **pwsh** Windows 脚本 |
+| **包结构** | monorepo `packages/*` + `apps/launcher` + `themes/`（无 `vendor/` 树 · ADR 0006） |
+| **注入面** | CDP（默认端口 9335）· 单 watch injector · control-plane `/kick` |
+| **主题** | 仅经 `packages/themes` + `themes/<id>/` |
+| **测试/门闩** | `npm test` · themes/contracts/deps/freshness · `doctor` / smoke |
+| **明确不做** | 第二 injector；改 Codex 安装包；跨平台主路径；第二套守护；绑定外仓 remote |
+
+**取舍理由（唯一方案）：** Codex Desktop 已是 Electron 宿主，换肤只需 CDP + 本机守护，不必自建 Web/桌面壳；Windows-only 与安装态路径现实一致。另起 Tauri/独立 UI 会双轨且破坏「不改 asar」边界。
+
+**Agent：** 形态未定或要换栈 → 停业务编码；先读本节 + ADR，再实现。
+
 ---
 
 ## 2. 架构总览（优化后分层）
