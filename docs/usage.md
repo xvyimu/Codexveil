@@ -139,9 +139,9 @@ node D:\orca\Codexveil\packages\core\cli.mjs doctor
 ### 重新导入内置主题
 
 ```powershell
-powershell -File D:\orca\codex-skin\scripts\windows\import-themes.ps1 -KeepUnlocked
+powershell -File D:\orca\Codexveil\scripts\windows\import-themes.ps1 -KeepUnlocked
 # 或
-node D:\orca\codex-skin\packages\core\cli.mjs import-themes
+node D:\orca\Codexveil\packages\core\cli.mjs import-themes
 ```
 
 ---
@@ -216,7 +216,7 @@ powershell -NoProfile -ExecutionPolicy RemoteSigned -File "$env:LOCALAPPDATA\Pro
 | 冒烟 | `...\smoke-dream-skin.ps1` |
 | 主题库 | `%LOCALAPPDATA%\CodexDreamSkin\themes` |
 | 当前皮肤 | `%LOCALAPPDATA%\CodexDreamSkin\active-theme` |
-| 开发仓 | `D:\orca\codex-skin` |
+| 开发仓 | `D:\orca\Codexveil` |
 | 会话 | `%USERPROFILE%\.codex\sessions` |
 
 ---

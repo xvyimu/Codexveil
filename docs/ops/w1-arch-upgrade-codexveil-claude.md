@@ -124,7 +124,7 @@ pwsh -NoProfile -File scripts/windows/verify-publish-runtime-payload.ps1
 | blur 回潮 | composer **固定 8px**；侧栏/header 仍 none |
 | inject 破坏 F6 | 未触 cycle/setTheme；`npm test` catalog 门仍绿 |
 | 装态与 tip 差一版 | **人 gate publish** 后才有 H1–H7 真证 |
-| CLI `DEFAULT_THEME_ID=miku-488137` | 空库回退 id，**非** runtime 模板默认；文档已注明；不在 W1 改常量 |
+| CLI `DEFAULT_THEME_ID=miku-488137`（W1 残留） | **SUPERSEDED 2026-07-24**：已对齐 `DEFAULT_THEME_ID = "preset-arina-hashimoto"`（`packages/core/constants.mjs` · arina-only） |
 
 ---
 

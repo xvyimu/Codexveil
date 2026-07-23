@@ -2,7 +2,7 @@
 
 > **组合总纲：** `D:\orca\.planning\portfolio-product-docs-program-2026-07-23\PORTFOLIO-PRODUCT-PROGRAM.md`  
 > **形态与栈 SSOT：** [`PROJECT.md`](./PROJECT.md)  
-> **tip：** `a5c4182` · 视觉 V3 = **文档 DEFER arina-only**（见 `design/atelier-v3-matrix.md`）
+> **tip：** `ff42fbe` · 视觉 V3 = **文档 DEFER arina-only**（见 `design/atelier-v3-matrix.md`）
 
 ---
 

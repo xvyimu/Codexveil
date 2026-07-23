@@ -3,7 +3,7 @@ $ErrorActionPreference = 'Continue'
 $ProgressPreference = 'SilentlyContinue'
 $programRoot = Join-Path $env:LOCALAPPDATA 'Programs\CodexDreamSkin'
 $stateRoot = Join-Path $env:LOCALAPPDATA 'CodexDreamSkin'
-$repo = 'D:\orca\codex-skin'
+$repo = if (Test-Path -LiteralPath 'D:\orca\Codexveil') { 'D:\orca\Codexveil' } else { [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..')) }
 $report = [ordered]@{ startedAt = (Get-Date).ToUniversalTime().ToString('o'); cases = @() }
 
 function Add-Case($name, $pass, $ms, $detail, $notes = @(), $severity = 'info') {

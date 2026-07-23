@@ -100,7 +100,7 @@
 | art focus | 0.72 / 0.45 · safeArea `left` · taskMode `ambient` |
 | runtime 模板 | `packages/runtime/assets/theme.json` **= arina** |
 
-> 注：`packages/core/constants.mjs` 的 `DEFAULT_THEME_ID = miku-488137` 是 CLI/空库回退 id，**不是** runtime 装机模板默认；产品装机模板与本波视觉默认仍为 arina。
+> 注（**SUPERSEDED 2026-07-24**）：W1 时曾写 `DEFAULT_THEME_ID = miku-488137` 作 CLI/空库回退说明。**现行已对齐** `packages/core/constants.mjs` → `DEFAULT_THEME_ID = "preset-arina-hashimoto"`（arina-only · 与 sole bundled / runtime 模板同 id）。
 
 ## 6. W1 实施清单（enact）
 
@@ -118,3 +118,4 @@
 | 日期 | 说明 |
 |------|------|
 | 2026-07-23 | W1 DIFF 表初版 + 与 enact 同步 |
+| 2026-07-24 | 脚注：`DEFAULT_THEME_ID` 已对齐 `preset-arina-hashimoto`（SUPERSEDED miku） |

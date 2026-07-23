@@ -80,7 +80,7 @@ if ($fail -eq 0 -and $cdp -and $state -and (Test-DreamSkinInjectorAlive -State $
 }
 
 # CLI hot path present
-$cli = 'D:\orca\codex-skin\packages\core\cli.mjs'
+$cli = 'D:\orca\Codexveil\packages\core\cli.mjs'
 if (Test-Path -LiteralPath $cli) {
   Assert-True $true 'codex-skin CLI present'
 } else {
@@ -93,7 +93,7 @@ if (-not (Test-Path -LiteralPath $probe)) {
   $probe = Join-Path $runtimeRoot 'scripts\probe-session-dom.mjs'
 }
 if (-not (Test-Path -LiteralPath $probe)) {
-  $probe = 'D:\orca\codex-skin\scripts\windows\probe-session-dom.mjs'
+  $probe = 'D:\orca\Codexveil\scripts\windows\probe-session-dom.mjs'
 }
 if ((Test-Path -LiteralPath $probe) -and $cdp) {
   $probeOut = & $node.Path $probe $Port 2>&1 | Out-String
