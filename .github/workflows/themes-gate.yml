@@ -22,7 +22,7 @@ jobs:
         # version from package.json packageManager field (avoid dual version conflict)
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           # pnpm 11.5+ needs Node >= 22.13 (node:sqlite); product engines remain >=20 for runtime
           node-version: "22"
