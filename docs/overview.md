@@ -19,7 +19,7 @@
 - [CHANGELOG.md](./CHANGELOG.md) · [PAIN-POINTS.md](./PAIN-POINTS.md) · [CONTRIBUTING.md](./CONTRIBUTING.md)
 - [GLOSSARY.md](./GLOSSARY.md) · [SECURITY.md](./SECURITY.md) · [usage.md](./usage.md) · [dual-open-policy.md](./dual-open-policy.md)
 - [RELEASE-EVIDENCE.md](./RELEASE-EVIDENCE.md) · [BASELINE.generated.md](./BASELINE.generated.md)
-- [design-tokens.md](./design-tokens.md) · [contracts/post-update-report.md](./contracts/post-update-report.md)
+- [design-tokens.md](./design-tokens.md) · [design/atelier-v3-matrix.md](./design/atelier-v3-matrix.md)（V3 SKIP/DEFER arina-only） · [contracts/post-update-report.md](./contracts/post-update-report.md)
 
 ## 2. ADR
 
