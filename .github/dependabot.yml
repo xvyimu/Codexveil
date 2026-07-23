@@ -1,0 +1,25 @@
+# Dependabot — Codexveil (desktop CDP skin; zero prod npm deps)
+# npm plane is dev/contracts only (ADR 0004). Actions pin CI tooling.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    # No intentional major churn on TS without maintainer review
+    ignore:
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies

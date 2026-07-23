@@ -4,6 +4,16 @@ npm-debug.log*
 yarn-error.log*
 pnpm-lock.yaml.bak
 
+# Local env / secrets (desktop product has no server .env contract; still never track)
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+id_rsa
+id_rsa.pub
+control.token
+
 # TypeScript build outputs (contracts etc.; CI builds as needed)
 *.tsbuildinfo
 packages/*/dist/

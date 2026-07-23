@@ -13,7 +13,7 @@
 - **默认 CDP 端口**：9335
 - **控制面端口**：9336（loopback）
 - **产品线**：DreamSkin 级守护 + heige 级多主题（合并前是两条独立线）
-- **当前主线**：runtime `1.3.25` · 11 套内置主题 · 产品 zip 分发
+- **当前主线**：runtime `1.3.25` · 内置主题 **arina-only**（`preset-arina-hashimoto`）· 产品 zip 分发
 
 ---
 
@@ -38,7 +38,7 @@ codex-skin/
 │   │   └── core/            #   ← image-metadata 真实现（scripts 是薄壳）
 │   └── core-win/            # PowerShell 共享库（launcher-ui / common / theme）
 ├── scripts/windows/         # 发布 / 产品包 / 导入主题 / 快捷方式 / 开发探针 / E2E
-├── themes/                  # 内置主题源（heige 格式，11 套；含 preset-arina-hashimoto）
+├── themes/                  # 内置主题源（heige；现行 arina-only · preset-arina-hashimoto）
 └── docs/                    # 本文件所在
 ```
 
@@ -179,7 +179,7 @@ Install / Uninstall 只 stamp 安装树。见 ADR 0003 产品包表。
 | `packages/themes/*` | heige theme-schema / theme-store + DreamSkin 双格式 |
 | `packages/runtime/scripts/injector.mjs` | DreamSkin watch 引擎（扩展至 1.3.25） |
 | `packages/runtime/assets/*` | DreamSkin CSS/JS + heige-fused 视觉 |
-| `themes/*` | heige 内置主题 + preset-arina-hashimoto（11 套） |
+| `themes/*` | 内置主题源（现行 **arina-only**：`preset-arina-hashimoto`） |
 | `apps/launcher/*` | DreamSkin 入口脚本 · **tray / launch / restore 第一方源** |
 | `apps/native/CodexFastLaunch` | 本仓原生任务栏入口 |
 

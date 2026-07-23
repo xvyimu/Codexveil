@@ -16,7 +16,8 @@ import {
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, "..", "..");
-const heigeThemeDir = join(repoRoot, "themes", "genshin-night");
+// Product catalog is arina-only (see docs/PRODUCT-LAYERS.md / atelier-v3-matrix).
+const heigeThemeDir = join(repoRoot, "themes", "preset-arina-hashimoto");
 const dreamThemeJson = join(repoRoot, "packages", "runtime", "assets", "theme.json");
 const dreamHero = join(repoRoot, "packages", "runtime", "assets", "dream-reference.jpg");
 
@@ -178,12 +179,12 @@ function assert(cond, msg) {
   );
 }
 
-// --- loadTheme on bundled heige theme ---
+// --- loadTheme on bundled theme (arina-only catalog) ---
 {
   await access(join(heigeThemeDir, "theme.json"));
   const loaded = await loadTheme(heigeThemeDir);
-  assert(loaded.manifest.id === "genshin-night", "loadTheme genshin-night id");
-  assert(loaded.manifest.colors.accent === "#E0B458", "loadTheme palette non-empty");
+  assert(loaded.manifest.id === "preset-arina-hashimoto", "loadTheme preset-arina-hashimoto id");
+  assert(loaded.manifest.colors.accent === "#E8A0BF", "loadTheme palette non-empty");
   assert(!!loaded.heroPath, "loadTheme heroPath resolved");
 }
 
@@ -209,7 +210,7 @@ function assert(cond, msg) {
   const bundledRoot = join(repoRoot, "themes");
   const entries = await readdir(bundledRoot, { withFileTypes: true });
   const dirs = entries.filter((e) => e.isDirectory()).map((e) => e.name).sort();
-  assert(dirs.length >= 11, `bundled theme count >= 11 (got ${dirs.length})`);
+  assert(dirs.length >= 1, `bundled theme count >= 1 (arina-only; got ${dirs.length})`);
   let loadedCount = 0;
   for (const id of dirs) {
     const dir = join(bundledRoot, id);

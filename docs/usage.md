@@ -66,27 +66,32 @@ powershell -File "$env:LOCALAPPDATA\Programs\CodexDreamSkin\open-codex-dream-ski
 
 ---
 
-## 换肤（多主题）
+## 换肤（主题）
 
-当前默认 **多主题已解锁**（catalog 11 套：preset 默认 + 原神 / 火影 / 鸣潮 / 恋与深空 / Miku 等）。
+**产品默认（2026-07）：** 仓内内置 **arina-only** — `themes/preset-arina-hashimoto`（装机 active / runtime 模板同 id）。  
+扩 catalog / 多 IP 主题须 **维护者 ADR**，勿把历史「11 套」叙述当现行产品。
+
+用户侧仍可用 **自建/导入** 主题写入 `%LOCALAPPDATA%\CodexDreamSkin\themes\`（schema data-only）；F6 / 托盘循环的是**本机 catalog**，不是仓内 11 套。
 
 ### 托盘
 
-系统托盘图标 → **切换皮肤（N）** → 点名称（当前项带 ✓）
+系统托盘图标 → **切换皮肤（N）** → 点名称（当前项带 ✓；N = 本机 catalog 数）
 
-### 窗口内 F6（代码已恢复 · 需 publish）
+### 窗口内 F6（代码已恢复 · 需 publish 对齐装态）
 
-仓内 `renderer-inject` 已恢复 **F6** / **Shift+F6** 循环 catalog，并 toast `名称（i/N）`；STATE 暴露 `catalog` / `setTheme` / `cycleTheme`。  
-**安装态** `%LOCALAPPDATA%\Programs\CodexDreamSkin\versions\<id>\` 仍是旧 payload，直到维护者运行 `publish-runtime.ps1 -Version 1.3.25`（或新 patch）。开发可用 repo 树 injector `--watch` 验证。
+仓内 `renderer-inject` 支持 **F6** / **Shift+F6** 循环 **本机 catalog**，并 toast `名称（i/N）`；STATE 暴露 `catalog` / `setTheme` / `cycleTheme`。  
+装态 payload 以 `current.json.runtimeId` 为准；开发可用 repo 树 injector `--watch` 验证。
 
 | 方式 | 操作 |
 |------|------|
-| 窗内（publish 后 / dev watch） | **F6** 下一主题 · **Shift+F6** 上一主题 |
+| 窗内（publish 后 / dev watch） | **F6** 下一主题 · **Shift+F6** 上一主题（catalog≥2 时有感） |
 | 图形 | 开始菜单 / 桌面 **Codex 换肤** |
 | 托盘 | 系统托盘 → **切换皮肤（N）** |
 | CLI | `node packages/core/cli.mjs apply --theme <id>` |
 
 F6 为注入态瞬切，**不**写 active-theme；持久换肤仍用托盘 / 面板 / CLI。见 [`PAIN-POINTS.md`](./PAIN-POINTS.md) **#25**。
+
+**开机自启：** 默认 **关闭**（`install-ux-shortcuts.ps1` 会移除旧 Startup lnk，publish 不重建）。需要时自行在「启动」里添加 `CodexFastLaunch.exe`。
 
 ### 消息气泡样式（对比）
 
@@ -103,11 +108,12 @@ F6 为注入态瞬切，**不**写 active-theme；持久换肤仍用托盘 / 面
 ### CLI（推荐脚本/自动化）
 
 ```powershell
-node D:\orca\codex-skin\packages\core\cli.mjs list
-node D:\orca\codex-skin\packages\core\cli.mjs apply --theme genshin-night
-node D:\orca\codex-skin\packages\core\cli.mjs apply --theme miku-488137
-node D:\orca\codex-skin\packages\core\cli.mjs doctor
+node D:\orca\Codexveil\packages\core\cli.mjs list
+node D:\orca\Codexveil\packages\core\cli.mjs apply --theme preset-arina-hashimoto
+node D:\orca\Codexveil\packages\core\cli.mjs doctor
 ```
+
+> 路径以本机克隆为准（统一入口 `D:\projects\Codexveil` 亦可）。`<id>` 须已在本机 catalog / 仓内 `themes/`；默认装机主题为 **`preset-arina-hashimoto`**。
 
 `apply` 只写 `active-theme`，由 watch injector 热更新，**不会**再起第二套注入器。  
 成功后默认弹一次轻反馈气泡（U3）；失败时气泡会带简短 note。

@@ -33,7 +33,8 @@
 
 ## 状态
 
-- 主线 runtime **1.3.25** · 11 套内置主题  
+- 主线 runtime **1.3.25** · 内置主题 **arina-only**（`themes/preset-arina-hashimoto`；扩 catalog 须 ADR）  
+
 - 版本权威：`publish-runtime.ps1 -Version` 写入 `SKIN_VERSION_TOKEN`（ADR 0003）  
 - CI：`themes-gate` → `npm test`（**不等于**本机 doctor / live CDP）  
 - 架构：[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · 总纲：[`docs/PROJECT.md`](docs/PROJECT.md) · 安全：[`docs/SECURITY.md`](docs/SECURITY.md)

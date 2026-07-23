@@ -14,7 +14,8 @@ import {
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, "..", "..");
-const sampleHero = join(repoRoot, "themes", "genshin-night", "hero.webp");
+// Bundled art for writeActiveThemeFromHeige (arina-only catalog).
+const sampleHero = join(repoRoot, "themes", "preset-arina-hashimoto", "hero.jpg");
 
 let failed = 0;
 function assert(cond, msg) {
@@ -59,7 +60,7 @@ function assert(cond, msg) {
           schemaVersion: 1,
           id: "adapter-write",
           name: "Adapter Write",
-          hero: "hero.webp",
+          hero: "hero.jpg",
           colors: {
             accent: "#E0B458",
             secondary: "#7A86D8",
@@ -74,7 +75,7 @@ function assert(cond, msg) {
       ),
       "utf8",
     );
-    await copyFile(sampleHero, join(themeDir, "hero.webp"));
+    await copyFile(sampleHero, join(themeDir, "hero.jpg"));
 
     const written = await writeActiveThemeFromHeige({
       heigeThemeDir: themeDir,

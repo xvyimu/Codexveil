@@ -24,7 +24,7 @@ function assertEqual(actual, expected, msg) {
 const base = {
   engine: "1.3.25",
   css: ".root{color:red}",
-  themeId: "miku-488137",
+  themeId: "preset-arina-hashimoto",
   themeHash: "abc123",
   rendererRev: "rev-1",
 };
