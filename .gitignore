@@ -33,3 +33,7 @@ docs/evidence/runs/*.json
 # Never commit install-side state (lives in %LOCALAPPDATA%)
 current.json.bak-*
 apps/native/CodexFastLaunch/bin/
+apps/native/CodexFastLaunch/obj/
+artifacts/
+coverage/
+TestResults/
