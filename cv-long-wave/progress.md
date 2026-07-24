@@ -1,102 +1,82 @@
 # Codexveil · cv-long-wave progress
 
-**总控 WT：** `cv-coord` · `…/Codexveil/cv-coord` · `xvyimu/cv-coord`  
-**产品仓：** `D:\orca\Codexveil` · base `main`  
-**会话日：** 2026-07-24 · **G0 续航 7 日**  
-**红线：** 单 injector · 禁 asar · 禁 vendor · 禁擅自 publish/push  
+**总控：** `cv-coord` · `xvyimu/cv-coord` @ **`fb792e0`+**（本轮将再 commit）  
+**产品：** `D:\orca\Codexveil` · base `main` @ `ebc3568`  
+**红线：** 单 injector · 禁 asar · 禁 vendor · 禁擅自 publish · **feature push OK**  
 
-SSOT 队列：[`WEEK-BACKLOG.md`](./WEEK-BACKLOG.md)
+SSOT：[`WEEK-BACKLOG.md`](./WEEK-BACKLOG.md)
 
 ---
 
-## 0. 状态机
+## 0. 状态机（2026-07-24 催办后）
 
-| Phase | 状态 |
-|-------|------|
-| G0 | **AUTHORIZED** · 一周续航 |
-| W1 scout-health | **ACCEPT** · branch `xvyimu/cv-scout-health` @ `9e2ba87` · wt **已 rm** |
-| W2 themes-contracts | **LIVE** |
-| W3 store-adapter-fix | **SKIP 除非 W2 红** |
-| W4 doctor-smoke-docs | **LIVE** |
-| W5–W10 · W12 | QUEUED |
-| W11 adr0005-onepager | **LIVE** |
-| W13 INTEGRATE | QUEUED · publish 另授 |
-
-**live 槽：** 3/3（W2 · W4 · W11）
-
-### 0.1 本波 / 一周北极星
-
-doctor/smoke/主题/契约门闩全绿可重复；PAIN 有关闭证据；ADR0005 **仅文档 DEFER**。
-
-### 0.2 基线（main `ebc3568`）
-
-| 命令 | exit |
-|------|------|
-| test:themes / themes-contracts / store / adapter / deps | **0** |
-| `npm test` | **0** |
-
-### 0.3 W1 总控审核
-
-| 项 | 结论 |
+| 项 | 状态 |
 |----|------|
-| evidence | `docs/ops/cv-scout-health-evidence-2026-07-24.md` @ `9e2ba87` |
-| 边界 | 只读 + docs · 无业务码 · 无 push/publish |
-| doctor | exit **0** · fresh=true · runtimeId `1.3.25-da2adc` · Codex idle |
-| themes 建议 | **NO-CODE** |
-| 审核 | **PASS · ACCEPT** |
+| W1 scout | **ACCEPT** · `9e2ba87` · **origin 已 push** |
+| W2 themes-contracts | **ACCEPT** · `65c38a3` · origin · wt **rm** · **NO-CODE PASS** |
+| W3 store-adapter-fix | **SKIP**（W2 全绿无红） |
+| W4 doctor-smoke-docs | **ACCEPT** · `2aa2b0b` · origin · wt **rm** |
+| W11 adr0005 DEFER | **ACCEPT** · `b4cbc94` · origin · wt **rm** · 零壳代码 |
+| **W5** cdp-url-guard | **LIVE** |
+| **W6** catalog-budget | **LIVE** |
+| **W8** core-runtime-boundary | **LIVE** |
+| W7/W9/W10/W12/W13 | QUEUED |
+
+**live 槽：** 3/3（W5 · W6 · W8）
+
+### 0.1 催办收口摘要
+
+| 动作 | 结果 |
+|------|------|
+| 三线 dirty | 仅 seed untracked（brief/scout 拷贝）→ **丢弃未提交**；产物已在 tip commit |
+| stop/rm | W2/W4/W11 wt **force rm** · branch 在 origin 保留 |
+| push feature | scout **新 push**；W2/W4/W11/coord **origin 已齐**（rm 前已跟踪） |
+| W3 | **未开**（无失败项） |
+
+### 0.2 origin 支 tip
+
+| branch | tip | 内容 |
+|--------|-----|------|
+| xvyimu/cv-scout-health | `9e2ba87` | Phase0 evidence |
+| xvyimu/cv-themes-contracts | `65c38a3` | W2 NO-CODE |
+| xvyimu/cv-doctor-smoke-docs | `2aa2b0b` | map + evidence |
+| xvyimu/cv-adr0005-onepager | `b4cbc94` | DEFER 1 页 |
+| xvyimu/cv-coord | `fb792e0`→本轮 | long-wave SSOT |
 
 ---
 
-## 1. Worktree 名表
+## 1. 名表（orca）
 
-| displayName | branch | path | status |
-|-------------|--------|------|--------|
-| main | main | `D:/orca/Codexveil` | 主 · `ebc3568` |
-| cv-coord | xvyimu/cv-coord | `…/cv-coord` | 总控 |
-| cv-themes-contracts | xvyimu/cv-themes-contracts | `…/cv-themes-contracts` | **LIVE** W2 |
-| cv-doctor-smoke-docs | xvyimu/cv-doctor-smoke-docs | `…/cv-doctor-smoke-docs` | **LIVE** W4 |
-| cv-adr0005-onepager | xvyimu/cv-adr0005-onepager | `…/cv-adr0005-onepager` | **LIVE** W11 |
-
-**已收：** `cv-scout-health` wt rm · branch 保留 `xvyimu/cv-scout-health` @ `9e2ba87`
-
-**注：** 三 live 从 main 起；W1 evidence 已 **拷入** 各 wt `docs/ops/`（未进 main）；合入走 W13。
+| displayName | branch | status |
+|-------------|--------|--------|
+| main | main | 主 |
+| cv-coord | xvyimu/cv-coord | 总控 |
+| cv-cdp-url-guard | xvyimu/cv-cdp-url-guard | **LIVE W5** |
+| cv-catalog-budget | xvyimu/cv-catalog-budget | **LIVE W6** |
+| cv-core-runtime-boundary | xvyimu/cv-core-runtime-boundary | **LIVE W8** |
 
 ---
 
-## 2. 派发日志
+## 2. 审核结论（W2/W4/W11）
 
-| 时间 | 事件 | 结果 |
-|------|------|------|
-| 2026-07-24 | G0 · progress · 基线 npm test 0 | ok |
-| 2026-07-24 | W1 create scout-health | LIVE |
-| 2026-07-24 | W1 evidence `9e2ba87` · 总控 PASS | ACCEPT |
-| 2026-07-24 | W1 stop + `worktree rm --force` | preserved branch |
-| 2026-07-24 | WEEK-BACKLOG.md 落盘 | ok |
-| 2026-07-24 | W2+W4+W11 create（live=3） | LIVE |
+| 卡 | 边界 | exit / 要点 | 审核 |
+|----|------|-------------|------|
+| W2 | 无业务码 | themes/store/adapter/contracts **全 0** | **PASS** |
+| W4 | 无 injector 改 | doctor **0** · fresh · smoke **skipped**（Codex idle）· map 齐 | **PASS** |
+| W11 | 无壳代码 | DEFER 页钉 Proposed | **PASS** |
 
 ---
 
-## 3. Child 回执
+## 3. 下一批（槽空后）
 
-| ID | status | commit / 注 |
-|----|--------|-------------|
-| W1 scout | **ACCEPT** | `9e2ba87` docs only |
-| W2 themes | LIVE | NO-CODE 预期 |
-| W4 doctor-smoke | LIVE | map + evidence |
-| W11 adr0005 | LIVE | DEFER 1 页 |
+W9 arina-only docs · W10 pain-close · W7 launcher · W12 long-verify · W13 INTEGRATE  
 
 ---
 
-## 4. 下一批（槽空后）
+## 4. 红线复核
 
-建议序：W8 `cv-core-runtime-boundary` · W5 `cv-cdp-url-guard` · W6 `cv-catalog-budget` · W9 arina-only docs · W10 pain-close · W7 launcher（后）· W12 long-verify · W13 INTEGRATE
-
-W3 仅 W2 红时开。
-
----
-
-## 5. 审核门
-
-- [x] W1 边界 / exit / 无密钥  
-- [ ] W2–W11 各 evidence  
-- [ ] W13 合入计划 · push/publish 人闸  
+- [x] 无 asar  
+- [x] 无第二 injector  
+- [x] 无 vendor  
+- [x] 无 publish  
+- [x] feature push 仅 feature 支  
