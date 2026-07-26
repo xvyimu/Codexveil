@@ -26,11 +26,13 @@ const here = path.dirname(scriptPath);
 const root = path.resolve(here, "..");
 // Version is the sole authority written by publish-runtime.ps1 (-Version arg).
 // The placeholder pattern below stays literal in the repo copy so dev runs
-// (`node packages/runtime/scripts/injector.mjs`) resolve to "dev"; publish
-// rewrites the placeholder to the release version in both this file and in
-// versions/<id>/scripts/injector.mjs.
-// Note: after publish-runtime.ps1 -Version X, the repo source is also stamped
-// (e.g. "1.3.25"); SKIN_VERSION === "dev" only on unpublished working copies.
+// (`node packages/runtime/scripts/injector.mjs`) always resolve to "dev".
+// publish-runtime.ps1 stamps the release version ONLY into the published
+// payload (versions/<id>/scripts/injector.mjs); it never rewrites this
+// git-tree copy (see ADR-0003).
+// Note: the repo source stays "__SKIN_VERSION__" permanently, so
+// SKIN_VERSION === "dev" on every working copy; only published payloads
+// carry a concrete version.
 const SKIN_VERSION_TOKEN = "__SKIN_VERSION__";
 const SKIN_VERSION = SKIN_VERSION_TOKEN === "__" + "SKIN_VERSION__" ? "dev" : SKIN_VERSION_TOKEN;
 const DEFAULT_PAYLOAD_BUDGET_BYTES = 4 * 1024 * 1024;

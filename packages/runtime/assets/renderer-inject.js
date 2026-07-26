@@ -4,12 +4,12 @@
   const TOAST_ID = "codex-dream-skin-toast";
   // Align with theme-catalog-budget MAX_THEME_CATALOG_ENTRIES (no Node import in browser IIFE).
   const MAX_CATALOG_ENTRIES = 8;
-  // Single version source: publish-runtime.ps1 rewrites __SKIN_VERSION__ in
-  // both this file (repo copy) and versions/<id>/assets/renderer-inject.js.
-  // If the token is still literal "__SKIN_VERSION__", we're on an unpublished
-  // working copy and SKIN_VERSION resolves to "dev".
-  // Note: after publish-runtime.ps1 -Version X, the repo source is also stamped
-  // (e.g. "1.3.25"); dev detection only fires before that stamp.
+  // Single version source: publish-runtime.ps1 stamps __SKIN_VERSION__ ONLY in
+  // the published payload (versions/<id>/assets/renderer-inject.js); it never
+  // rewrites this git-tree copy (see ADR-0003).
+  // The token stays literal "__SKIN_VERSION__" in the repo permanently, so on
+  // any working copy SKIN_VERSION resolves to "dev"; only published payloads
+  // carry a concrete version.
   const SKIN_VERSION_TOKEN = "__SKIN_VERSION__";
   const SKIN_VERSION = SKIN_VERSION_TOKEN === "__" + "SKIN_VERSION__" ? "dev" : SKIN_VERSION_TOKEN;
   const CHROME_ID = "codex-dream-skin-chrome";

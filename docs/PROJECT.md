@@ -82,7 +82,7 @@
 | 日常 | 任务栏 / 开始菜单 **Codex** → 安装态 launcher | 终端用户 |
 | 开发 CLI | `node packages/core/cli.mjs <cmd>` | 开发 / Agent |
 | 换肤 | 托盘「换肤…」· F6 · `apply --theme` | 用户 / 自动化 |
-| 发布（开发） | `scripts/windows/publish-runtime.ps1 -Version` | 维护者 · 写回 git tree 版本 |
+| 发布（开发） | `scripts/windows/publish-runtime.ps1 -Version` | 维护者 · 只 stamp 包内/安装态（git 源恒占位符） |
 | 产品 zip | `Build-ProductPackage.ps1` → `Install.ps1` | 终端用户分发 · 只 stamp 包内/安装态 |
 
 ### 1.4 成功标准（产品级）
@@ -360,7 +360,7 @@ cli apply --theme <id>
 ```text
 publish-runtime.ps1 -RepoRoot D:\orca\Codexveil [-Version x.y.z]
   → 拷 packages/runtime → versions/<id>/
-  → stamp SKIN_VERSION_TOKEN（源 + 副本）
+  → stamp SKIN_VERSION_TOKEN（仅包内副本 versions/<id>/；git 源恒占位符）
   → 同步 core-win → lib\ + versions scripts
   → 同步入口 open/check/switch/smoke
   → current.json 翻页 + .bak
@@ -386,7 +386,7 @@ publish-runtime.ps1 -RepoRoot D:\orca\Codexveil [-Version x.y.z]
 遵循 **ADR 0003 单一版本源**：
 
 - 权威：`publish-runtime.ps1 -Version`  
-- 源文件使用 `SKIN_VERSION_TOKEN = "__SKIN_VERSION__"`，publish 替换  
+- 源文件使用 `SKIN_VERSION_TOKEN = "__SKIN_VERSION__"`，git 树恒占位符；publish 只 stamp 包内副本（versions/<id>/）  
 - 未 stamp 时 `SKIN_VERSION = "dev"`  
 - verify 必须 `version === expectedVersion`  
 
