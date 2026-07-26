@@ -195,3 +195,18 @@ pwsh -NoProfile -File scripts/windows/verify-publish-runtime-payload.ps1   # VER
 
 **下一步（仅人）：** 若未来 tip 真改 injector 图或装态行为分叉 → 走 [`true-publish-gate-checklist.md`](./true-publish-gate-checklist.md) → 口述 VERSION +「现在 publish」→ 再跑 `publish-runtime.ps1`。  
 **Agent 停步：** 不 publish、不 push、不改 runtime。
+
+---
+
+## 7. debt#6 复核 · start-dream-skin.ps1 `--state-root`（2026-07-27 · cv-debt-close wt）
+
+**结论：无需修 · 定级「低/关闭」依据已坐实。**
+
+| 核查项 | 事实 |
+|--------|------|
+| 载入路径 | `tray-dream-skin.ps1`（跑在 `versions/<id>/scripts/`）以 `$PSScriptRoot` 调 **同目录** `start-dream-skin.ps1` → 即 publish **刷新过**的 versions 副本，非陈旧 copy |
+| publish 白名单 | `start-dream-skin.ps1` **在** `versions/<id>/scripts/` 拷贝清单（publish-runtime.ps1 first-party 段）；**不在** programRoot daily 段 → programRoot 无被执行的陈旧副本 |
+| `--state-root` 缺失影响 | `start-dream-skin.ps1` 自身**无需** `--state-root` 参数：内部 `$StateRoot = %LOCALAPPDATA%\CodexDreamSkin` 派生 canonical 值，并把 `--state-root $StateRoot` 正确透传给 injector（L197-198） |
+| 原卡「白名单其实不含该 ps1」担忧 | **不成立** — 该 ps1 在 versions/scripts 白名单内且被 tray 执行的正是此份 |
+
+原「低」定级成立；关闭该债，无代码改动。
