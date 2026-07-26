@@ -23,6 +23,7 @@
     "test:control": "node packages/runtime/scripts/control-plane.test.mjs",
     "test:freshness": "node packages/core/state/state-freshness.test.mjs",
     "test:cdp-url": "node packages/runtime/scripts/cdp-url-guard.test.mjs",
+    "test:cdp-exposure": "node packages/core/cdp/cdp-exposure.test.mjs",
     "test:catalog-budget": "node packages/runtime/scripts/theme-catalog-budget.test.mjs",
     "test:stamp": "node packages/runtime/scripts/stamp.test.mjs",
     "test:theme-load": "node packages/runtime/scripts/theme-load.test.mjs",
@@ -32,7 +33,7 @@
     "test:contracts": "pnpm --filter @codex-skin/contracts test",
     "typecheck:contracts": "pnpm --filter @codex-skin/contracts typecheck",
     "build:contracts": "pnpm --filter @codex-skin/contracts build",
-    "test:unit": "npm run test:themes && npm run test:themes-contracts && npm run test:store && npm run test:adapter && npm run test:deps && npm run test:freshness && npm run test:cdp-url && npm run test:catalog-budget && npm run test:stamp && npm run test:theme-load && npm run test:payload-builder && npm run test:catalog-quality && npm run test:probe-kit",
+    "test:unit": "npm run test:themes && npm run test:themes-contracts && npm run test:store && npm run test:adapter && npm run test:deps && npm run test:freshness && npm run test:cdp-url && npm run test:cdp-exposure && npm run test:catalog-budget && npm run test:stamp && npm run test:theme-load && npm run test:payload-builder && npm run test:catalog-quality && npm run test:probe-kit",
     "test": "npm run test:unit && npm run test:contracts",
     "typecheck": "npm run typecheck:contracts"
   },

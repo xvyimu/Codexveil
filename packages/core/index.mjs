@@ -50,6 +50,13 @@ export {
 } from "./cdp/cdp-client.mjs";
 
 export {
+  CDP_LOCAL_TRUST_ADVICE,
+  evaluateCdpExposure,
+  formatCdpExposureNote,
+  inspectCdpExposure,
+} from "./cdp/cdp-exposure.mjs";
+
+export {
   formatKickResultNote,
   kickThemeInjectNow,
 } from "./state/kick-inject.mjs";

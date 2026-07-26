@@ -30,6 +30,7 @@ import {
   THEME_SCHEMA_VERSION,
   resolveStudioPaths,
 } from "./constants.mjs";
+import { formatCdpExposureNote, inspectCdpExposure } from "./cdp/cdp-exposure.mjs";
 import { detectDreamSkinRuntime } from "./state/dreamskin-guard.mjs";
 import { formatKickResultNote, kickThemeInjectNow } from "./state/kick-inject.mjs";
 import { inspectInjectorPathFreshness } from "./state/state-freshness.mjs";
@@ -154,6 +155,7 @@ function defaults(overrides) {
     discoverCodex,
     runtimeDiagnostics,
     detectDreamSkinRuntime,
+    inspectCdpExposure,
     writeActiveThemeFromHeige,
     importAllBundledThemes,
     touchThemesCatalog,
@@ -324,6 +326,10 @@ export async function runCli(argv, overrides = {}) {
       port: requestedPort,
       autoDiscoverPort: args.port === undefined,
     });
+    // CV-CR-001：CDP 是本机信任边界，doctor 必须报告端口监听地址是否 loopback-only。
+    const cdpExposure = await (deps.inspectCdpExposure ?? inspectCdpExposure)({
+      port: runtime.activePort ?? requestedPort,
+    });
     const freshnessNote = injectorPathFreshness.fresh
       ? "injector 路径与 current runtime 对齐"
       : `injector 路径漂移：${injectorPathFreshness.reason}`;
@@ -348,6 +354,7 @@ export async function runCli(argv, overrides = {}) {
       },
       themeSchemaVersion: THEME_SCHEMA_VERSION,
       dreamSkin,
+      cdpExposure,
       themeCount: themes.length,
       userThemeCount,
       skippedThemeCount,
@@ -358,6 +365,7 @@ export async function runCli(argv, overrides = {}) {
           ? `${classifyInjection(runtime)}；watch injector 存活，可用 apply --theme 热切换`
           : `${classifyInjection(runtime)}；watch injector 未检测到，请先点任务栏 Codex`,
         freshnessNote,
+        formatCdpExposureNote(cdpExposure),
       ].join("；"),
     };
   }
