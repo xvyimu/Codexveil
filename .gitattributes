@@ -1,0 +1,24 @@
+# Normalize line endings on commit; keep working-tree endings per-type.
+* text=auto eol=lf
+
+# Windows scripts must stay CRLF (PowerShell 5.1 / VBScript hosts).
+*.ps1 eol=crlf
+*.psm1 eol=crlf
+*.psd1 eol=crlf
+*.cmd eol=crlf
+*.bat eol=crlf
+*.vbs eol=crlf
+
+# Binary assets: never touch.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
+*.ico binary
+*.exe binary
+*.dll binary
+*.zip binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
