@@ -3,7 +3,10 @@
 param(
   [string]$RepoRoot = (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent),
   [string]$Version = "1.3.0",
-  [switch]$SkipImportThemes
+  [switch]$SkipImportThemes,
+  # Retention: total runtime versions to keep after publish (>=1). Default 2 =
+  # current + one previous (debt#2). Selection logic in lib/version-retention.ps1.
+  [int]$KeepVersions = 2
 )
 
 $ErrorActionPreference = "Stop"
@@ -261,29 +264,34 @@ $currentJson = ($currentObj | ConvertTo-Json -Depth 5) + "`n"
 [System.IO.File]::WriteAllText($currentPath, $currentJson, [System.Text.UTF8Encoding]::new($false))
 Write-Host "current.json -> $runtimeId"
 
-# GC old runtime versions: keep current + previous (and never delete the just-published one).
+# GC old runtime versions: keep current + previous (never delete the just-published one).
+# Selection logic lives in lib/version-retention.ps1 (pure, unit-tested); this block
+# only supplies filesystem inputs (dir list + previous current) and executes removals.
+. (Join-Path $PSScriptRoot 'lib\version-retention.ps1')
 try {
   $versionsDir = Join-Path $programRoot 'versions'
   if (Test-Path -LiteralPath $versionsDir) {
-    $keep = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::OrdinalIgnoreCase)
-    [void]$keep.Add($runtimeId)
-    # Prefer previous current from backup if present
+    # Previous current from newest backup (if present).
+    $previousRuntimeId = $null
     $bakFiles = @(Get-ChildItem $programRoot -Filter 'current.json.bak-*' -File -ErrorAction SilentlyContinue |
       Sort-Object LastWriteTime -Descending | Select-Object -First 1)
     foreach ($bak in $bakFiles) {
       try {
         $prev = Get-Content $bak.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
-        if ($prev.runtimeId) { [void]$keep.Add([string]$prev.runtimeId) }
+        if ($prev.runtimeId) { $previousRuntimeId = [string]$prev.runtimeId }
       } catch {}
     }
-    # Also keep newest non-current as a safety previous if backup missing
     $all = @(Get-ChildItem $versionsDir -Directory | Sort-Object LastWriteTime -Descending)
+    $allIds = @($all | ForEach-Object { $_.Name })
+    $plan = Get-CodexSkinRetentionPlan `
+      -CurrentRuntimeId $runtimeId `
+      -PreviousRuntimeId $previousRuntimeId `
+      -AllRuntimeIdsNewestFirst $allIds `
+      -KeepVersions $KeepVersions
+    $removeSet = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::OrdinalIgnoreCase)
+    foreach ($id in $plan.Remove) { [void]$removeSet.Add($id) }
     foreach ($dir in $all) {
-      if ($keep.Count -ge 2) { break }
-      [void]$keep.Add($dir.Name)
-    }
-    foreach ($dir in $all) {
-      if ($keep.Contains($dir.Name)) { continue }
+      if (-not $removeSet.Contains($dir.Name)) { continue }
       try {
         Remove-Item -LiteralPath $dir.FullName -Recurse -Force -ErrorAction Stop
         Write-Host "GC removed old runtime $($dir.Name)"
@@ -291,6 +299,7 @@ try {
         Write-Warning ("GC skip $($dir.Name): " + $_.Exception.Message)
       }
     }
+    Write-Host ("GC keep=" + ($plan.Keep -join ',') + " (KeepVersions=" + $plan.KeepVersions + ")")
   }
 } catch {
   Write-Warning ("GC versions failed: " + $_.Exception.Message)
