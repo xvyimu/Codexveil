@@ -31,7 +31,7 @@ const root = path.resolve(here, "..");
 // versions/<id>/scripts/injector.mjs.
 // Note: after publish-runtime.ps1 -Version X, the repo source is also stamped
 // (e.g. "1.3.25"); SKIN_VERSION === "dev" only on unpublished working copies.
-const SKIN_VERSION_TOKEN = "1.3.25";
+const SKIN_VERSION_TOKEN = "__SKIN_VERSION__";
 const SKIN_VERSION = SKIN_VERSION_TOKEN === "__" + "SKIN_VERSION__" ? "dev" : SKIN_VERSION_TOKEN;
 const DEFAULT_PAYLOAD_BUDGET_BYTES = 4 * 1024 * 1024;
 // Strong audit less often: catalog stamp checks already cover normal switches.

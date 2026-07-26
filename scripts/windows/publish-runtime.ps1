@@ -207,15 +207,15 @@ Set-Content -Path (Join-Path $dest "VERSION") -Value $Version -Encoding ascii -N
 
 # --- Single version source ---------------------------------------------------
 # The runtime injector + renderer declare `const SKIN_VERSION_TOKEN = "..."`.
-# In the repo it stays "__SKIN_VERSION__" (dev runs evaluate that to "dev").
-# Publish stamps the release version into BOTH the repo source (so git shows the
-# published version) and the just-copied versions/<id> files (so the running
-# skin reports the right version and verify's version===expectedVersion holds).
-# The regex matches whatever literal is currently assigned, so re-publishing
-# over an already-stamped repo copy replaces the old version cleanly.
+# The repo source ALWAYS stays "__SKIN_VERSION__" (git tree = placeholder), so a
+# local `node packages/runtime/scripts/injector.mjs` always resolves to "dev"
+# (ADR 0003 dev-mode contract). Publish stamps the release version ONLY into the
+# just-copied versions/<id> payload (the running skin reports the right version
+# and verify's version===expectedVersion holds). The regex matches whatever
+# literal is currently assigned, so re-publishing over a copy replaces cleanly.
+# NOTE: we intentionally do NOT stamp the RepoRoot source files anymore — doing
+# so used to break dev-mode detection on any already-published checkout.
 $versionTargets = @(
-  (Join-Path $RepoRoot 'packages\runtime\scripts\injector.mjs'),
-  (Join-Path $RepoRoot 'packages\runtime\assets\renderer-inject.js'),
   (Join-Path $dest 'scripts\injector.mjs'),
   (Join-Path $dest 'assets\renderer-inject.js')
 )
@@ -226,7 +226,7 @@ foreach ($target in $versionTargets) {
   $text = [regex]::Replace($text, 'const SKIN_VERSION_TOKEN = "[^"]*";', $versionReplacement)
   [System.IO.File]::WriteAllText($target, $text, [System.Text.UTF8Encoding]::new($false))
 }
-Write-Host "Stamped SKIN_VERSION=$Version into repo + runtime copies"
+Write-Host "Stamped SKIN_VERSION=$Version into versions/$runtimeId payload (repo tree stays placeholder)"
 
 # dream-skin runtime marker
 $runtimeJson = (@{

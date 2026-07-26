@@ -23,10 +23,10 @@ runtime 的版本号曾在 5 处硬编码：`injector.mjs` 的 `SKIN_VERSION` �
   （`"__" + "SKIN_VERSION__"` 拼接防止字符串替换误伤自检式本身）
 - 所有版本使用点改为引用 `SKIN_VERSION`，不再有裸字面量。
 - `publish-runtime.ps1` 用正则把 `const SKIN_VERSION_TOKEN = "..."` 的字面量
-  替换成 `-Version` 值，**同时写入**：
-  1. repo 源文件（`packages/runtime/{scripts/injector.mjs,assets/renderer-inject.js}`）
-  2. 刚拷贝的 `versions/<id>/` 副本
-- 未 publish 直接 `node` 跑 → token 仍是占位符 → `SKIN_VERSION = "dev"`。
+  替换成 `-Version` 值，**只写入刚拷贝的 `versions/<id>/` 副本**（install/payload 面）。
+  **repo 源文件（`packages/runtime/{scripts/injector.mjs,assets/renderer-inject.js}`）
+  始终保持占位符 `__SKIN_VERSION__`，publish 不再回写 git tree。**
+- 直接 `node` 跑 repo 源 → token 仍是占位符 → `SKIN_VERSION = "dev"`（dev-mode 契约恒成立）。
 
 ## 结果
 
@@ -36,10 +36,12 @@ runtime 的版本号曾在 5 处硬编码：`injector.mjs` 的 `SKIN_VERSION` �
 
 ## 权衡 / 已知代价
 
-- 选择"publish 一并写回 repo 源文件"（而非只改 versions/ 拷贝），因此**发版后
-  repo 里不再是纯占位符**，而是上次发布的版本号。代价：从已发布过的
-  checkout 直接 `node` 跑会显示上次版本而非 `"dev"`；只有全新 clone 显示 `"dev"`。
-  这是有意接受的 trade-off（git 可见性 > dev 纯净性）。
+- **修订（2026-07-27 · debt#1）**：早期实现选择"publish 一并写回 repo 源文件"，
+  导致发版后 repo 里被 stamp 成上次版本号（如 `"1.3.25"`），dev-mode 契约在已发布过
+  的 checkout 上失效（本地 `node` 跑假报 published 而非 `"dev"`）。现已回退：
+  **publish 只 stamp `versions/<id>/` 副本，repo 源恒为占位符**。代价是 git 里看不到
+  "当前发布版本号"——但版本可见性由 `versions/<id>/`、`current.json`、`VERSION` 文件、
+  `.dream-skin-runtime.json`、CHANGELOG 提供，无需污染源占位符。dev 纯净性 > git 源可见性。
 - 依赖字面量格式 `const SKIN_VERSION_TOKEN = "..."` 稳定；若重命名该常量需同步改
   publish 的正则。
 
