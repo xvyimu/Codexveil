@@ -57,6 +57,7 @@ Out-of-scope examples:
 | Install vs repo drift | `scripts/windows/verify-install-matches-repo.ps1` |
 | Post-update failure observability | `docs/contracts/post-update-report.md` |
 | Release evidence (DOM) | `docs/evidence/` · `Run-ReleaseProbes.ps1` (real dumps gitignored) |
+| Dev-plane `pnpm audit` | CI `themes-gate` forces `registry.npmjs.org`（mirrors often lack advisories bulk API）； local `npm run audit:deps` · [`ops/cv-audit-registry-evidence-2026-07-28.md`](./ops/cv-audit-registry-evidence-2026-07-28.md) · Dependabot weekly |
 
 ## Third-party material
 

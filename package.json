@@ -34,6 +34,7 @@
     "test:contracts": "pnpm --filter @codex-skin/contracts test",
     "typecheck:contracts": "pnpm --filter @codex-skin/contracts typecheck",
     "build:contracts": "pnpm --filter @codex-skin/contracts build",
+    "audit:deps": "node scripts/audit-local.mjs",
     "test:unit": "npm run test:themes && npm run test:themes-contracts && npm run test:store && npm run test:adapter && npm run test:deps && npm run test:freshness && npm run test:cdp-url && npm run test:cdp-exposure && npm run test:catalog-budget && npm run test:stamp && npm run test:theme-load && npm run test:payload-builder && npm run test:catalog-quality && npm run test:probe-kit && npm run test:version-retention",
     "test": "npm run test:unit && npm run test:contracts",
     "typecheck": "npm run typecheck:contracts"

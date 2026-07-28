@@ -42,7 +42,8 @@
 ## 3b. 运维 / DAY 就绪（ops）
 
 - [cv-oss-gap-2026-07-23](./ops/cv-oss-gap-2026-07-23.md) — OSS L0–L2 矩阵 · arina-only · Startup off  
-- [cv-day-ready-2026-07-24](./ops/cv-day-ready-2026-07-24.md) — 装机就绪 runbook（版本源 · preset · 自启 · 故障树）
+- [cv-day-ready-2026-07-24](./ops/cv-day-ready-2026-07-24.md) — 装机就绪 runbook（版本源 · preset · 自启 · 故障树）  
+- [cv-audit-registry-evidence-2026-07-28](./ops/cv-audit-registry-evidence-2026-07-28.md) — pnpm audit 官方 registry 路径 · 解开 npmmirror DEFER
 
 ## 4. 审计 / 报告（仓内）
 

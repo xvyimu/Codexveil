@@ -31,6 +31,17 @@ jobs:
       - name: Install (dev plane)
         run: pnpm install --frozen-lockfile
 
+      # Dependency audit — official registry only.
+      # npmmirror / many private registries lack /-/npm/v1/security/advisories/bulk
+      # (ERR_PNPM_AUDIT_ENDPOINT_NOT_EXISTS). Forcing registry.npmjs.org keeps the
+      # signal real. Baseline 2026-07-28: 0 known vulns (prod npm deps = 0; ADR 0004).
+      # Policy: hard-fail (no continue-on-error). Flaky advisory DB → maintainer
+      # may temporarily add continue-on-error:true with a dated comment + recheck.
+      # Local/mirror machines: npm run audit:deps (scripts/audit-local.mjs).
+      # Evidence: docs/ops/cv-audit-registry-evidence-2026-07-28.md
+      - name: Dependency audit (official registry)
+        run: pnpm audit --registry=https://registry.npmjs.org --audit-level=high
+
       - name: Typecheck contracts
         run: pnpm run typecheck:contracts
 

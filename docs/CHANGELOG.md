@@ -6,9 +6,15 @@
 
 ---
 
-## Unreleased — maintenance on 1.3.25 product line（2026-07-20 → 07-24）
+## Unreleased — maintenance on 1.3.25 product line（2026-07-20 → 07-28）
 
 > 产品线版本仍为 **1.3.25**；安装态 runtimeId 以 doctor 为准（例 `1.3.25-107b0e` / 本机 `1.3.25-da2adc`）。下列为扫描落地 + 任务卡收口 + DAY 文档，**未**改 SKIN_VERSION 产品线号。
+
+### 安全 / 依赖审计路径（2026-07-28）
+
+- **解开 npmmirror audit DEFER**：CI `themes-gate` 增加 `pnpm audit --registry=https://registry.npmjs.org --audit-level=high`（hard-fail）；本地 `npm run audit:deps` → `scripts/audit-local.mjs`。
+- 证据：[`ops/cv-audit-registry-evidence-2026-07-28.md`](./ops/cv-audit-registry-evidence-2026-07-28.md)（默认镜像无 bulk advisories endpoint；官方 0 vuln）。
+- **无** asar / publish / registry token 入库。
 
 ### 文档 / OSS DAY 就绪（2026-07-24）
 
