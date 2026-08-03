@@ -6,9 +6,17 @@
 
 ---
 
-## Unreleased — maintenance on 1.3.25 product line（2026-07-20 → 07-28）
+## Unreleased — maintenance on 1.3.25 product line（2026-07-20 → 08-03）
 
 > 产品线版本仍为 **1.3.25**；安装态 runtimeId 以 doctor 为准（例 `1.3.25-107b0e` / 本机 `1.3.25-da2adc`）。下列为扫描落地 + 任务卡收口 + DAY 文档，**未**改 SKIN_VERSION 产品线号。
+
+### 测试接线修复 + 防复发门（2026-08-03）
+
+- **根因**：`c22dbc9`（2026-07-21「docs: GitHub identity README」的 rebase 重放）静默回退了 `3f36e56` 80 分钟前加的 `test:state-io` / `test:fs-io` 两条 script 及其在 `test:unit` 中的引用。两个单测文件仍在仓内、单独跑也过，但**数周未进 `npm test` / CI** —— 绿门并不覆盖它们。
+- **修复**：两条 script 重新接线并归位到 `test:unit`（`npm test` 单元门 15 → 18 条）。
+- **防复发**：新增 `scripts/check-test-wiring.mjs` + `npm run test:wiring`（已进 `test:unit`）。发现 (a) 仓内存在 `*.test.mjs` / `*.test.ps1` 但无 script 运行（孤儿测试），或 (b) script 存在但从 `test:unit` 不可达，即失败。`test:control` 为 live-only（需真 CDP，CLAUDE.md 已注明不进 CI），白名单豁免；`packages/contracts` 自带 runner，不在扫描范围。
+- **门有效性已实证**：分别人为制造上述两类违例，门均 exit 1；恢复后 exit 0。
+- 勘误：[`reports/2026-07-21-five-layer-internal-opt-report.md`](./reports/2026-07-21-five-layer-internal-opt-report.md) §5 原称两测「并入 test:unit」，已加勘误说明。
 
 ### 安全 / 依赖审计路径（2026-07-28）
 

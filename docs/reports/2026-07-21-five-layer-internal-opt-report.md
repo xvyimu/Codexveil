@@ -98,7 +98,7 @@ L4 执行   runtime injector · core/cdp · discover
 
 | 项 | 内容 |
 |----|------|
-| 测试 | `test:state-io` · `test:fs-io` 并入 `test:unit` |
+| 测试 | `test:state-io` · `test:fs-io` 并入 `test:unit`（**勘误 2026-08-03**：本条当时成立于 `3f36e56`，但 80 分钟后 `c22dbc9`（"docs: GitHub identity README" 的 rebase 重放）把两条 script 连同 `test:unit` 里的引用一并回退，导致两个单测数周未进 `npm test` / CI。已于 2026-08-03 重新接线，并加 `test:wiring` 门防复发） |
 | 注释 | core `index.mjs` 标明 state-io 包内 |
 | 报告 | 本文 |
 

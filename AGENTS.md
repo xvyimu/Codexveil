@@ -34,6 +34,7 @@ npm run test:themes-contracts   # themes normalizeColors ⊂ contracts palette
 npm run test:store
 npm run test:adapter
 npm run test:deps
+npm run test:wiring             # 每个 *.test.* 都有 script 且可从 test:unit 达到
 npm run test:freshness
 npm run test:cdp-url
 npm run test:catalog-budget
